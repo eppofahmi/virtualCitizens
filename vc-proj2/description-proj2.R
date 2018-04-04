@@ -1,4 +1,4 @@
-# gojek
+# Gojek
 # 1. Twitter data mentioning @gojekindonesia
 # 2. topics 
 # 3. network analysis
