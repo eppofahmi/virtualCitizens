@@ -1,2 +1,6 @@
-# here we are going to map from our 2nd object 
-# the main quiestion is how citizens?
+# gojek
+# 1. Twitter data mentioning @gojekindonesia
+# 2. topics 
+# 3. network analysis
+# 4. taking more data based on influencer timeline
+# 6. taking more data based on pupular hashtag/topics
