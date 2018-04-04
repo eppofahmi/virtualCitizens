@@ -1,4 +1,7 @@
-# here we are going to map from our 2nd object 
-# here we will use two data source
-# 1. twitter
-# 2. petition 
+# gojek
+# 1. Twitter data mentioning @gojekindonesia
+# 2. topics 
+# 3. network analysis
+# 4. taking more data based on influencer timeline
+# 5. taking more data based on pupular hashtag/topics
+# 6. goals1: discourse construction pattern
