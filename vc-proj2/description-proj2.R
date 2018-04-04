@@ -3,4 +3,5 @@
 # 2. topics 
 # 3. network analysis
 # 4. taking more data based on influencer timeline
-# 6. taking more data based on pupular hashtag/topics
+# 5. taking more data based on pupular hashtag/topics
+# 6. goals1: discourse construction pattern 
