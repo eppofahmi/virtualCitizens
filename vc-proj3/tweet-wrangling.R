@@ -1,9 +1,3 @@
-# Data Wrangling
-# script ini digunakan untuk membuat data frame dari data mentah dengan menambahkan:
-# 1. menambah kolom berisi username
-# 2. menambah kolom berisi jumlah username per row
-
-# library
 library(dplyr)
 library(tidyr)
 library(stringr)
@@ -11,37 +5,42 @@ library(data.table)
 library(tidyverse)
 library(ggplot2)
 
-# data
-data_mentah1 <- read.csv("hasil-new1.csv", stringsAsFactors = FALSE, header = FALSE, sep = ",", 
-                         encoding = "UTF-8")
+#----------------------------------------data--------------------------------------------------
+rawTweet_change <- read.csv("change_012014-012018.csv", stringsAsFactors = FALSE, 
+                            header = TRUE, sep = ";", encoding = "UTF-8")
+names(rawTweet_change)
 
-# add @ to column V3
-user <- data_mentah1[,c("V3", "V4")]
-user$V3 <- paste("@", user$V3, sep="")
+colnames(rawTweet_change) <- c("date", "time", "user", "tweets", "replying", "rep_count", 
+                            "ret_count", "link")
 
-# merge the V3 and V4 column
-user$username <- paste(user$V3, user$V4, sep=" ")
-user$username_com <- str_extract_all(user$username, "@\\w+", simplify = FALSE)
+#------------------------------------take and count username-----------------------------------
+# Q: are they (twitter users) consisten in participating in the discussion?
+#----------------------------------------------------------------------------------------------
 
-# calculate username per row
-user$username_count <- sapply(user$username_com, 
-                              function(x) length(unlist(strsplit(as.character(x), "\\^@+"))))
+# extract all string start with @ and put in a new column named username_com
+rawTweet_change$user_all <- sapply(str_extract_all(rawTweet_change$tweets, "@\\S+", 
+                                                   simplify = FALSE), paste, collapse=", ")
+# add @ if nedeed
+#user_change$User <- paste("@", user_change$User, sep="")
 
-data <- bind_cols(data_mentah1, user)
+# merge column user and user_all
+rawTweet_change$user_all <- paste(rawTweet_change$user, rawTweet_change$user_all, sep=" ")
+str(rawTweet_change)
 
-data <- data[,c("V1", "V2","V3", "V4", "V5", "V6", "V7", "V8", 
-                            "username_com", "username_count")]
+rawTweet_change$user_count <- sapply(rawTweet_change$user_all, 
+                              function(x) length(unlist(strsplit(as.character(x), "@\\S+"))))
 
-colnames(data) <- c("date", "time", "username", "tweets", "replying", "rep_coun", 
-                    "ret_count", "fav_count", "user_all", "user_count")
+# at this point we allready have a new data (tweet_change) with 11 variables
 
-# deleting empty row no 13493
-data <- data[-13493, ] 
+#------------------------------------ extracting hashtag -------------------------------------
+# Q: is hashtag is also develove through years
+#---------------------------------------------------------------------------------------------
 
-data$user_all <- as.character(data$user_all)
-data$user_all = gsub("^c\\(|\\)$", "", data$user_all) # remove c()
-data$user_all = gsub("[^[:alnum:]@_]", " ", data$user_all) # remove ""
-data$user_all = gsub("\\s+", " ", str_trim(data$user_all)) # remove space
+rawTweet_change$hashtag <- sapply(str_extract_all(rawTweet_change$tweets, "#\\S+", 
+                                                   simplify = FALSE), paste, collapse=", ")
 
-# Saving the result for next 
+rawTweet_change$tag_count <- sapply(rawTweet_change$hashtag, 
+                                     function(x) length(unlist(strsplit(as.character(x), "#\\S+"))))
+
+#---------------------------------Saving the result for next----------------------------------
 # write_tsv(data, "wr_jod.tsv")
