@@ -37,6 +37,7 @@ library(dplyr)
 library(tm)
 library(stringr)
 library(tidytext)
+library(ggplot2)
 ```
 
 # Mengambil data dari twitter dengan kata kunci teluk benoa dengan API
@@ -97,11 +98,30 @@ tag_detect <- function(input_col) {
 tb_api_tagar <- tag_detect(tb_api)
 ```
 
+```{r}
+tb_api_tagar %>%
+  arrange(desc(Freq)) %>%
+  slice(1:15) %>%
+  ungroup() %>%
+  mutate(word = factor(hashtag, unique(hashtag))) %>%
+  ungroup() %>%
+  ggplot(aes(x = reorder(hashtag, Freq), y = Freq)) + 
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  labs(x = NULL, 
+       y = "15 Tagar paling sering digunakan dalam twit dengan kata kunci 'reklamasi'")
+```
+
 Dari data twit sebanyak 5687, terdapat 96 tagar. Tagar sepsifik yang "mungkin" berkaitan dengan bali adalah tagar **#balitolakreklamasi**. Namun twit dengan tagar ini tidak mungkin untuk diambil dengan api, karena di sini hanya digunakan sekali. Artinya, tidak banyak digunakan oleh warga net dalam twit dalam 7 hari terakhir. 
 
 ## Keputusan dan tindak lanjut
 Kata kunci reklamasi tidak memberikan data. Jadi, data ini selanjutnya tidak akan digunakan lagi dalam analisis tentang publicness diseputar kasus **Teluk Benoa**. Dari sini, ada satu tagar yang perlu di jajaki yaitu **#balitolakreklamasi**. Namun karena hanya sedikit, maka pengumpulan data akan dilakukan dengan metode scrapping dengan parameter utama tagar **#balitolakreklamasi**. 
 
-# hasil scrapping tagar #balitolakreklamasi
+# Hasil scrapping tagar #balitolakreklamasi
+
+**Catatan: scrapping dilkukan menggunakan python**
+
+Now i have to stop here, and scrap some tweets using python........
+
 
 
