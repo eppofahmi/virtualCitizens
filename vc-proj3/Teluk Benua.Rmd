@@ -1,0 +1,107 @@
+---
+title: "Teluk Benua"
+author: "Ujang Fahmi"
+date: "4/9/2018"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+```
+
+# Deskripsi
+Menjajaki dan mencoba menemukan diskursus yang ada dibalik perbincangan di Twitter yang meyangkut kasus reklamasi Teluk Benua di Bali. Hal ini digunakan sebagai salah satu cara untuk memetakan publicness di seputar keberadaan change.org yang dapat digunakan oleh masyarakat untuk melakukan petisi. 
+
+Kenapa mengambil kasus tentang teluk benua? Karena berdasarkan hasil pemetaan awal terhadap data Twitter yang memention akun @ChangeOrg_ID, salah satu kasus yang muncul adalah tentang Teluk Benoa, seperti dapat dilihat pada gambar di bawah ini. 
+![jjj](/Volumes/mydata/RStudio/virtualCitizens/vc-proj3/hasil-tm to change.png)
+
+Beberapa yang langkah ditempuh untuk dapat melakukan pemetaan nilai publicness di sekitar Teluk Benoa:
+
+1. Mengambil data dari twitter dengan kata kunci teluk benoa (eksplorasi tagar, username)
+2. Mengambil data tambahan tentang teluk benoa dengan tagar yang spesifik
+3. Menggabungkan data hasil pencarian 
+4. Membuat kolom keterangan duplicate atau tidak berdasarkan konten twit
+5. Ambil twit yang tidak duplicate
+6. Topic modelling
+7. Network Analysis
+8. Mensubset data berdasarkan parameter pengirim twit yang menjadi 10 username dengan betweeness tertinggi dalam network
+9. Mengekspor data hasil subset per username untuk dibaca manual. 
+
+
+# Library
+```{r liball, message=FALSE, warning=FALSE,echo=TRUE}
+library(twitteR)
+library(dplyr)
+library(tm)
+library(stringr)
+library(tidytext)
+```
+
+# Mengambil data dari twitter dengan kata kunci teluk benoa dengan API
+Langkah1 - mengambil dan mencoba memetakan data dengan menggunakan API dengan tujuan:
+
+1. Mengetahui keragaman tagar yang digunakan
+2. Mengetehui username yang terlibat
+
+**setting api**
+```{r api}
+options(httr_oauth_cache=T)
+
+api_key <- "pAFA3zX08uixfVtP4PMpcHas0"
+api_secret <- "FZfuzn055vuJgRFraq8KNAAWipsa0ugUEpIjWxuhOFH9Kd5HAm"
+token <- "73705532-JApWQavtY5kkKbpRUGpDByEhHdLxb2HcKzAgtDZ7T"
+token_secret <- "2p2xuhlsMHVlbqDx8Swb7IkCAstwmCEMoINYreNmWxoCN"
+
+setup_twitter_oauth(api_key, api_secret, token, token_secret)
+```
+
+Proses pengambilan data dengan API - kata kunci yang digunakan adalah **reklamasi**. Harapannya, kata kunci tersebut dapat menangkap kasus tentang reklamasi, salah satunya yang terjadi di Bali. 
+
+**Mengambil twit**
+```{r}
+tb_api <- searchTwitter("reklamasi", n=30000, lang="id")
+```
+
+Dengan kata kunci **reklamasi** api dapat memeberikan twit sebanyak 5687
+
+**Membuat data frame dan menyimpan data**
+```{r}
+tb_api <- twListToDF(tb_api)
+```
+
+## tagar dari tb_api
+
+**fungsi pengambilan tagar**
+```{r}
+# function detecting hashtag
+tag_detect <- function(input_col) {
+  hashtag <- str_extract_all(input_col, "#\\w+")
+  # put tags in vector
+  hashtag <- unlist(hashtag)
+  # removing pic etc chr in the vector
+  hashtag <- gsub("pic$", "", hashtag)
+  hashtag <- gsub("http$", "", hashtag)
+  hashtag <- gsub("https$", "", hashtag)
+  hashtag <- gsub("XAmarthaXCoworkinc$", "", hashtag)
+  hashtag <- tolower(hashtag)
+  # calculate hashtag frequencies
+  hashtag = table(hashtag)
+  hashtag = as.data.frame(hashtag)
+}
+```
+
+**pengambilan tagar**
+```{r}
+tb_api_tagar <- tag_detect(tb_api)
+```
+
+Dari data twit sebanyak 5687, terdapat 96 tagar. Tagar sepsifik yang "mungkin" berkaitan dengan bali adalah tagar **#balitolakreklamasi**. Namun twit dengan tagar ini tidak mungkin untuk diambil dengan api, karena di sini hanya digunakan sekali. Artinya, tidak banyak digunakan oleh warga net dalam twit dalam 7 hari terakhir. 
+
+## Keputusan dan tindak lanjut
+Kata kunci reklamasi tidak memberikan data. Jadi, data ini selanjutnya tidak akan digunakan lagi dalam analisis tentang publicness diseputar kasus **Teluk Benoa**. Dari sini, ada satu tagar yang perlu di jajaki yaitu **#balitolakreklamasi**. Namun karena hanya sedikit, maka pengumpulan data akan dilakukan dengan metode scrapping dengan parameter utama tagar **#balitolakreklamasi**. 
+
+# hasil scrapping tagar #balitolakreklamasi
+
+
