@@ -82,6 +82,27 @@ rawTweet_change$tag_count <- sapply(rawTweet_change$hashtag,
 # PQ: ....?
 rawTweet_change$date <- paste(rawTweet_change$date, rawTweet_change$time, sep=" ")
 rawTweet_change = subset(rawTweet_change, select = -c(time))
-rawTweet_change = subset(rawTweet_change, select = -c(tweets))
+
+# how many tweets that are retweet?
+
+#-------------------------------------- duplicate content ------------------------------------
+# how many tweets that are duplicate? 
+# basicly, i want indetfying which tweets is duplicate using `duplicated` function
+
+# make a new logical column based on tweets column 
+rawTweet_change <- rawTweet_change %>%
+  dplyr::mutate(is_duplicate = duplicated(tweets))
+
+names(rawTweet_change)
+
+# i need to restructuring the data
+rawTweet_change <- rawTweet_change[ , c("date", "user", "tweets","is_duplicate", "text", 
+                                        "replying", "rep_count", "ret_count", "fav_count", 
+                                        "user_all", "user_count", "hashtag", "tag_count", 
+                                        "link")]
+
+# Remove duplicated rows based on tweets column
+no_dup <- distinct(rawTweet_change, tweets)
+
 #---------------------------------Saving the result for next----------------------------------
 write_tsv(rawTweet_change, "tweets_change.tsv")
