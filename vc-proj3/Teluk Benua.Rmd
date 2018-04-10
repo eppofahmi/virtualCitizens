@@ -2,7 +2,12 @@
 title: "Teluk Benua"
 author: "Ujang Fahmi"
 date: "4/9/2018"
-output: html_notebook
+output: 
+  html_notebook:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    number_sections: true
 ---
 
 ```{r setup, include=FALSE}
@@ -40,36 +45,34 @@ library(tidytext)
 library(ggplot2)
 ```
 
-# Mengambil data dari twitter dengan kata kunci teluk benoa dengan API
+# Kata kunci Reklamasi
 Langkah1 - mengambil dan mencoba memetakan data dengan menggunakan API dengan tujuan:
 
 1. Mengetahui keragaman tagar yang digunakan
 2. Mengetehui username yang terlibat
 
 **setting api**
-```{r api}
-options(httr_oauth_cache=T)
-
-api_key <- "pAFA3zX08uixfVtP4PMpcHas0"
-api_secret <- "FZfuzn055vuJgRFraq8KNAAWipsa0ugUEpIjWxuhOFH9Kd5HAm"
-token <- "73705532-JApWQavtY5kkKbpRUGpDByEhHdLxb2HcKzAgtDZ7T"
-token_secret <- "2p2xuhlsMHVlbqDx8Swb7IkCAstwmCEMoINYreNmWxoCN"
-
-setup_twitter_oauth(api_key, api_secret, token, token_secret)
+```{r api, include=FALSE}
+#options(httr_oauth_cache=T)
+#api_key <- "pAFA3zX08uixfVtP4PMpcHas0"
+#api_secret <- "FZfuzn055vuJgRFraq8KNAAWipsa0ugUEpIjWxuhOFH9Kd5HAm"
+#token <- "73705532-JApWQavtY5kkKbpRUGpDByEhHdLxb2HcKzAgtDZ7T"
+#token_secret <- "2p2xuhlsMHVlbqDx8Swb7IkCAstwmCEMoINYreNmWxoCN"
+#setup_twitter_oauth(api_key, api_secret, token, token_secret)
 ```
 
 Proses pengambilan data dengan API - kata kunci yang digunakan adalah **reklamasi**. Harapannya, kata kunci tersebut dapat menangkap kasus tentang reklamasi, salah satunya yang terjadi di Bali. 
 
 **Mengambil twit**
 ```{r}
-tb_api <- searchTwitter("reklamasi", n=30000, lang="id")
+#tb_api <- searchTwitter("reklamasi", n=30000, lang="id")
 ```
 
 Dengan kata kunci **reklamasi** api dapat memeberikan twit sebanyak 5687
 
 **Membuat data frame dan menyimpan data**
 ```{r}
-tb_api <- twListToDF(tb_api)
+#tb_api <- twListToDF(tb_api)
 ```
 
 ## tagar dari tb_api
@@ -95,7 +98,7 @@ tag_detect <- function(input_col) {
 
 **pengambilan tagar**
 ```{r}
-tb_api_tagar <- tag_detect(tb_api)
+#tb_api_tagar <- tag_detect(tb_api)
 ```
 
 ```{r}
@@ -115,13 +118,305 @@ tb_api_tagar %>%
 Dari data twit sebanyak 5687, terdapat 96 tagar. Tagar sepsifik yang "mungkin" berkaitan dengan bali adalah tagar **#balitolakreklamasi**. Namun twit dengan tagar ini tidak mungkin untuk diambil dengan api, karena di sini hanya digunakan sekali. Artinya, tidak banyak digunakan oleh warga net dalam twit dalam 7 hari terakhir. 
 
 ## Keputusan dan tindak lanjut
-Kata kunci reklamasi tidak memberikan data. Jadi, data ini selanjutnya tidak akan digunakan lagi dalam analisis tentang publicness diseputar kasus **Teluk Benoa**. Dari sini, ada satu tagar yang perlu di jajaki yaitu **#balitolakreklamasi**. Namun karena hanya sedikit, maka pengumpulan data akan dilakukan dengan metode scrapping dengan parameter utama tagar **#balitolakreklamasi**. 
+Kata kunci reklamasi tidak memberikan data. Jadi, data ini selanjutnya tidak akan digunakan lagi dalam analisis tentang publicness diseputar kasus **Teluk Benoa**. Dari sini, ada satu tagar yang perlu di jajaki yaitu **#balitolakreklamasi**. Namun dalam data ini tagar tersebut hanya digunakan satu kali. Oleh karena itu pencariaran twit akan dilakukan dengan metor **semi automatic scrapping**.  
 
-# Hasil scrapping tagar #balitolakreklamasi
+# Tagar #balitolakreklamasi
 
 **Catatan: scrapping dilkukan menggunakan python**
+Now i have to stop here, and scrap some tweets using python........ 
+Finally after few hours, I think we have the data now!!! Here is the plan to handle the data:
 
-Now i have to stop here, and scrap some tweets using python........
+1. Impor data
+2. Mendeteksi twit duplicate dengan menambah kolom logical 
+3. Mendokumentasikan twit duplicate dalam data baru
+4. Menghapus twit duplicate (rows)
+5. Data wrangling (text cleaning, hastag extraction, term_count/row)
+6. Ploting distribusi twit - group_by `date`
+7. Next steps...
+
+**raw_btr = data hasil scrapping dengan kata kunci tagar #balitolakreklamsi mentah**
+```{r}
+# memasukkan data hasil scrapping #balitolakreklamasi
+raw_btr <- read.csv("btr2014-2018.csv", header = FALSE, stringsAsFactors = FALSE, sep = ";") 
+colnames(raw_btr) <- c("date", "time", "user", "tweets", "replying", "rep_count", "ret_count", "fav_count","link")
+```
+
+Twit hasil scrapping dari tahun 2013 - 2018 sebanyak 72641
+
+## Mendeteksi twit duplicate
+
+Kode di bawah ini digunakan untuk membuat sebuah kolom baru yang bernama `is_duplicate` yang berisi informasi logical yang menerangkan apakah sebuah twit memiliki duplicate atau tidak berdasarkan kesamaan konten yang ada dalam kolom `tweets`. 
+
+```{r}
+# make a new logical column based on tweets column 
+raw_btr <- raw_btr %>%
+  dplyr::mutate(is_duplicate = duplicated(tweets))
+```
+
+Selanjutnya, saya ingin membuat sebuah data baru yang hanya berisi twit duplicate. 
+```{r}
+btr_dup <- raw_btr %>%
+  filter(is_duplicate == TRUE)
+```
+
+Berikut adalah contoh isi twit duplicate.
+
+```{r}
+head(btr_dup$tweets)
+```
+
+**Catatan: isi twit no 1 bukan duplicate no 2 dan sebaliknya, tapi isi twit tersebut menduplicate isi twit lain yang sudah ada lebih dulu berdasarkan waktu posting**.
+
+Twit duplicate ada 12922 twit. Berikutnya, saya membuat data baru, dengan subset data yang `is_duplicate` nya == FALSE
+
+```{r}
+btr_no_dup <- raw_btr %>%
+  filter(is_duplicate == FALSE)
+```
+
+59719 twit akan diproses pada tahapan selanjutnya. 
+
+## Data wrangling 
+
+(text cleaning, hastag extraction, term_count/row)
+
+### Cleaning tweets 1
+```{r}
+# fungsi untuk cleaning 
+tweet_cleaner1 <- function(input_text) # nama kolom yang akan dibersihkan
+{    
+  # create a corpus (type of object expected by tm) and document term matrix
+  corpusku <- Corpus(VectorSource(input_text)) # make a corpus object
+  # remove urls1
+  removeURL1 <- function(x) gsub("http[^[:space:]]*", "", x) 
+  corpusku <- tm_map(corpusku, content_transformer(removeURL1))
+  #remove urls3
+  removeURL2 <- function(x) gsub("pic[^[:space:]]*", "", x) 
+  corpusku <- tm_map(corpusku, content_transformer(removeURL2))
+  #remove puntuation
+  removeNumPunct <- function(x) gsub("[^[:alpha:][:space:]@#]*", "", x) # kecuali @ dan #
+  corpusku <- tm_map(corpusku, content_transformer(removeNumPunct))
+  
+  corpusku <- tm_map(corpusku, stripWhitespace)
+  #kata khusus yang dihapus
+  corpusku <- tm_map(corpusku, removeWords, c("iki"))
+  corpusku <- tm_map(corpusku, stripWhitespace)
+  #removing white space in the begining
+  rem_spc_front <- function(x) gsub("^[[:space:]]+", "", x)
+  corpusku <- tm_map(corpusku, content_transformer(rem_spc_front))
+  
+  #removing white space at the end
+  rem_spc_back <- function(x) gsub("[[:space:]]+$", "", x)
+  corpusku <- tm_map(corpusku, content_transformer(rem_spc_back))
+  
+  data <- data.frame(text=sapply(corpusku, identity),stringsAsFactors=F)
+  
+  a <- bind_cols(btr_no_dup, data)
+}
+```
+
+**clean text**
+```{r}
+btr_no_dup <- tweet_cleaner1(btr_no_dup$tweets)
+```
+
+### Menampbahkan daftar username dan menghitung jumlah per row
+```{r}
+btr_no_dup$user_all <- sapply(str_extract_all(btr_no_dup$text, "@\\S+", simplify = FALSE), paste, collapse=", ")
+
+# add @ if nedeed
+#user_change$User <- paste("@", user_change$User, sep="")
+
+# merge column user and user_all
+btr_no_dup$user_all <- paste(btr_no_dup$user, btr_no_dup$user_all, sep=" ")
+#str(rawTweet_change)
+
+btr_no_dup$user_count <- sapply(btr_no_dup$user_all, 
+                              function(x) length(unlist(strsplit(as.character(x), "@\\S+"))))
+```
+
+Catatan: Hasilnya masih belum bersih
+
+### Extract hashtag
+```{r}
+btr_no_dup$hashtag <- sapply(str_extract_all(btr_no_dup$text, "#\\S+", simplify = FALSE), paste, collapse=", ")
+
+btr_no_dup$tag_count <- sapply(btr_no_dup$hashtag, 
+                                     function(x) length(unlist(strsplit(as.character(x), "#\\S+"))))
+```
+
+**menyusun ulang data**
+```{r}
+names(btr_no_dup)
+
+# i need to restructuring the data
+btr_no_dup <- btr_no_dup[ , c("date", "user", "tweets","is_duplicate", "replying", "rep_count", "ret_count", "fav_count", "user_all", "user_count", "hashtag", "tag_count", "link")]
+
+```
+
+### Cleaning tweets 2
+
+```{r}
+# fungsi untuk cleaning 
+tweet_cleaner2 <- function(input_text) # nama kolom yang akan dibersihkan
+{    
+  # create a corpus (type of object expected by tm) and document term matrix
+  corpusku <- Corpus(VectorSource(input_text)) # make a corpus object
+  # remove urls1
+  removeURL1 <- function(x) gsub("http[^[:space:]]*", "", x) 
+  corpusku <- tm_map(corpusku, content_transformer(removeURL1))
+  #remove urls3
+  removeURL2 <- function(x) gsub("pic[^[:space:]]*", "", x) 
+  corpusku <- tm_map(corpusku, content_transformer(removeURL2))
+  #remove username 
+  TrimUsers <- function(x) {
+    str_replace_all(x, '(@[[:alnum:]_]*)', '')
+  }
+  corpusku <- tm_map(corpusku, TrimUsers)
+  #remove all "#Hashtag1"
+  removehashtag <- function(x) gsub("#\\w+", "", x)
+  corpusku <- tm_map(corpusku, content_transformer(removehashtag))
+  #merenggangkan tanda baca
+  tandabaca1 <- function(x) gsub("((?:\b| )?([.,:;!?()]+)(?: |\b)?)", " \\1 ", x, perl=T)
+  corpusku <- tm_map(corpusku, content_transformer(tandabaca1))
+  #remove puntuation
+  removeNumPunct <- function(x) gsub("[^[:alpha:][:space:]]*", "", x) # kecuali - dan '
+  corpusku <- tm_map(corpusku, content_transformer(removeNumPunct))
+  corpusku <- tm_map(corpusku, stripWhitespace)
+  corpusku <- tm_map(corpusku, content_transformer(tolower)) 
+  #stopwords bahasa indonesia
+  stopwords <- read.csv("stopwords_indo.csv", header = FALSE)
+  stopwords <- as.character(stopwords$V1)
+  stopwords <- c(stopwords, stopwords())
+  corpusku <- tm_map(corpusku, removeWords, stopwords)
+  #kata khusus yang dihapus
+  corpusku <- tm_map(corpusku, removeWords, c("rt", "cc", "via", "jrx", "balitolakreklamasi", "acehjakartajambisurabayabalintbpaluambon"))
+  corpusku <- tm_map(corpusku, stripWhitespace)
+  #removing white space in the begining
+  rem_spc_front <- function(x) gsub("^[[:space:]]+", "", x)
+  corpusku <- tm_map(corpusku, content_transformer(rem_spc_front))
+
+  #removing white space at the end
+  rem_spc_back <- function(x) gsub("[[:space:]]+$", "", x)
+  corpusku <- tm_map(corpusku, content_transformer(rem_spc_back))
+  data <- data.frame(clean_text=sapply(corpusku, identity),stringsAsFactors=F)
+}
+```
+
+Fungsi di atas, akan diulang-ulang sampai text dirasa sudah bersih.
+
+Menambahkan dua kolom, `clean_text` dan `word_count` yang akan digunakan untuk eksplrasi lebih jauh dalam text mining. 
+
+```{r}
+# eksekusi fungsi di atas
+btr_no_dup_clean <- tweet_cleaner2(btr_no_dup$tweets)
+btr_no_dup_clean$word_count <- sapply(btr_no_dup_clean$clean_text, function(x) length(unlist(strsplit(as.character(x), "\\W+"))))
+```
+
+Selanjutnya, saya akan membuat daftar kata yang ada dalam text, untuk dijadikan pedoman dalam cleaning text selanjutnya. 
+
+**tdm creator**
+```{r}
+tdm_creator <- function(input_text)
+{    
+  Corpus <- VCorpus(VectorSource(input_text))
+  tdm <- TermDocumentMatrix(Corpus, control=list(wordLengths = c(1, Inf)))
+  unique_indexes <- unique(tdm$i)
+  tdm <- tdm[unique_indexes,]
+}
+
+# test 
+tdm <- tdm_creator(btr_no_dup_clean$clean_text)
+```
+
+**count term**
+```{r}
+# fungsi untuk menghitung frequensi kata
+count_term <- function(tdm_input)
+{    
+  #(freq.terms <- findFreqTerms(dtm_input, lowfreq = 100))
+  term.freq <- rowSums(as.matrix(tdm_input))
+  term.freq <- subset(term.freq, term.freq >= 1) # frekuensi minimal kata
+  df <- data.frame(term = names(term.freq), freq = term.freq)
+}
+
+frekuensi_kata <- count_term(tdm)
+```
+
+**top freq words**
+```{r}
+frekuensi_kata <- frekuensi_kata %>%
+  arrange(desc(freq))
+
+write_csv(frekuensi_kata, path = "teluk benoa output/term freq-teluk benoa.csv")
+```
+
+**20 kata paling sering digunakan**
+```{r}
+frekuensi_kata %>%
+  top_n(30) %>%
+  ungroup() %>%
+  mutate(word = factor(term, unique(term))) %>%
+  ungroup() %>%
+  ggplot(aes(x = reorder(term, freq), y = freq)) + 
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  labs(x = NULL, 
+       y = "Top 30 term in the tweets")
+```
+
+**tf-idf**
+```{r}
+# fungsi untuk menghitungan tf-idf
+tfidf_count <- function(tdm_input)
+{
+  tidy_all <- tidy(tdm_input)
+  tf_idf_all <- tidy_all %>%
+    bind_tf_idf(term, document, count)
+}
+
+#menggunakan fungsi
+tweets_tf_idf <- tfidf_count(tdm)
+write_csv(tweets_tf_idf, path = "teluk benoa output/tfidf-teluk benoa.csv")
+```
+
+**top tifidf**
+```{r}
+tweets_tf_idf <- tweets_tf_idf %>%
+  arrange(desc(tf_idf))
+```
+
+**Catatan:** sebaiknya sebelum melakukan penilaian tf-idf dokumen dibagi terlebih dahulu kedalam beberapa kluster, misalnya berdasarkan tahun, atau rentang bulan (e.g: per 6 bulan). Sehingga urgensi kata bisa di nilai pada tiap kluster, tidak seperti di atas, per dokumen/row. 
+
+Dengan dua data yang baru saja dibuat, selanjutnya perlu diputuskan term mana saja yang akan dihapus. Jika sudah, maka kembali lagi ke cleaning 2. 
+
+### Menggabungkan hasil cleaning 2
+
+Di sini kita akan menggbaungkan hasil cleaning 2, dengan data lama, dengan fungsi `bind_cols`, untuk menggabungkan kolom. 
+
+```{r}
+tweets_btr <- bind_cols(btr_no_dup, btr_no_dup_clean)
+```
+
+## Ploting distribusi twit - group_by `date`
+
+```{r}
+btr_dist <- tweets_btr[, c("date", "fav_count", "rep_count", "ret_count", "user_count")]
+```
 
 
+```{r}
+btr_dist %>%
+  group_by(date) %>%
+  tally()
 
+```
+
+
+## Next steps...
+
+
+# removing data 
+```{r}
+rm(btr_no_dup_a)
+```
