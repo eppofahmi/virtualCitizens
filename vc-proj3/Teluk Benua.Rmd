@@ -20,7 +20,8 @@ knitr::opts_chunk$set(warning = FALSE)
 Menjajaki dan mencoba menemukan diskursus yang ada dibalik perbincangan di Twitter yang meyangkut kasus reklamasi Teluk Benua di Bali. Hal ini digunakan sebagai salah satu cara untuk memetakan publicness di seputar keberadaan change.org yang dapat digunakan oleh masyarakat untuk melakukan petisi. 
 
 Kenapa mengambil kasus tentang teluk benua? Karena berdasarkan hasil pemetaan awal terhadap data Twitter yang memention akun @ChangeOrg_ID, salah satu kasus yang muncul adalah tentang Teluk Benoa, seperti dapat dilihat pada gambar di bawah ini. 
-![jjj](/Volumes/mydata/RStudio/virtualCitizens/vc-proj3/hasil-tm to change.png)
+
+![hasil topic modelling twit mention to @changeOrg_ID](/Volumes/mydata/RStudio/virtualCitizens/vc-proj3/hasil-tm to change.png){width=70%}
 
 Beberapa yang langkah ditempuh untuk dapat melakukan pemetaan nilai publicness di sekitar Teluk Benoa:
 
@@ -43,6 +44,9 @@ library(tm)
 library(stringr)
 library(tidytext)
 library(ggplot2)
+library(lubridate)
+library(tidyr)
+library(tidyverse)
 ```
 
 # Kata kunci Reklamasi
@@ -139,6 +143,8 @@ Finally after few hours, I think we have the data now!!! Here is the plan to han
 # memasukkan data hasil scrapping #balitolakreklamasi
 raw_btr <- read.csv("btr2014-2018.csv", header = FALSE, stringsAsFactors = FALSE, sep = ";") 
 colnames(raw_btr) <- c("date", "time", "user", "tweets", "replying", "rep_count", "ret_count", "fav_count","link")
+# converting date format
+raw_btr$date <- as.Date(raw_btr$date,format='%d %b %Y')
 ```
 
 Twit hasil scrapping dari tahun 2013 - 2018 sebanyak 72641
@@ -251,7 +257,6 @@ names(btr_no_dup)
 
 # i need to restructuring the data
 btr_no_dup <- btr_no_dup[ , c("date", "user", "tweets","is_duplicate", "replying", "rep_count", "ret_count", "fav_count", "user_all", "user_count", "hashtag", "tag_count", "link")]
-
 ```
 
 ### Cleaning tweets 2
@@ -345,6 +350,7 @@ frekuensi_kata <- count_term(tdm)
 
 **top freq words**
 ```{r}
+library(tidyverse)
 frekuensi_kata <- frekuensi_kata %>%
   arrange(desc(freq))
 
@@ -384,6 +390,7 @@ write_csv(tweets_tf_idf, path = "teluk benoa output/tfidf-teluk benoa.csv")
 ```{r}
 tweets_tf_idf <- tweets_tf_idf %>%
   arrange(desc(tf_idf))
+tweets_tf_idf
 ```
 
 **Catatan:** sebaiknya sebelum melakukan penilaian tf-idf dokumen dibagi terlebih dahulu kedalam beberapa kluster, misalnya berdasarkan tahun, atau rentang bulan (e.g: per 6 bulan). Sehingga urgensi kata bisa di nilai pada tiap kluster, tidak seperti di atas, per dokumen/row. 
@@ -396,27 +403,161 @@ Di sini kita akan menggbaungkan hasil cleaning 2, dengan data lama, dengan fungs
 
 ```{r}
 tweets_btr <- bind_cols(btr_no_dup, btr_no_dup_clean)
+write_csv(tweets_btr, path = "teluk benoa output/btr_tweets_ready.csv")
 ```
 
-## Ploting distribusi twit - group_by `date`
+File di atas, selanjutnya bisa dijadikan sebagai input untuk topic modelling karena twitnya sudah dibersihkan. 
+
+
+# Eksplorasi 1 - Distribution 
 
 ```{r}
 btr_dist <- tweets_btr[, c("date", "fav_count", "rep_count", "ret_count", "user_count")]
+btr_dist$ret_count <- as.integer(btr_dist$ret_count)
 ```
 
 
 ```{r}
-btr_dist %>%
-  group_by(date) %>%
-  tally()
+btr_dist <- tidyr::replace_na(btr_dist, list(fav_count=0, rep_count=0, ret_count=0))
 
+# counting tweets distribution
+df1 <- btr_dist %>%
+  group_by(date) %>%
+  count(date)
+
+# counting users and activities distribution
+df2 <- btr_dist %>% 
+  group_by(date) %>% 
+  summarise_all(sum)
+
+# combining two data frame
+btr_dist <- as.data.frame(bind_cols(df1, df2))
+btr_dist <- btr_dist %>%
+  select(date, fav_count, rep_count, ret_count, user_count, tweet_count = n)
 ```
 
+**Ploting user activities**
+```{r}
+library(reshape2)
+library(scales)
+
+# melt the data for ggplot using `reshape2`
+datanya_long <- melt(btr_dist, id = "date")
+
+# ploting to goem_line ggplot2
+plot_interaksi <- ggplot(data=datanya_long,
+                aes(x=date, y=value, colour=variable)) +
+  geom_line() +
+  scale_x_date(labels = date_format("%Y-%m"), 
+               breaks = date_breaks("12 months")) +
+  facet_grid(variable~., scales="free") +
+  theme(legend.position="top")
+
+plot_interaksi
+```
+
+Dari plot dapat dilihat bahwa tagar #balitolakreklamasi paling banyak digunakan pada pertengahan tahun 2014. Lebih spesifiknya pada 2014-06-14 terdapat 2312, dan pada 2014-06-16 ada 1194 twit, sementara rata-rata perharinya sekitar 460. Hal ini juga cenderung diikuti oleh jumlah lainnya, seperti favorite, reply, retweet dan username yang terlibat. 
+
+**Pertanyaan:** apa yang menyebabkan pada tanggal itu pengguna twitter banyak menggunakan tagar? dan apa isi twitnnya. 
+
+Untuk menjawab pertanyaan tersebut, saya mengambil twit dari tanggal di mana orang banyak menggunakan tagar. 
+
+```{r}
+# melihat tanggal twit yang memiliki rerata lebih dari 460
+btr_dist %>%
+  filter(tweet_count > 460) %>%
+  ggplot(aes(x = as.character(date), y = tweet_count)) + 
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  labs(x = NULL, 
+       y = "Tanggal ketika tagar lebih sering digunakan")
+#tweets_btr
+```
+Tepatnya ada 14 hari di mana pengguna twitter lebih sering menggunakan tagar ini dibanding hari lainnya. Data ini akan saya beri nama `btr_anomali`. 
+
+2014-06-14 to 2014-06-17
+2014-06-19
+2014-06-23
+2014-06-26
+2014-08-23
+2014-08-25 to 2014-08-27
+2014-08-29 to 2014-08-30
+2014-09-30
+
+**Pengambilan data 14 hari**
+```{r}
+btr_anomali <- tweets_btr %>%
+  subset(date >= "2014-06-14" & date <= "2014-06-17" | date == "2014-06-19" | date == "2014-06-23" | date == "2014-06-26" | date == "2014-08-23" | date >= "2014-08-25" & date <= "2014-08-27" | date >= "2014-08-29" & date <= "2014-08-30" | date == "2014-09-30")
+
+write_csv(btr_anomali, path = "teluk benoa output/btr-anomali.csv")
+```
+
+Dalam 14 hari tersebut di atas, terdapat 11383 twit yang menggunakan tagar atau 19.06 persen dari kesuluruhan data. 
+
+**Catatan:** untuk mendalami isu, mungkun close reading terhadap data ini perlu dilakukan. 
+
+# Eksplorasi 2 - Tagar
+**Tujuan:** untuk mengetahui tagar apa saja yang digunakan dalam twit
+
+```{r}
+# function detecting hashtag
+tag_detect <- function(input_col) {
+  hashtag <- str_extract_all(input_col, "#\\w+")
+  # put tags in vector
+  hashtag <- unlist(hashtag)
+  # removing pic etc chr in the vector
+  hashtag <- gsub("pic$", "", hashtag)
+  hashtag <- gsub("http$", "", hashtag)
+  hashtag <- gsub("https$", "", hashtag)
+  hashtag <- tolower(hashtag)
+  # calculate hashtag frequencies
+  hashtag = table(hashtag)
+  hashtag = as.data.frame(hashtag)
+} 
+# run the funtion 
+btr_tagar <- tag_detect(tweets_btr$tweets)
+```
+
+**Visualisasi 20 tagar paling sering digunakan**
+```{r}
+btr_tagar %>%
+  filter(!str_detect(hashtag, '#balitolakreklamasi')) %>%
+  arrange(desc(Freq)) %>%
+  top_n(20) %>%
+  ggplot(aes(x = reorder(hashtag, Freq), y = Freq)) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  labs(x = NULL, 
+       y = "20 Tagar paling sering digunakan dalam twit")
+```
 
 ## Next steps...
 
-
-# removing data 
 ```{r}
-rm(btr_no_dup_a)
+input_net_btr <- tweets_btr %>%
+  select(Data = user_all)
+input_net_btr$Data <- gsub("[^[:alpha:][:space:]@_]*", "", input_net_btr$Data)
+
+write_csv(input_net_btr, path = "teluk benoa output/net_benua.csv")
 ```
+
+
+# Rankuman 
+Sampai di sini kita sudah melakukan eksplorasi beberapa hal:
+
+1. Parameter pencarian data - **pertama**, parameter yang digunakan adalah twit yang memention akun Twitter @changeOrg_ID. Dari data yang didapatkan kita mendapatkan beberapa topik, salah satunya adalah tentang **teluk benoa**. **Kedua**, karena teluk benoa merupakan kasus tentang reklamasi kita mencoba kata kunci **reklamasi** dengan API Twitter. Dari data yang didapat kita mendapatkan kata kunci yang berkaitan, yaitu tagar **#balitolakreklamasi**. **Ketiga** tagar tersebut kemudian dijadikan parameter pencarian berikutnya dan mendapatkan data sebanyak **72.641** twit. Setelah melalui pengecekan duplikasi, data yang dapat di analisis sebanyak 59.719 twit.
+
+2. Dari 59.719 selanjutnya dilihat distribusinya. Beradasrkan visualiasi distribusi diketahui bahwa pertengahan tahun 2014 merupakan puncak penggunaan tagar. Untuk itu, saya sediakan data dari tanggal di mana tagar digunakan lebih dari rerata secara umum. Hasilnya, terdapat 14 hari, di mana tagar lebih sering digunakan. Untuk kajian lebih lanjut dan mendalam, saya subset data dari tanggal-tanggal tersebut untuk **close reading** dengan nama data `btr_anomali`. Data tersebut berisi 11382 twit dengan 15 kolom/variabel, termasuk raw twit dan twit yang sudah dibersihkan dari elemen-elemen lainya. 
+
+3. Berdasarkan pemetaan tagar, diketahui bahwa selain tagar #balitolakreklamasi terdapat tagar lain yang sering digunakan. Salah satunya adalah tagar #batalkanperpres51th2014. Sehingga untuk kajian lebih mendalam pada langkah selanjutnya akan lebih baik jika melakukan studi terhadap *cases* yang ada di seputar teluk benoa ini. 
+
+4. Untuk tahap selanjutnya, proses dalam script ini menyediakan beberapa output data, yang perlu dilihat secara manual untuk memastikan proses cleaning. Data tersebut adalah: (1) `term freq-teluk benoa.csv`; dan (2) `tfidf-teluk benoa.csv`. Dua data tersebut digunakan untuk melihat term apa saja yang tidak diperlukan dan bisa di delete dari data untuk memperkecil jumlah term, dan meringkan proses komputasi. **Topik modelling dan network analisis bisa dilakukan setelah memastikan data cukup bersih.** 
+
+5. Untuk tf-idf jika memungkinkan ada timeline kasus teluk benua, sehingga kita bisa lakukan clustering data terlebih dahulu. Misalnya: data dibagi dalam beberapa fase yang menunjukkan perkembangan kasus. Fase pertama: perencanaan reklamasi dari tanggal sekian sampai sekian. Fase kedua: munculnya perpres. Fase ketiga, empat dan seterusnya. 
+
+Demikian laporan ini saya buat, dan **happy close reading**.
+
+**Catatan:** 
+
+1. Semua data ini dapat dilihat [di sini](https://drive.google.com/drive/folders/1wO6bqd5adJkISwIb7bYJ89P1gJW9-4gh?usp=sharing)
+2. Untuk update bisa cek [di sini](https://github.com/eppofahmi/virtualCitizens)
