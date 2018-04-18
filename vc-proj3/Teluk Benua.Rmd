@@ -106,17 +106,17 @@ tag_detect <- function(input_col) {
 ```
 
 ```{r}
-tb_api_tagar %>%
-  arrange(desc(Freq)) %>%
-  slice(1:15) %>%
-  ungroup() %>%
-  mutate(word = factor(hashtag, unique(hashtag))) %>%
-  ungroup() %>%
-  ggplot(aes(x = reorder(hashtag, Freq), y = Freq)) + 
-  geom_col(show.legend = FALSE) +
-  coord_flip() +
-  labs(x = NULL, 
-       y = "15 Tagar paling sering digunakan dalam twit dengan kata kunci 'reklamasi'")
+#tb_api_tagar %>%
+#  arrange(desc(Freq)) %>%
+#  slice(1:15) %>%
+#  ungroup() %>%
+#  mutate(word = factor(hashtag, unique(hashtag))) %>%
+#  ungroup() %>%
+#  ggplot(aes(x = reorder(hashtag, Freq), y = Freq)) + 
+#  geom_col(show.legend = FALSE) +
+#  coord_flip() +
+#  labs(x = NULL, 
+#       y = "15 Tagar paling sering digunakan dalam twit dengan kata kunci 'reklamasi'")
 ```
 
 Dari data twit sebanyak 5687, terdapat 96 tagar. Tagar sepsifik yang "mungkin" berkaitan dengan bali adalah tagar **#balitolakreklamasi**. Namun twit dengan tagar ini tidak mungkin untuk diambil dengan api, karena di sini hanya digunakan sekali. Artinya, tidak banyak digunakan oleh warga net dalam twit dalam 7 hari terakhir. 
@@ -200,7 +200,7 @@ tweet_cleaner1 <- function(input_text) # nama kolom yang akan dibersihkan
   removeURL2 <- function(x) gsub("pic[^[:space:]]*", "", x) 
   corpusku <- tm_map(corpusku, content_transformer(removeURL2))
   #remove puntuation
-  removeNumPunct <- function(x) gsub("[^[:alpha:][:space:]@#]*", "", x) # kecuali @ dan #
+  removeNumPunct <- function(x) gsub("[^[:alpha:][:space:]@#_]*", "", x) # kecuali @ dan #
   corpusku <- tm_map(corpusku, content_transformer(removeNumPunct))
   
   corpusku <- tm_map(corpusku, stripWhitespace)
@@ -531,8 +531,51 @@ btr_tagar %>%
        y = "20 Tagar paling sering digunakan dalam twit")
 ```
 
-## Next steps...
+# Eksplorasi 3 - Username
 
+```{r}
+# pengirim
+user_pengirim <- tweets_btr %>%
+  unnest_tokens(user, user, to_lower = FALSE) %>%
+  count(user, sort = TRUE) %>%
+  arrange(desc(n)) %>%
+  ungroup()
+# terlibat 
+user_terlibat <- tweets_btr %>%
+  unnest_tokens(user, user_all, to_lower = FALSE) %>%
+  count(user, sort = TRUE) %>%
+  arrange(desc(n)) %>%
+  ungroup()
+```
+
+**Visualisasi user pengirim:**
+
+```{r}
+user_pengirim %>%
+  arrange(desc(n)) %>%
+  top_n(20) %>%
+  ggplot(aes(x = reorder(user, n), y = n)) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  labs(x = NULL, 
+       y = "20 Username paling sering mengirim twit")
+```
+
+**Visualisasi user terlibat:**
+
+```{r}
+user_terlibat %>%
+  arrange(desc(n)) %>%
+  top_n(20) %>%
+  ggplot(aes(x = reorder(user, n), y = n)) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  labs(x = NULL, 
+       y = "20 Username paling sering terlibat dalam twit")
+```
+
+
+# Input 1 - Network analysis 
 ```{r}
 input_net_btr <- tweets_btr %>%
   select(Data = user_all)
@@ -540,6 +583,21 @@ input_net_btr$Data <- gsub("[^[:alpha:][:space:]@_]*", "", input_net_btr$Data)
 
 write_csv(input_net_btr, path = "teluk benoa output/net_benua.csv")
 ```
+
+
+# input 2 - Topic Modelling
+untuk topic modelling kita hanya butuh 3 kolom, yaitu `date`, `clean_text`, dan `word_count`. Kolom `date` digunakan untuk melakukan pelacakan perkembangan topic. `clean_text` digunakan sebagai input data, dan `word_count` digunakan untuk memfilter rows yang kosong atau tidak memiliki term setelah proses cleaning. 
+
+```{r}
+# memilih kolom untuk data
+input_tm <- tweets_btr[,c("date", "clean_text","word_count")]
+input_tm <- input_tm %>%
+  filter(word_count > 1)
+#menyimpannya
+write_csv(input_tm, path = "teluk benoa output/tm_benua.csv")
+```
+
+**Keterangan:** file yang disimpan untuk input tm terdiri dari rows yang di dalamnya terdapat minimal 2 kata. Hal ini dilakukan karena topic modelling akan menggunakan bigram. Dengan kata lain, topic modelling dilakukan terhadap term yang memiliki konteks lokal, atau term lain yang bisa menambah penjelasan dari sebuah term. 
 
 
 # Rankuman 
@@ -561,3 +619,12 @@ Demikian laporan ini saya buat, dan **happy close reading**.
 
 1. Semua data ini dapat dilihat [di sini](https://drive.google.com/drive/folders/1wO6bqd5adJkISwIb7bYJ89P1gJW9-4gh?usp=sharing)
 2. Untuk update bisa cek [di sini](https://github.com/eppofahmi/virtualCitizens)
+
+Berikut ini adalah twit yang diunggah oleh 5 username yang memiliki betweenes tertinggi. 
+```{r}
+jrx <- raw_btr %>%
+  filter(str_detect(user, '@JRX_SID'))
+gendovara <- raw_btr %>%
+  filter(str_detect(user, '@gendovara'))
+```
+
