@@ -1,0 +1,58 @@
+---
+title: "Save Gojek Hashtag"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+## Tentang data
+Data diambil dari twitter dengan tagar save gojek
+
+## Data
+
+```{r}
+savegojek_raw <- read.csv("savegojek.csv", header = FALSE, stringsAsFactors = FALSE, sep = ";") 
+
+library(dplyr)
+savegojek_raw <- savegojek_raw %>%
+  select(tanggal = V1, jam = V2, nama_user = V3, twit = V4, rep_count = V6, ret_count = V7, fav_count = V8) %>%
+  unite(tanggal, tanggal, jam)
+
+library(lubridate)
+savegojek_raw$tanggal <- as.POSIXct(dmy_hm(savegojek_raw$tanggal))
+
+str(savegojek_raw)
+```
+
+## Eksplorasi 1 - twit distribution
+
+```{r}
+library(ggplot2)
+
+savegojek_raw %>%
+  select(tanggal) %>%
+  ggplot(aes(tanggal)) + geom_histogram(bins = 50) + 
+  labs(x = NULL, y= "jumlah twit")
+```
+
+  > Sebagian besar twit berasal dari akhir tahun 2015 hingga awal tahun 2016
+  
+## Eksplorasi 2 - Pengirim twit
+
+```{r}
+library(stringr)
+savegojek_raw %>%
+  select(nama_user) %>%
+  count(nama_user, sort = TRUE) %>%
+  filter(!nama_user == "@poocongs") %>%
+  top_n(20) %>%
+  ggplot(aes(x=reorder(nama_user, n), y=n)) + geom_col() + coord_flip() +
+  labs(x = "Username", y = NULL)
+```
+
+  > Username paling banyak ngetwit adalah @poocongs (dihilangkan dari plot) untuk melihat aktor lain. 
+  
+
+  
