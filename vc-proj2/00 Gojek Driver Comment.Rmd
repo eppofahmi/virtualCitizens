@@ -1,6 +1,8 @@
 ---
 title: "Gojek Driver Comment"
-output: html_notebook
+output:
+  html_notebook:
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
@@ -9,10 +11,21 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 
 ## Library
 ```{r}
+# Runing RJava
+if (Sys.info()['sysname'] == 'Darwin') {
+  libjvm <- paste0(system2('/usr/libexec/java_home',stdout = TRUE)[1],'/jre/lib/server/libjvm.dylib')
+  message (paste0('Load libjvm.dylib from: ',libjvm))
+  dyn.load(libjvm)
+}
+
 library(tidyverse)
 library(lubridate)
-```
+library(tm)
+library(topicmodels) # for LDA topic modelling 
+library(SnowballC) # for stemming
+library(RWeka) # create dtm bigram 
 
+```
 
 ## Tentang Data
 Data diambil dari koment pada aplikasi gojek untuk dirver di google playstore. Komentar di ambil hanya yang dianggap paling berpengaruh. Pengaruh didasarkan pada label bintang di komentar. 
@@ -25,9 +38,163 @@ driver_comment <- driver_comment %>%
   separate(V1, into = c("tanggal", "tahun", "nama", "komen"), sep = ",") %>%
   unite_("tanggal", c("tahun", "tanggal"), sep = " ")
 
-str(driver_comment)
-
 driver_comment$tanggal <- as.Date(driver_comment$tanggal, format = "%Y %b %d")
 ```
+
+## Term Freq
+Menggunakan n-grams 3
+
+```{r}
+library(tidytext)
+library(stringr)
+
+frekuensi_kata <- driver_comment %>%
+  unnest_tokens(kata, komen, to_lower = TRUE, token = "ngrams", n=3) %>%
+  count(kata, sort = TRUE) %>%
+  ungroup()
+
+frekuensi_kata %>%
+  top_n(20) %>%
+  ggplot(aes(x = reorder(kata, n), y= n)) +
+  geom_col(show.legend = FALSE) + 
+  coord_flip() +
+  labs(x = NULL, y = NULL)
+```
+
+Dari isi komentar para driver gojek terhadap aplikasi gojekdriver diketahui bahwa mereka menggunakan fasilitas komentar untuk mengutarakan apa yang mereka rasakan tentang aplikasi yang dikeluarkan oleh PT. Gojek Indonesia. Dengan menggunakan *trigram* seperti pada gambar 1 di atas juga diketahui bahwa mereka (driver gojek) berusaha menyampaikan fitur yang diinginkannya dalam aplikasi. Selain itu, di sini mereka juga menyampaikan keluhan, seperti adanya penggunaan gps palsu yang dapat merugikan driver, serta kendala tidak bisa login.   
+
+  > Jika saya adalah PT G.I, maka dengan data ini saya tahu hal apa saja yang perlu ditingkatkan dari aplikasi gojek. 
+
+  > Jika saya adalah peneliti "komunikasi", maka dengan data ini saya akan mengajukan pertanyaan: Bagaiaman pola komunikasi antara mitra dengan perusahaan?
+
+## Topic modelling
+Topic modelling dilakukan dengan library `topicmodels` dan bigram
+Pertanyaan: Topik apa yang dibahas para driver gojek dalam komentar aplikasi gojek untuk driver?
+
+### Text Cleaning
+```{r, echo=FALSE}
+tweet_cleaner2 <- function(input_text) # nama kolom yang akan dibersihkan
+{    
+  # create a corpus (type of object expected by tm) and document term matrix
+  corpusku <- Corpus(VectorSource(input_text)) # make a corpus object
+  # remove urls1
+  removeURL1 <- function(x) gsub("http[^[:space:]]*", "", x) 
+  corpusku <- tm_map(corpusku, content_transformer(removeURL1))
+  #remove urls3
+  removeURL2 <- function(x) gsub("pic[^[:space:]]*", "", x) 
+  corpusku <- tm_map(corpusku, content_transformer(removeURL2))
+  #remove username 
+  TrimUsers <- function(x) {
+    str_replace_all(x, '(@[[:alnum:]_]*)', '')
+  }
+  corpusku <- tm_map(corpusku, TrimUsers)
+  #remove all "#Hashtag1"
+  removehashtag <- function(x) gsub("#\\w+", "", x)
+  corpusku <- tm_map(corpusku, content_transformer(removehashtag))
+  #merenggangkan tanda baca
+  tandabaca1 <- function(x) gsub("((?:\b| )?([.,:;!?()]+)(?: |\b)?)", " \\1 ", x, perl=T)
+  corpusku <- tm_map(corpusku, content_transformer(tandabaca1))
+  #remove puntuation
+  removeNumPunct <- function(x) gsub("[^[:alpha:][:space:]]*", "", x) # kecuali - dan '
+  corpusku <- tm_map(corpusku, content_transformer(removeNumPunct))
+  corpusku <- tm_map(corpusku, stripWhitespace)
+  corpusku <- tm_map(corpusku, content_transformer(tolower)) 
+  #stopwords bahasa indonesia
+  stopwords <- read.csv("stopwords_indo.csv", header = FALSE)
+  stopwords <- as.character(stopwords$V1)
+  stopwords <- c(stopwords, stopwords())
+  corpusku <- tm_map(corpusku, removeWords, stopwords)
+  #kata khusus yang dihapus
+  corpusku <- tm_map(corpusku, removeWords, c("rt", "cc", "via", "jrx", "balitolakreklamasi", "acehjakartajambisurabayabalintbpaluambon", "wkwkwkwkwkwkwkkkkkkkkkkk", "ok", "gojek", "pt"))
+  corpusku <- tm_map(corpusku, stripWhitespace)
+  #removing white space in the begining
+  rem_spc_front <- function(x) gsub("^[[:space:]]+", "", x)
+  corpusku <- tm_map(corpusku, content_transformer(rem_spc_front))
+
+  #removing white space at the end
+  rem_spc_back <- function(x) gsub("[[:space:]]+$", "", x)
+  corpusku <- tm_map(corpusku, content_transformer(rem_spc_back))
+  data <- data.frame(clean_text=sapply(corpusku, identity),stringsAsFactors=F)
+}
+```
+
+
+**Menjalankan fungsi cleaning....**
+
+```{r}
+driver_comment_clean <- tweet_cleaner2(driver_comment$komen)
+
+driver_comment_clean$word_count <- sapply(driver_comment_clean$clean_text, function(x) length(unlist(strsplit(as.character(x), "\\W+"))))
+
+tm_input <- driver_comment_clean %>%
+  filter(word_count > 1)
+
+```
+
+
+### Fungsi topic modelling
+```{r, echo=FALSE}
+# the LDA function using topicmodels package
+bigram_tm <- function(input_text, # should be a columm from a dataframe
+                       plot = T, # return a plot? TRUE by defult
+                       number_of_topics = 4) # number of topics (4 by default)
+{    
+  # create a corpus (type of object expected by tm) and document term matrix
+  Corpus <- VCorpus(VectorSource(input_text)) # make a VCorpus object spec for RWeka
+  
+  # function for creating bigram in the DTM
+  BigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min=2, max=2))
+  # you can explore which term combination gave the most interpretable topic for you
+  # by changing numbers inside Weka_control
+  
+  DTM <- DocumentTermMatrix(Corpus, control=list(tokenize=BigramTokenizer))
+  
+  # remove any empty rows in our document term matrix (if there are any 
+  # we'll get an error when we try to run our LDA)
+  unique_indexes <- unique(DTM$i) # get the index of each unique value
+  DTM <- DTM[unique_indexes,] # get a subset of only those indexes
+  
+  # preform LDA & get the words/topic in a tidy text format
+  lda <- LDA(DTM, k = number_of_topics, control = list(seed = 1234))
+  topics <- tidy(lda, matrix = "beta")
+  
+  # get the top ten terms for each topic
+  top_terms <- topics  %>% # take the topics data frame and..
+    group_by(topic) %>% # treat each topic as a different group
+    top_n(15, beta) %>% # get the top 10 most informative words
+    ungroup() %>% # ungroup
+    arrange(topic, -beta) # arrange words in descending informativeness
+  
+  # if the user asks for a plot (TRUE by default)
+  if(plot == T){
+    # plot the top ten terms for each topic in order
+    top_terms %>% # take the top terms
+      mutate(term = reorder(term, beta)) %>% # sort terms by beta value 
+      ggplot(aes(term, beta, fill = factor(topic))) + # plot beta by theme
+      geom_col(show.legend = FALSE) + # as a bar plot
+      facet_wrap(~ topic, scales = "free") + # which each topic in a seperate plot
+      labs(x = NULL, y = "Beta") + # no x label, change y label 
+      coord_flip() # turn bars sideways
+  }else{ 
+    # if the user does not request a plot
+    # return a list of sorted terms instead
+    return(top_terms)
+  }
+}
+```
+
+### Test 1 - TM
+**Menjalankan fungsi tm...**
+```{r, fig.width=14, fig.height=12, fig.cap="Gambar 2: 15 Term dengan probability tertinggi sebagai topic"}
+
+tm_driverComment <- bigram_tm(tm_input$clean_text, number_of_topics = 4) # plot top ten terms
+tm_driverComment
+```
+
+Dari hasil topic modelling diketahui bahwa komentar para driver dalam aplikasi gojek untuk driver membahas:
+
+1. Aplikasi tamabahan, yaitu fitur chat dengan customer (mungkin biar mereka ga perlu pake wa/atau pulsa)
+2. Keluhan tentang adanya aplikas gps palsu
+3. Salam satu aspal - mungkin ini salam khas mereka
 
 
