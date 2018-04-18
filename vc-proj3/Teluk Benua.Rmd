@@ -585,6 +585,11 @@ write_csv(input_net_btr, path = "teluk benoa output/net_benua.csv")
 ```
 
 
+```{r}
+write_csv(input_net_btr, "net_benua.csv")
+```
+
+
 # input 2 - Topic Modelling
 untuk topic modelling kita hanya butuh 3 kolom, yaitu `date`, `clean_text`, dan `word_count`. Kolom `date` digunakan untuk melakukan pelacakan perkembangan topic. `clean_text` digunakan sebagai input data, dan `word_count` digunakan untuk memfilter rows yang kosong atau tidak memiliki term setelah proses cleaning. 
 

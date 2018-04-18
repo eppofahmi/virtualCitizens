@@ -80,10 +80,17 @@ ldavis_tm <- function(input_text, # should be a columm from a dataframe
 }
 ```
 
+## Pembagian data 
+```{r}
+
+```
+
+
 
 ## 1st try
+Result: fatal error
+
 ```{r}
-# Execution 
-ldavis_tm(tm_telukBenua$clean_text, number_of_topics = 4)
+# ldavis_tm(tm_telukBenua$clean_text, number_of_topics = 4)
 ```
 
