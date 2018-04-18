@@ -1,0 +1,33 @@
+---
+title: "Gojek Driver Comment"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+## Library
+```{r}
+library(tidyverse)
+library(lubridate)
+```
+
+
+## Tentang Data
+Data diambil dari koment pada aplikasi gojek untuk dirver di google playstore. Komentar di ambil hanya yang dianggap paling berpengaruh. Pengaruh didasarkan pada label bintang di komentar. 
+
+```{r}
+driver_comment <- read.csv("gojekdriverkomen.csv", sep = ",", header = FALSE, stringsAsFactors = FALSE)
+
+driver_comment <- driver_comment %>%
+  select(V1) %>%
+  separate(V1, into = c("tanggal", "tahun", "nama", "komen"), sep = ",") %>%
+  unite_("tanggal", c("tahun", "tanggal"), sep = " ")
+
+str(driver_comment)
+
+driver_comment$tanggal <- as.Date(driver_comment$tanggal, format = "%Y %b %d")
+```
+
+
