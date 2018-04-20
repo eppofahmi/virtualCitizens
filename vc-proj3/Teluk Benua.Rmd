@@ -295,7 +295,7 @@ tweet_cleaner2 <- function(input_text) # nama kolom yang akan dibersihkan
   stopwords <- c(stopwords, stopwords())
   corpusku <- tm_map(corpusku, removeWords, stopwords)
   #kata khusus yang dihapus
-  corpusku <- tm_map(corpusku, removeWords, c("rt", "cc", "via", "jrx", "balitolakreklamasi", "acehjakartajambisurabayabalintbpaluambon"))
+  corpusku <- tm_map(corpusku, removeWords, c("rt", "cc", "via", "jrx", "balitolakreklamasi", "acehjakartajambisurabayabalintbpaluambon", "bali", "selamat", "pagi", "bli"))
   corpusku <- tm_map(corpusku, stripWhitespace)
   #removing white space in the begining
   rem_spc_front <- function(x) gsub("^[[:space:]]+", "", x)
@@ -604,7 +604,6 @@ write_csv(input_tm, path = "teluk benoa output/tm_benua.csv")
 
 **Keterangan:** file yang disimpan untuk input tm terdiri dari rows yang di dalamnya terdapat minimal 2 kata. Hal ini dilakukan karena topic modelling akan menggunakan bigram. Dengan kata lain, topic modelling dilakukan terhadap term yang memiliki konteks lokal, atau term lain yang bisa menambah penjelasan dari sebuah term. 
 
-
 # Rankuman 
 Sampai di sini kita sudah melakukan eksplorasi beberapa hal:
 
@@ -616,7 +615,7 @@ Sampai di sini kita sudah melakukan eksplorasi beberapa hal:
 
 4. Untuk tahap selanjutnya, proses dalam script ini menyediakan beberapa output data, yang perlu dilihat secara manual untuk memastikan proses cleaning. Data tersebut adalah: (1) `term freq-teluk benoa.csv`; dan (2) `tfidf-teluk benoa.csv`. Dua data tersebut digunakan untuk melihat term apa saja yang tidak diperlukan dan bisa di delete dari data untuk memperkecil jumlah term, dan meringkan proses komputasi. **Topik modelling dan network analisis bisa dilakukan setelah memastikan data cukup bersih.** 
 
-5. Untuk tf-idf jika memungkinkan ada timeline kasus teluk benua, sehingga kita bisa lakukan clustering data terlebih dahulu. Misalnya: data dibagi dalam beberapa fase yang menunjukkan perkembangan kasus. Fase pertama: perencanaan reklamasi dari tanggal sekian sampai sekian. Fase kedua: munculnya perpres. Fase ketiga, empat dan seterusnya. 
+5. Untuk tf-idf jika memungkinkan ada timeline kasus teluk benua, sehingga kita bisa lakukan clustering data terlebih dahulu. Misalnya: data dibagi dalam beberapa fase yang menunjukkan perkembangan kasus. Fase pertama: perencanaan reklamasi dari tanggal sekian sampai sekian. Fase kedua: munculnya perpres. Fase ketiga, empat dan seterusnya.
 
 Demikian laporan ini saya buat, dan **happy close reading**.
 

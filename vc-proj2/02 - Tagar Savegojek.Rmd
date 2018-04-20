@@ -73,7 +73,7 @@ tag_detect <- function(input_col) {
   hashtag = as.data.frame(hashtag)
 }
 
-tag_detect(savegojek_raw$twit) %>%
+tag_detect(savegojek$twit) %>%
   arrange(desc(Freq)) %>% filter(!hashtag == "#savegojek") %>% 
   head(n=20) %>%
   ggplot(aes(x = reorder(hashtag, Freq), y = Freq)) + 
@@ -86,4 +86,57 @@ tag_detect(savegojek_raw$twit) %>%
 **Catatan:** tagar #savedriver gojek mungkin perlu juga diambil datanya
 
 ## Eksplorasi 4 - Term Frequency
+
+```{r}
+library(tidytext)
+# Cleaning text
+replace_reg <- "http://[A-Za-z]+|&amp;|&lt;|&gt;|RT|https|[@|#|pic]['_A-Za-z|[:punct:]|\\d]+"
+unnest_reg <- "([^A-Za-z])+"
+stopwords <- read.csv("stopwords_indo.csv", header = FALSE)
+
+cltext <- savegojek %>%
+  mutate(twit = str_replace_all(twit,replace_reg,"")) %>%
+  unnest_tokens(word,twit,token="regex",pattern=unnest_reg) %>%
+  filter(!word %in% stopwords$V1,str_detect(word,"[a-z]")) %>%
+  filter(nchar(word)>2) %>%
+  filter(!word %in% c('ed','co','bd','ri','gl','leb','ra','dun', 'hat', 'onl', 'rv', 'mem', 'gad', 'ket', 'set', 'mungk', 'orang', 'www', 'gojek', 'indones', "ter", 'bero'))
+
+# Get frequncy
+cl_text <- as.data.frame(table(cltext$word)) %>%
+  arrange(desc(Freq)) 
+
+cl_text %>% head(n=20) %>%
+  ggplot(aes(x=reorder(Var1,Freq),y=Freq)) +
+  geom_col() +
+  coord_flip() +
+  labs(title='10 kata terbanyak',x='kata',y='jumlah')
+```
+
+```{r}
+poocongs <- savegojek_raw %>%
+  filter(nama_user == "@poocongs")
+```
+
+
+## Celaning text
+**After Cleaning**
+
+
+
+```{r}
+savegojek <- tweet_cleaner2(savegojek_raw$twit)
+
+savegojek$word_count <- sapply(savegojek$clean_text, function(x) length(unlist(strsplit(as.character(x), "\\W+"))))
+
+savegojek <- bind_cols(savegojek_raw, savegojek)
+
+savegojek <- savegojek %>%
+  filter(word_count >= 2)
+
+savegojek <- savegojek %>%
+  dplyr::mutate(is_duplicate = duplicated(twit))
+
+savegojek <- savegojek %>%
+  filter(is_duplicate == FALSE)
+```
 
