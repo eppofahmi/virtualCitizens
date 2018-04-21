@@ -24,5 +24,36 @@ map_df(c(0,10,20,30,40), function(i) {
   
 }) -> tes_chang
 
-## data cleaning
+## data cleaning ----
+library(tidyverse)
 
+gojek_petisi <- tes_chang %>%
+  separate(date, into = c('non', 'date'), sep = 7)
+gojek_petisi <- gojek_petisi %>%
+  select(title, date, jml_pendukung = suporter, terpetisi = target, 
+         inisiator, link = links)
+View(gojek_petisi)
+# 9.643 pendukung
+gojek_petisi <- gojek_petisi %>%
+  separate(jml_pendukung, into = c("juml_pendukung", "non"), sep = " ")
+gojek_petisi <- a %>%
+  select(date, title, jml_pendukung = juml_pendukung, terpetisi, inisiator, link)
+
+gojek_petisi$jml_pendukung <- gsub('[[:punct:] ]+','', gojek_petisi$jml_pendukung)
+
+gojek_petisi$jml_pendukung <- as.integer(gojek_petisi$jml_pendukung)
+
+library(lubridate)
+# Des = Dec     - Okt = Oct
+# Agt = Aug     - Mei = May
+
+gojek_petisi$date <- gsub("Des", "Dec", gojek_petisi$date)
+gojek_petisi$date <- gsub("Agt", "Aug", gojek_petisi$date)
+gojek_petisi$date <- gsub("Okt", "Oct", gojek_petisi$date)
+gojek_petisi$date <- gsub("Mei", "May", gojek_petisi$date)
+
+gojek_petisi$date <- dmy(gojek_petisi$date)
+
+glimpse(gojek_petisi)
+
+write_csv(gojek_petisi, path = "wrangled data proj-2/daftar petisi ttg gojek.csv")
