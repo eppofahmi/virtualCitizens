@@ -91,4 +91,8 @@ rm(a)
 # clean_text----
 playstore_data <- bind_cols(playstore_data, clean_text)
 
-rm(clean_text, driver_comment, user_comment)
+playstore_data <- playstore_data %>%
+  select(sumber_data, aplikasi, date = tanggal, username = nama, text = komen, clean_text)
+
+# saving the data
+write_csv(playstore_data, path = "wrangled data proj-2/playstore-gojek.csv")
