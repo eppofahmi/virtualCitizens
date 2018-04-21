@@ -1,9 +1,11 @@
 Project ini berusahan mencari publicness yang berkembang di dunia maya seputar keberadaan laman untuk melakukan petisi, yaitu change.org 
 
 Data yang digunakan bersumber dari:
-1. Twit yang memention akun @changeOrg_ID - digunakan untuk mengidentifikasi kasus
-2. Twit dengan tagar tertentu - digunakan untuk mendapatkan kasus
-   2a. Twit dengan tagar #balitolakreklamasi
-   2b. twit dengan tagar dan atau mengandung kata "uum-md3"
-3. Komentar pada petisi yang memiliki kata kunci "teluk benua" di website change.org
-4. Komentar pada petisi yang memiliki kata kunci "uu-md3" di website change.org
+1. Twitter
+   1a. twit yang memention akun @changeOrg_ID
+   1b. twit dengan tagar #balitolakreklamasi
+   1c. twit dengan tagar dan atau mengandung kata "uum-md3"
+   
+2. Change 
+   2a. komentar petisi dengan kata kunci "teluk benua"
+   2b. komentar petisi dengan kata kunci "uu-md3"

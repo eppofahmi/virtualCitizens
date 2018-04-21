@@ -140,3 +140,18 @@ btr_raw <- btr_raw %>%
 #periode_3 <- subset(btr_raw, date >= "2014-09-01" & date <= "2018-03-31")
 
 glimpse(btr_raw)
+
+#9. Parameter pencarian======================
+btr_raw <- btr_raw %>%
+  mutate(sumber_data = "twitter")
+
+btr_raw <- btr_raw %>%
+  mutate(parameter = "#balitolakreklamasi")
+
+#10. save ----
+names(btr_raw)
+
+btr_raw <- btr_raw %>%
+  select(sumber_data, parameter, date, time, periode, user, user_all, user_count, tweets,clean_text, word_count, hashtag, tag_count, is_duplicate, replying, fav_count, rep_count, ret_count, link)
+
+write_csv(btr_raw, path = "wrangled data proj-3/twit-tagar-balitolakreklamasi.csv")

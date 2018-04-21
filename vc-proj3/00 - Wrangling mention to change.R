@@ -134,4 +134,17 @@ change_raw <- change_raw %>%
     TRUE ~ "periode_5")) %>%
   mutate(periode = factor(periode, levels = c("periode_1", "periode_2", "periode_3", "periode_4", "periode_5")))
 
-glimpse(change_raw)
+#9. Parameter pencarian======================
+change_raw <- change_raw %>%
+  mutate(sumber_data = "twitter")
+
+change_raw <- change_raw %>%
+  mutate(parameter = "to_@changeOrg_ID")
+
+#10. save ----
+names(change_raw)
+
+change_raw <- change_raw %>%
+  select(sumber_data, parameter, date, time, periode, user, user_all, user_count, tweets,clean_text, word_count, hashtag, tag_count, is_duplicate, replying, fav_count, rep_count, ret_count, link)
+
+write_csv(change_raw, path = "wrangled data proj-3/twit-mention-change.csv")
