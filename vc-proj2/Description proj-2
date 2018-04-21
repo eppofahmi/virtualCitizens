@@ -1,0 +1,9 @@
+Project ini berusahan mencari publicness yang berkembang di dunia maya seputar transportasi online. 
+Kasus yang dijadikan sebagai sample adalah gojek.
+
+Data yang digunakan bersumber dari:
+1. Twit yang memention akun gojek - digunakan untuk mengidentifikasi kasus
+2. Twit dengan tagar-tagar tertentu - digunakan untuk mendapatkan kasus
+3. Komentar pada petisi yang memiliki kata kunci "gojek" di website change.org
+5. Komentar dari playstorw terhadap aplikasi gojek
+6. Komentar dari playstore terhadap aplikasi gojek untuk driver
