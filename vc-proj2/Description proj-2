@@ -8,9 +8,32 @@ Data yang digunakan bersumber dari:
    1c. twit dengan tagar #savedrivergojek
    1d. twit yang mengandung frasa "transportasi online" dalam bahasa Indonesia
    1e. twit dari timeline @CeritaTranspOL
-2. change
-   2a. 
-   2b. 
+2. change.org
+   2a. daftar petisi dengan kata kunci "gojek""
+   2b. komentar terhadap petisi yang ada dalam daftar 2c
+   2c. daftar petisi dengan kata kunci "uumd3"
+   2d. komentar terhadap petisi yang ada dalam daftar 2c 
 3. playstore
    3a. komentar user tentang aplikasi gojek
    3b. komentra user pada aplikasi gojek driver
+   
+Nama dan keterangan isi kolom: 
+1. "sumber_data" = Jenis sumber data (twitter, change, playstore)  
+2. "parameter"  = keyword pencarian
+3. "date" = tanggal 
+4. "time" = jam 
+5. "periode"  = periode waktu berdasar timline kejadian di darat
+6. "user" = pengirim twit/penulis komentar
+7. "user_all" = gabungan username twitter   
+8. "user_count" = jumlah username gabungan per baris/twit
+9. "tweets" = twit asli 
+10. "clean_text" = twit yang sudah dibersihkan
+11. "word_count" = jumlah kata/term per baris/twit
+12. "hashtag"  = term/tagar per baris/twit
+13. "tag_count" = jumlah tagar per baris/twit
+14. "is_duplicate" = keterangan twit memiliki duplicate atau tidak
+15. "replying" = keterangan twit di kirim sebagai balasan atau bukan 
+16. "fav_count" = jumlah favorit per twit/baris 
+17. "rep_count" = jumlah reply yang didapat per baris/twit
+18. "ret_count" = jumlah retweet yang didapat per baris/twit
+19. "link" = link twitter.com ke pengguna aslinya
