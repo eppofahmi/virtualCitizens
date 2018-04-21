@@ -10,7 +10,8 @@
 # 6. clean_text = text yang sudah dibersihkan dari kolom `tweets`
 # 7. word_count = jumlah kata dari kolom `clean_text`
 # 8. periode = keterangan asal twit berdasarkan waktu yang dibagi menjadi tiga
-
+# 9. sumber_data = menunjukkan sumber data (e.g twitter, change.org, kitabisa.com)
+# 10. Parameter = menunjukkan parameter yang digunakan untuk mendapatkan data
 
 # Library ----
 library(lubridate)

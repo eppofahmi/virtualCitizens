@@ -1,74 +1,145 @@
-# Topic modelling of teluk benua tweets
-# there are still need some text cleaning
+# Twit Wrangling tagar #balinotforsale
+# Script ini digunakan untuk warangling data twit yang didapat dengan parameter mention ke username @changeOrg_ID
 
-# Runing RJava
-if (Sys.info()['sysname'] == 'Darwin') {
-  libjvm <- paste0(system2('/usr/libexec/java_home',stdout = TRUE)[1],'/jre/lib/server/libjvm.dylib')
-  message (paste0('Load libjvm.dylib from: ',libjvm))
-  dyn.load(libjvm)
-}
+# Kolom tambahan ===========================
+# 1. is_duplicate = FALSE/TRUE
+# 2. user_all = berisi daftar user yang ada dalam data (dari kolom user dan tweets)
+# 3. user_count = jumlah @ dari user_all
+# 4. tagar = term dengan awalan # dari kolom `tweets`
+# 5. tag_count = jumlah tagar per twit dari kolom `tagar`
+# 6. clean_text = text yang sudah dibersihkan dari kolom `tweets`
+# 7. word_count = jumlah kata dari kolom `clean_text`
+# 8. periode = keterangan asal twit berdasarkan tahun
+# 9. sumber_data = menunjukkan sumber data (e.g twitter, change.org, kitabisa.com)
+# 10. Parameter = menunjukkan parameter yang digunakan untuk mendapatkan data
 
-# read in the libraries we're going to use
+# Library ----
+library(lubridate)
 library(tidyverse)
 library(tidytext)
-library(topicmodels)
-library(tm) 
-library(SnowballC)
-library(RWeka)
+library(stringr)
+library(tm)
 
+# Data mentah =====================================
+bns_raw <- read.csv("bns.csv", header = FALSE, 
+                       stringsAsFactors = FALSE, sep = ";") 
 
+colnames(bns_raw) <- c("date", "time", "user", "tweets", "replying", 
+                          "rep_count", "ret_count", "fav_count","link")
+# converting date format
+bns_raw$date <- as.Date(bns_raw$date, format='%d %b %Y')
 
-# the LDA function using topicmodels package
-bigram_tm <- function(input_text, # should be a columm from a dataframe
-                      plot = T, # return a plot? TRUE by defult
-                      number_of_topics = 4) # number of topics (4 by default)
+# 1. is_duplicate =================================
+bns_raw <- bns_raw %>%
+  dplyr::mutate(is_duplicate = duplicated(tweets))
+
+# 2. user_all ===================================== 
+bns_raw$user_all <- sapply(str_extract_all(bns_raw$tweets, "@\\S+", simplify = FALSE), paste, collapse=", ")
+
+# add @ if nedeed
+#user_change$User <- paste("@", user_change$User, sep="")
+
+# merge column user and user_all
+bns_raw$user_all <- paste(bns_raw$user, bns_raw$user_all, sep=" ")
+
+# removing punct
+bns_raw$user_all <- gsub("[^[:alpha:][:space:]@_]*", "", bns_raw$user_all)
+
+# 3. user_count ==================================
+bns_raw$user_count <- sapply(bns_raw$user_all, 
+                                function(x) length(unlist(strsplit(as.character(x), "@\\S+"))))
+
+# 4. tagar =======================================
+bns_raw$hashtag <- sapply(str_extract_all(bns_raw$tweets, "#\\S+", simplify = FALSE), 
+                             paste, collapse=", ")
+
+bns_raw$hashtag <- gsub("[^[:alpha:][:space:]#]*", "", bns_raw$hashtag)
+
+# 5. tag_count ===================================
+bns_raw$tag_count <- sapply(bns_raw$hashtag, 
+                               function(x) length(unlist(strsplit(as.character(x), "#\\S+"))))
+
+# 6. clean_text ==================================
+tweet_cleaner2 <- function(input_text) # nama kolom yang akan dibersihkan
 {    
   # create a corpus (type of object expected by tm) and document term matrix
-  Corpus <- VCorpus(VectorSource(input_text)) # make a VCorpus object spec for RWeka
-  
-  # function for creating bigram in the DTM
-  BigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min=2, max=2))
-  # you can explore which term combination gave the most interpretable topic for you
-  # by changing numbers inside Weka_control
-  
-  DTM <- DocumentTermMatrix(Corpus, control=list(tokenize=BigramTokenizer))
-  
-  # remove any empty rows in our document term matrix (if there are any 
-  # we'll get an error when we try to run our LDA)
-  unique_indexes <- unique(DTM$i) # get the index of each unique value
-  DTM <- DTM[unique_indexes,] # get a subset of only those indexes
-  
-  # preform LDA & get the words/topic in a tidy text format
-  lda <- LDA(DTM, k = number_of_topics, control = list(seed = 1234))
-  topics <- tidy(lda, matrix = "beta")
-  
-  # get the top ten terms for each topic
-  top_terms <- topics  %>% # take the topics data frame and..
-    group_by(topic) %>% # treat each topic as a different group
-    top_n(10, beta) %>% # get the top 10 most informative words
-    ungroup() %>% # ungroup
-    arrange(topic, -beta) # arrange words in descending informativeness
-  
-  # if the user asks for a plot (TRUE by default)
-  if(plot == T){
-    # plot the top ten terms for each topic in order
-    top_terms %>% # take the top terms
-      mutate(term = reorder(term, beta)) %>% # sort terms by beta value 
-      ggplot(aes(term, beta, fill = factor(topic))) + # plot beta by theme
-      geom_col(show.legend = FALSE) + # as a bar plot
-      facet_wrap(~ topic, scales = "free") + # which each topic in a seperate plot
-      labs(x = NULL, y = "Beta") + # no x label, change y label 
-      coord_flip() # turn bars sideways
-  }else{ 
-    # if the user does not request a plot
-    # return a list of sorted terms instead
-    return(top_terms)
+  corpusku <- Corpus(VectorSource(input_text)) # make a corpus object
+  # remove urls1
+  removeURL1 <- function(x) gsub("http[^[:space:]]*", "", x) 
+  corpusku <- tm_map(corpusku, content_transformer(removeURL1))
+  #remove urls3
+  removeURL2 <- function(x) gsub("pic[^[:space:]]*", "", x) 
+  corpusku <- tm_map(corpusku, content_transformer(removeURL2))
+  #remove username 
+  TrimUsers <- function(x) {
+    str_replace_all(x, '(@[[:alnum:]_]*)', '')
   }
+  corpusku <- tm_map(corpusku, TrimUsers)
+  #remove all "#Hashtag1"
+  removehashtag <- function(x) gsub("#\\S+", "", x)
+  corpusku <- tm_map(corpusku, content_transformer(removehashtag))
+  #merenggangkan tanda baca
+  #tandabaca1 <- function(x) gsub("((?:\b| )?([.,:;!?()]+)(?: |\b)?)", " \\1 ", x, perl=T)
+  #corpusku <- tm_map(corpusku, content_transformer(tandabaca1))
+  #remove puntuation
+  removeNumPunct <- function(x) gsub("[^[:alpha:][:space:]]*", "", x)
+  corpusku <- tm_map(corpusku, content_transformer(removeNumPunct))
+  corpusku <- tm_map(corpusku, stripWhitespace)
+  corpusku <- tm_map(corpusku, content_transformer(tolower)) 
+  #stopwords bahasa indonesia
+  stopwords <- read.csv("stopwords_indo.csv", header = FALSE)
+  stopwords <- as.character(stopwords$V1)
+  stopwords <- c(stopwords, stopwords())
+  corpusku <- tm_map(corpusku, removeWords, stopwords)
+  #kata khusus yang dihapus
+  corpusku <- tm_map(corpusku, removeWords, c("rt", "cc", "via", "jrx", "balitolakreklamasi", "acehjakartajambisurabayabalintbpaluambon", "bali", "selamat", "pagi", "bli", "paraf", "petisi", "yks", "thn", "ri", "sign", "can", "go", "mr", "dlm", "recruiterutmsourcesharepetitionutmmediumtwitterutmcampaignsharetwittermobile"))
+  corpusku <- tm_map(corpusku, stripWhitespace)
+  #removing white space in the begining
+  rem_spc_front <- function(x) gsub("^[[:space:]]+", "", x)
+  corpusku <- tm_map(corpusku, content_transformer(rem_spc_front))
+  
+  #removing white space at the end
+  rem_spc_back <- function(x) gsub("[[:space:]]+$", "", x)
+  corpusku <- tm_map(corpusku, content_transformer(rem_spc_back))
+  data <- data.frame(clean_text=sapply(corpusku, identity),stringsAsFactors=F)
 }
 
-# data 
-test_data <- read.csv("tm_benua.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
+clean_text <- tweet_cleaner2(bns_raw$tweets)
 
-# execution
-test_bigram <- bigram_tm(test_data$clean_text, number_of_topics = 10) # plot top ten terms
-test_bigram
+a <- clean_text %>%
+  unnest_tokens(bigram, clean_text, token = "ngrams", n=2, drop = FALSE) %>%
+  count(bigram, sort = TRUE)
+
+#View(a)
+rm(a)
+
+# 7. word_count ==================================
+clean_text$word_count <- sapply(clean_text$clean_text, 
+                                function(x) length(unlist(strsplit(as.character(x), "\\W+"))))
+
+bns_raw <- bind_cols(bns_raw, clean_text)
+rm(clean_text)
+
+# 8. Periode =====================================
+# Periode dibagi berdasarkan tahun
+bns_raw <- bns_raw %>%
+  mutate(periode = case_when(
+    date >= "2012-01-01" & date <= "2014-03-31" ~ "periode_1",
+    date >= "2014-04-01" & date <= "2014-08-31" ~ "periode_2",
+    TRUE ~ "periode_3")) %>%
+  mutate(periode = factor(periode, levels = c("periode_1", "periode_2", "periode_3")))
+
+#9. Parameter pencarian======================
+bns_raw <- bns_raw %>%
+  mutate(sumber_data = "twitter")
+
+bns_raw <- bns_raw %>%
+  mutate(parameter = "#balinotforsale")
+
+#10. save ----
+names(bns_raw)
+
+bns_raw <- bns_raw %>%
+  select(sumber_data, parameter, date, time, periode, user, user_all, user_count, tweets,clean_text, word_count, hashtag, tag_count, is_duplicate, replying, fav_count, rep_count, ret_count, link)
+
+write_csv(bns_raw, path = "wrangled data proj-3/twit-tagar-balinotforsale.csv")
