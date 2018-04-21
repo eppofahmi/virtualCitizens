@@ -24,6 +24,5 @@ map_df(c(0,10,20,30,40), function(i) {
   
 }) -> tes_chang
 
-
 ## data cleaning
 
