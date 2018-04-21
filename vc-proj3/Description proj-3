@@ -2,10 +2,12 @@ Project ini berusahan mencari publicness yang berkembang di dunia maya seputar k
 
 Data yang digunakan bersumber dari:
 1. Twitter
-   1a. twit yang memention akun @changeOrg_ID
-   1b. twit dengan tagar #balitolakreklamasi
-   1c. twit dengan tagar dan atau mengandung kata "uum-md3"
+   1a. twit yang memention akun @changeOrg_ID (sudah)
+   1b. twit dengan tagar #balitolakreklamasi (sudah)
+   1c. twit dengan tagar #balinotforsale (sudah)
+   1c. twit dengan tagar #uumd3 (belum)
+   1d. twit yang mengandung kata "uum-md3" (belum)
    
-2. Change 
+2. Change
    2a. komentar petisi dengan kata kunci "teluk benua"
    2b. komentar petisi dengan kata kunci "uu-md3"
