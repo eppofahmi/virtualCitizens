@@ -44,8 +44,6 @@ gojek_petisi$jml_pendukung <- gsub('[[:punct:] ]+','', gojek_petisi$jml_pendukun
 gojek_petisi$jml_pendukung <- as.integer(gojek_petisi$jml_pendukung)
 
 library(lubridate)
-# Des = Dec     - Okt = Oct
-# Agt = Aug     - Mei = May
 
 gojek_petisi$date <- gsub("Des", "Dec", gojek_petisi$date)
 gojek_petisi$date <- gsub("Agt", "Aug", gojek_petisi$date)
@@ -53,7 +51,5 @@ gojek_petisi$date <- gsub("Okt", "Oct", gojek_petisi$date)
 gojek_petisi$date <- gsub("Mei", "May", gojek_petisi$date)
 
 gojek_petisi$date <- dmy(gojek_petisi$date)
-
-glimpse(gojek_petisi)
 
 write_csv(gojek_petisi, path = "wrangled data proj-2/daftar petisi ttg gojek.csv")
