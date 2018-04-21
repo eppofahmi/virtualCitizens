@@ -1,0 +1,11 @@
+---
+title: "Comment to Gojek Apss"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+## Tentang Data
+Data di ambil dari komentar yang diberikan oleh pengunduh aplikasi gojek di playstore. 
