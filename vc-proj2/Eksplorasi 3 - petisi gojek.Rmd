@@ -9,3 +9,26 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 
 ## Tentang Data
 Data di ambil dari komentar yang diberikan oleh pengunduh aplikasi gojek di playstore. 
+
+
+## Library
+
+```{r}
+library(lubridate)
+library(tidyverse)
+library(tidytext)
+library(stringr)
+library(tm)
+library(ggplot2)
+```
+
+## Import Data
+
+```{r}
+dirwd <- paste(getwd(),"/wrangled data proj-2/",sep='')
+daftar_petisi <- read.csv(paste(dirwd,"daftar petisi ttg gojek.csv",sep=''), 
+                     header = TRUE, sep = ",", stringsAsFactors = FALSE)
+petisi_gojek <- read.csv(paste(dirwd,"petisi-gojek.csv",sep=''), 
+                     header = TRUE, sep = ",", stringsAsFactors = FALSE)
+```
+
