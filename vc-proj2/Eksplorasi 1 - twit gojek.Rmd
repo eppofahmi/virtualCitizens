@@ -34,6 +34,8 @@ library(tm)
 library(reshape2)
 library(scales)
 library(AnomalyDetection)
+library(igraph)
+library(ggraph)
 ```
 
 ## Import Data
@@ -150,7 +152,7 @@ Bigram yang paling sering muncul, yaitu "ojek online" menunjukkan bahwa dokumen 
 ## Eksplorasi 6 - TF-IDF
 
 ```{r}
-a <- twit_gojek %>%
+twit_words <- twit_gojek %>%
   filter(is_duplicate == FALSE) %>%
   filter(!user == "poocongs") %>%
   select(parameter, clean_text) %>%
@@ -158,16 +160,13 @@ a <- twit_gojek %>%
   unnest_tokens(kata, clean_text, token = "ngrams", n = 2) %>%
   count(kata, sort = TRUE)
 
-total_words <- a %>% 
+total_words <- twit_words %>% 
   group_by(parameter) %>% 
   summarize(total = sum(n))
-
-twit_words <- left_join(a, total_words)
-
+twit_words <- left_join(twit_words, total_words)
 twit_words <- twit_words %>%
   bind_tf_idf(kata, parameter, n) %>%
   arrange(desc(tf_idf))
-
 
 # Visualisasi tf-idf
 twit_words %>%
@@ -179,12 +178,46 @@ twit_words %>%
   ggplot(aes(reorder(kata,tf_idf), tf_idf, fill = parameter)) +
   geom_col(show.legend = FALSE) +
   labs(x = NULL, y = "tf-idf") +
-  facet_wrap(~parameter, ncol = 2, scales = "free") +
+  facet_wrap(~parameter, ncol = 2, scales = "free") + 
+  labs(x = NULL, y = "tf-idf bigram to parameters") +
   coord_flip()
 ```
 
+Dari twit dengan tagar savedrivergojek, diketahui bahwa kata yang memiliki nilai tf-idf tertinggi adalah tarif driver. Hal tersebut merujuk pada tagar itu sendiri yang digunakan untuk menyarakan pendapat tentang kasus menyelamatkan dirver gojek. Diselamatkan dari apa? dan apa yang terjadi?
+
+Dengan menggunakan data di atas, juga dapat diketahui bahwa salah satu isu yang dibahas adalah tentang tarif driver. Hal ini kemungkinan berkaitan dengan kebijakan tarif yang diterapkan oleh PT GI dan berdampak pada driver sebagai mitra, serta mendapatkan respons. Tagar lain juga dapat diinterpretasikan seperti itu, dengan jumlah kata dengan nilai tf-idf tertinggi yang diubah-ubah.  
+
 ## Eksplorasi 7 - Network
 
+```{r}
+names(twit_words)
+
+bigram_counts <- twit_gojek %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(!user == "poocongs") %>%
+  select(clean_text) %>%
+  unnest_tokens(bigram, clean_text, token = "ngrams", n = 2) %>%
+  count(bigram, sort = TRUE) %>%
+  separate(bigram, into = c("word1", "word2"))
+
+bigram_graph <- bigram_counts %>%
+  filter(n > 10) %>%
+  graph_from_data_frame()
+
+bigram_graph
+
+set.seed(2016)
+
+a <- grid::arrow(type = "closed", length = unit(.15, "inches"))
+
+ggraph(bigram_graph, layout = "fr") +
+  geom_edge_link(aes(edge_alpha = n), show.legend = FALSE,
+                 arrow = a, end_cap = circle(.07, 'inches')) +
+  geom_node_point(color = "lightblue", size = 5) +
+  geom_node_text(aes(label = name), vjust = 1, hjust = 1) +
+  theme_void()
+
+```
 
 ## Eksplorasi 8 - Topic Modelling
 
