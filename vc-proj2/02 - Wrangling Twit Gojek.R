@@ -108,7 +108,9 @@ tweet_cleaner2 <- function(input_text) # nama kolom yang akan dibersihkan
   #kata khusus yang dihapus
   corpusku <- tm_map(corpusku, removeWords, c("rt", "cc", "via", "jrx", "balitolakreklamasi", 
                                               "acehjakartajambisurabayabalintbpaluambon", "bali", 
-                                              "selamat", "pagi", "bli"))
+                                              "selamat", "pagi", "bli", 'ed','co','bd','ri','gl','leb','ra','dun', 'hat',
+                                              'onl', 'rv', 'mem', 'gad', 'ket', 'set', 'mungk', 'orang', 'www', 
+                                              'gojek', 'indones', "ter", 'bero'))
   corpusku <- tm_map(corpusku, stripWhitespace)
   #removing white space in the begining
   rem_spc_front <- function(x) gsub("^[[:space:]]+", "", x)
@@ -165,3 +167,5 @@ twit_gojek <- twit_gojek %>%
   select(sumber_data, parameter, date, time, periode, user, user_all, user_count, tweets,clean_text, word_count, hashtag, tag_count, is_duplicate, replying, fav_count, rep_count, ret_count, link)
 
 write_csv(twit_gojek, path = "wrangled data proj-2/twit-gojek.csv")
+
+# @poocongs - del
