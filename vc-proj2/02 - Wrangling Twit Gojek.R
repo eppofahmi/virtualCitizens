@@ -168,4 +168,4 @@ twit_gojek <- twit_gojek %>%
 
 write_csv(twit_gojek, path = "wrangled data proj-2/twit-gojek.csv")
 
-# @poocongs - del
+# @poocongs - delete
