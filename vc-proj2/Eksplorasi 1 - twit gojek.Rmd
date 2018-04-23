@@ -1,15 +1,18 @@
 ---
 title: "Twit tentang Gojek"
-output:
-  html_notebook: default
-  pdf_document: default
+output: 
+ html_notebook:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    number_sections: true
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 ```
 
-## Pendahuluan
+# Pendahuluan
 Data yang digunakan di sini diambil dengan menggunakan beberapa parameter, yaitu: 
 
 1. tagar #savegojek
@@ -23,9 +26,17 @@ Tujuan ekplorasi adalah:
 2. Mengetahui utama (jika ada)
 3. Mengetahui isi yang dibahas
 
-## Library
+# Library
 
 ```{r}
+# Runing RJava
+if (Sys.info()['sysname'] == 'Darwin') {
+  libjvm <- paste0(system2('/usr/libexec/java_home',stdout = TRUE)[1],'/jre/lib/server/libjvm.dylib')
+  message (paste0('Load libjvm.dylib from: ',libjvm))
+  dyn.load(libjvm)
+}
+
+
 library(lubridate)
 library(tidyverse)
 library(tidytext)
@@ -36,9 +47,13 @@ library(scales)
 library(AnomalyDetection)
 library(igraph)
 library(ggraph)
+library(topicmodels)
+library(SnowballC)
+library(RWeka) 
+
 ```
 
-## Import Data
+# Import Data
 
 ```{r}
 dirwd <- paste(getwd(),"/wrangled data proj-2/",sep='')
@@ -46,10 +61,10 @@ twit_gojek <- read.csv(paste(dirwd,"twit-gojek.csv",sep=''),
                      header = TRUE, sep = ",", stringsAsFactors = FALSE)
 ```
 
-## Eksplorasi 1 - Perbandingan Sumber data
+# Eksplorasi 1 - Perbandingan Sumber data
 Data yang digunakan di sini bersumber dari beberapa parameter yang digunakan untuk scrapping. Gambar di bawah ini, menunjukkan perbandingan jumlah twit yang dihasilkan oleh masing-masing parameter. 
 
-```{r}
+```{r, fig.cap="Perbandingan twit antar parameter"}
 twit_gojek %>%
   group_by(parameter) %>%
   count(parameter) %>%
@@ -64,10 +79,10 @@ Namun, data di atas masih kotor (ada yang duplicate dan tidak relevan). Salah sa
 1. twit duplicate
 2. twit dari akun @poocongs
 
-```{r}
+```{r, fig.cap="Perbandingan twit antar parameter setelah cleaning"}
 twit_gojek %>%
   filter(is_duplicate == FALSE) %>%
-  filter(!user == "poocongs") %>%
+  filter(!user == "@poocongs") %>%
   group_by(parameter) %>%
   count(parameter) %>%
   ggplot(aes(parameter, n)) + geom_col() +
@@ -76,12 +91,12 @@ twit_gojek %>%
 
 Gambar di atas menunjukkan bahwa distribusi twit masih didominasi oleh tagar #savegojek. Namun dilihat dari segi jumlahnya, twit dengan tagar tersebut sudah menunurun dibanding sebelumnya.
 
-## Eksplorasi 2 - Username pengirim twit
+# Eksplorasi 2 - Username pengirim twit
 
-```{r}
+```{r, fig.cap="Username pengirim twit terbanyak"}
 twit_gojek %>%
   filter(is_duplicate == FALSE) %>%
-  filter(!user == "poocongs") %>%
+  filter(!user == "@poocongs") %>%
   group_by(user) %>%
   count(user, sort = TRUE) %>%
   head(n = 20) %>%
@@ -91,14 +106,14 @@ twit_gojek %>%
 
 Setelah dibersihkan total masih tersisi **4995** twit dengan daftar username yang paling banyak mengirim twit di atas. Selanjutnya, ekploasi dilakukan terhadap asal twit berdasarkan waktu
 
-## Eksplorasi 3 - Distribusi twit
+# Eksplorasi 3 - Distribusi twit
 
-```{r}
+```{r, fig.cap="Perbandingan distribusi twit antar parameter"}
 twit_gojek$date <- as.Date(twit_gojek$date)
 
 twit_gojek %>%
   filter(is_duplicate == FALSE) %>%
-  filter(!user == "poocongs") %>%
+  filter(!user == "@poocongs") %>%
   group_by(parameter) %>%
   count(date, sort = TRUE) %>% 
   ggplot(aes(x=date, y=n, colour=parameter)) +
@@ -111,12 +126,12 @@ twit_gojek %>%
 
 Gambar di atas menunjukkan asal waktu untuk masing-masing paramter pencarian twit. Twit dengan tagar #savedrivergojek berasal dari akhir tahun 2016 hingga akhir 2017, dengan puncaknya sekitar bulan 11 tahun 2017. Di sini parameter yang lain juga dapat dilihat tren penggunaan dan postingan twitnya. 
 
-## Eksplorasi 4 - Tagar
+# Eksplorasi 4 - Tagar
 
-```{r}
+```{r, fig.cap="Tagar paling sering digunakan dalam keseluruhan twit"}
 twit_gojek %>%
   filter(is_duplicate == FALSE) %>%
-  filter(!user == "poocongs") %>%
+  filter(!user == "@poocongs") %>%
   select(hashtag) %>%
   unnest_tokens(tagar, hashtag) %>%
   count(tagar, sort = TRUE) %>%
@@ -132,13 +147,13 @@ twit_gojek %>%
 
 Gambar di atas menunjukkan tagar yang paling sering digunakan setelah dilakukan filter terlebih dahulu. Tagar yang tidak diikutsertakan di antaranya adalah, tagar yang menjadi parameter pencarian, tagar gojek, dan akukaukita.
 
-## Eksplorasi 5 - Term
+# Eksplorasi 5 - Term
 Term yang digunakan dalam twit setelah di cleaning dapat dilihat pada gambar di bawah ini. Gambar menunjukkan 20 pasangan kata (bigram) yang paling sering muncul dalam data. 
 
-```{r}
+```{r, fig.cap="Bigram dengan frekuensi tertinggi"}
 twit_gojek %>%
   filter(is_duplicate == FALSE) %>%
-  filter(!user == "poocongs") %>%
+  filter(!user == "@poocongs") %>%
   select(clean_text) %>%
   unnest_tokens(kata, clean_text, token = "ngrams", n = 2) %>%
   count(kata, sort = TRUE) %>%
@@ -149,12 +164,12 @@ twit_gojek %>%
 
 Bigram yang paling sering muncul, yaitu "ojek online" menunjukkan bahwa dokumen teks sebagian besar membahas tentang ojek online atau transportasi online. Hal tersebut ditunjukkan dengan tingginya coocurrance kata ojek dengan online. 
 
-## Eksplorasi 6 - TF-IDF
+# Eksplorasi 6 - TF-IDF
 
-```{r}
+```{r, echo=FALSE, fig.cap="TF-IDF untuk masing parameter"}
 twit_words <- twit_gojek %>%
   filter(is_duplicate == FALSE) %>%
-  filter(!user == "poocongs") %>%
+  filter(!user == "@poocongs") %>%
   select(parameter, clean_text) %>%
   group_by(parameter) %>%
   unnest_tokens(kata, clean_text, token = "ngrams", n = 2) %>%
@@ -187,21 +202,21 @@ Dari twit dengan tagar savedrivergojek, diketahui bahwa kata yang memiliki nilai
 
 Dengan menggunakan data di atas, juga dapat diketahui bahwa salah satu isu yang dibahas adalah tentang tarif driver. Hal ini kemungkinan berkaitan dengan kebijakan tarif yang diterapkan oleh PT GI dan berdampak pada driver sebagai mitra, serta mendapatkan respons. Tagar lain juga dapat diinterpretasikan seperti itu, dengan jumlah kata dengan nilai tf-idf tertinggi yang diubah-ubah.  
 
-## Eksplorasi 7 - Network
+# Eksplorasi 7 - Semantic Network
 
-```{r}
+```{r, echo=FALSE, fig.cap="Semantic Network"}
 names(twit_words)
 
 bigram_counts <- twit_gojek %>%
   filter(is_duplicate == FALSE) %>%
-  filter(!user == "poocongs") %>%
+  filter(!user == "@poocongs") %>%
   select(clean_text) %>%
   unnest_tokens(bigram, clean_text, token = "ngrams", n = 2) %>%
   count(bigram, sort = TRUE) %>%
   separate(bigram, into = c("word1", "word2"))
 
 bigram_graph <- bigram_counts %>%
-  filter(n > 10) %>%
+  filter(n > 7) %>%
   graph_from_data_frame()
 
 bigram_graph
@@ -214,10 +229,80 @@ ggraph(bigram_graph, layout = "fr") +
   geom_edge_link(aes(edge_alpha = n), show.legend = FALSE,
                  arrow = a, end_cap = circle(.07, 'inches')) +
   geom_node_point(color = "lightblue", size = 5) +
-  geom_node_text(aes(label = name), vjust = 1, hjust = 1) +
+  geom_node_text(aes(label = name), vjust = 2, hjust = 2) +
   theme_void()
-
 ```
 
-## Eksplorasi 8 - Topic Modelling
+
+
+# Eksplorasi 8 - Topic Modelling
+
+```{r, echo=FALSE}
+# the LDA function using topicmodels package
+bigram_tm <- function(input_text, # should be a columm from a dataframe
+                       plot = T, # return a plot? TRUE by defult
+                       number_of_topics = 4) # number of topics (4 by default)
+{    
+  set.seed(2016)
+  # create a corpus (type of object expected by tm) and document term matrix
+  Corpus <- VCorpus(VectorSource(input_text)) # make a VCorpus object spec for RWeka
+  
+  # function for creating bigram in the DTM
+  BigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min=2, max=2))
+  # you can explore which term combination gave the most interpretable topic for you
+  # by changing numbers inside Weka_control
+  
+  DTM <- DocumentTermMatrix(Corpus, control=list(tokenize=BigramTokenizer))
+  
+  # remove any empty rows in our document term matrix (if there are any 
+  # we'll get an error when we try to run our LDA)
+  unique_indexes <- unique(DTM$i) # get the index of each unique value
+  DTM <- DTM[unique_indexes,] # get a subset of only those indexes
+  
+  # preform LDA & get the words/topic in a tidy text format
+  lda <- LDA(DTM, k = number_of_topics, control = list(seed = 1234))
+  topics <- tidy(lda, matrix = "beta")
+  
+  # get the top ten terms for each topic
+  top_terms <- topics  %>% # take the topics data frame and..
+    group_by(topic) %>% # treat each topic as a different group
+    top_n(10, beta) %>% # get the top 10 most informative words
+    ungroup() %>% # ungroup
+    arrange(topic, -beta) # arrange words in descending informativeness
+  
+  # if the user asks for a plot (TRUE by default)
+  if(plot == T){
+    # plot the top ten terms for each topic in order
+    top_terms %>% # take the top terms
+      mutate(term = reorder(term, beta)) %>% # sort terms by beta value 
+      ggplot(aes(term, beta, fill = factor(topic))) + # plot beta by theme
+      geom_col(show.legend = FALSE) + # as a bar plot
+      facet_wrap(~ topic, scales = "free") + # which each topic in a seperate plot
+      labs(x = NULL, y = "Beta") + # no x label, change y label 
+      coord_flip() # turn bars sideways
+  }else{ 
+    # if the user does not request a plot
+    # return a list of sorted terms instead
+    return(top_terms)
+  }
+}
+```
+
+Menyiapkan file 
+
+```{r, fig.cap="Hasil topic modelling"}
+# execution
+tm_gojek <- twit_gojek %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(!user == "@poocongs") %>%
+  select(date, user,clean_text, word_count, parameter) %>%
+  filter(word_count >= 2)
+
+tm_twit_gojek <- bigram_tm(tm_gojek$clean_text, number_of_topics = 3)
+tm_twit_gojek
+```
+
+```{r}
+rmarkdown::render("Eksplorasi 1 - twit gojek.Rmd", "pdf_document")
+```
 
