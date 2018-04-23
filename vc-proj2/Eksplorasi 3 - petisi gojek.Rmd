@@ -14,21 +14,67 @@ Data di ambil dari komentar yang diberikan oleh pengunduh aplikasi gojek di play
 ## Library
 
 ```{r}
+if (Sys.info()['sysname'] == 'Darwin') {
+  libjvm <- paste0(system2('/usr/libexec/java_home',stdout = TRUE)[1],'/jre/lib/server/libjvm.dylib')
+  message (paste0('Load libjvm.dylib from: ',libjvm))
+  dyn.load(libjvm)
+}
+
+
 library(lubridate)
 library(tidyverse)
 library(tidytext)
 library(stringr)
 library(tm)
-library(ggplot2)
+library(reshape2)
+library(scales)
+library(AnomalyDetection)
+library(igraph)
+library(ggraph)
+library(topicmodels)
+library(SnowballC)
+library(RWeka) 
 ```
 
-## Import Data
+## Tentang Data
+
+Data yang digunakan di sini di ambil dari komentar dalam website change.org. Komentar diberikan oleh pemberi/pendukung petisi terhadap setiap petisi yang dilayangkan. Dalam hal ini petisi yang memiliki kata kunci gojek di dalam judulnya. 
 
 ```{r}
 dirwd <- paste(getwd(),"/wrangled data proj-2/",sep='')
 daftar_petisi <- read.csv(paste(dirwd,"daftar petisi ttg gojek.csv",sep=''), 
                      header = TRUE, sep = ",", stringsAsFactors = FALSE)
-petisi_gojek <- read.csv(paste(dirwd,"petisi-gojek.csv",sep=''), 
-                     header = TRUE, sep = ",", stringsAsFactors = FALSE)
 ```
+
+Sampai saat ini, terdapat 41 petisi yang memiliki kata kunci gojek. Beberapa petisi dengan pendukung terbanyak dapat dilihat pada gambar di bawah in.
+
+![*Daftar 10 Petisi tentang gojek dengan pendukung tertinggi.*](/Volumes/mydata/RStudio/virtualCitizens/vc-proj2/daftar petisi.png)
+
+```{r, results='hide', echo=FALSE, include=FALSE}
+str(daftar_petisi)
+
+daftar_petisi %>%
+  select(title, jml_pendukung) %>%
+  arrange(desc(jml_pendukung)) %>%
+  head(n=10) %>%
+  ggplot(aes(x = reorder(title, jml_pendukung), y = jml_pendukung)) +
+  geom_col() + coord_flip() +
+  labs( x= "Judul Petisi", y = "Jumlah Pendukung")
+```
+
+Dari daftar tersebut diketahui bahwa ada beberapa petisi yang cukup populer. Salah satunya bahkan didukung oleh lebih dari 60 rb pendukung. 
+
+```{r}
+petisi1 <- read.csv(paste(dirwd,"2-cabut_larangan.csv",sep=''), 
+                     header = TRUE, sep = ";", stringsAsFactors = FALSE)
+petisi2 <- read.csv(paste(dirwd,"3-tolak_pencabutan.csv",sep=''), 
+                     header = TRUE, sep = ";", stringsAsFactors = FALSE)
+petisi3 <- read.csv(paste(dirwd,"5-kami_membutuhkan.csv",sep=''), 
+                     header = TRUE, sep = ";", stringsAsFactors = FALSE)
+petisi4 <- read.csv(paste(dirwd,"6-dukung_keberadaan.csv",sep=''), 
+                     header = TRUE, sep = ";", stringsAsFactors = FALSE)
+petisi5 <- read.csv(paste(dirwd,"7-hentikan_permenhub.csv",sep=''), 
+                     header = TRUE, sep = ";", stringsAsFactors = FALSE)
+```
+
 
