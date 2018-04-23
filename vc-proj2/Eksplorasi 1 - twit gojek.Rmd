@@ -298,4 +298,4 @@ tm_twit_gojek <- bigram_tm(tm_gojek$clean_text, number_of_topics = 3)
 tm_twit_gojek
 ```
 
-Topik pertama cenderung membahas tentang apa gojek dalam persepsi username. Dalam hal ini gojek sebagai karya anak bangsa. Selain itu, dalam topik 1 gojek juga didefinisikan sebagai transportasi onlin. Namun, di sini juga ada topik tentang demo yang dilakukan oleh driver. Hal ini berkaitan dengan tagar savedriver gojek yang untuk mendiskusikan kebijakan tarif yang diterapkan oleh PT GI. 
+Topik pertama cenderung membahas tentang apa gojek dalam persepsi username. Dalam hal ini gojek sebagai karya anak bangsa. Selain itu, dalam topik 1 gojek juga didefinisikan sebagai transportasi onlin. Namun, di sini juga ada topik tentang demo yang dilakukan oleh driver. Hal ini berkaitan dengan tagar savedriver gojek yang untuk mendiskusikan kebijakan tarif yang diterapkan oleh PT GI.
