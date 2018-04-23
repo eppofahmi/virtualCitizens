@@ -61,7 +61,7 @@ twit_gojek <- read.csv(paste(dirwd,"twit-gojek.csv",sep=''),
                      header = TRUE, sep = ",", stringsAsFactors = FALSE)
 ```
 
-# Eksplorasi 1 - Perbandingan Sumber data
+# Eksplorasi 1 - Perbandingan
 Data yang digunakan di sini bersumber dari beberapa parameter yang digunakan untuk scrapping. Gambar di bawah ini, menunjukkan perbandingan jumlah twit yang dihasilkan oleh masing-masing parameter. 
 
 ```{r, fig.cap="Perbandingan twit antar parameter"}
@@ -91,7 +91,8 @@ twit_gojek %>%
 
 Gambar di atas menunjukkan bahwa distribusi twit masih didominasi oleh tagar #savegojek. Namun dilihat dari segi jumlahnya, twit dengan tagar tersebut sudah menunurun dibanding sebelumnya.
 
-# Eksplorasi 2 - Username pengirim twit
+# Eksplorasi 2 - Username
+Gambar di bawah ini digunakan untuk melihat username yang paling sering muncul dalam data. 
 
 ```{r, fig.cap="Username pengirim twit terbanyak"}
 twit_gojek %>%
@@ -204,6 +205,8 @@ Dengan menggunakan data di atas, juga dapat diketahui bahwa salah satu isu yang 
 
 # Eksplorasi 7 - Semantic Network
 
+Semantic network di sini dibuat berdasarkan posisi sebuah term dalam bigram. 
+
 ```{r, echo=FALSE, fig.cap="Semantic Network"}
 names(twit_words)
 
@@ -216,24 +219,17 @@ bigram_counts <- twit_gojek %>%
   separate(bigram, into = c("word1", "word2"))
 
 bigram_graph <- bigram_counts %>%
-  filter(n > 7) %>%
+  filter(n > 10) %>%
   graph_from_data_frame()
 
-bigram_graph
-
-set.seed(2016)
-
-a <- grid::arrow(type = "closed", length = unit(.15, "inches"))
-
 ggraph(bigram_graph, layout = "fr") +
-  geom_edge_link(aes(edge_alpha = n), show.legend = FALSE,
-                 arrow = a, end_cap = circle(.07, 'inches')) +
-  geom_node_point(color = "lightblue", size = 5) +
-  geom_node_text(aes(label = name), vjust = 2, hjust = 2) +
-  theme_void()
+  geom_edge_link() +
+  geom_node_point() +
+  geom_node_text(aes(label = name), vjust = 1, hjust = 1)
+
 ```
 
-
+Hasil di atas menunjukkan bahwa sebuah kata, cenderung berdampingan dengan kata lain. Misalnya, di sini dapat dilihat bahwa kata online berdekatan atau cenderung berasosiasi dengan kata taksi, angkutan, dan transportasi. Sementara kata karya, berdampingan dengan kata anak dan bangsa. 
 
 # Eksplorasi 8 - Topic Modelling
 
@@ -288,7 +284,7 @@ bigram_tm <- function(input_text, # should be a columm from a dataframe
 }
 ```
 
-Menyiapkan file 
+Berikut ini adalah term dengan probabilitas tertinggi sebagai topik yang dibahas dalam twit tentang gojek.   
 
 ```{r, fig.cap="Hasil topic modelling"}
 # execution
@@ -302,7 +298,4 @@ tm_twit_gojek <- bigram_tm(tm_gojek$clean_text, number_of_topics = 3)
 tm_twit_gojek
 ```
 
-```{r}
-rmarkdown::render("Eksplorasi 1 - twit gojek.Rmd", "pdf_document")
-```
-
+Topik pertama cenderung membahas tentang apa gojek dalam persepsi username. Dalam hal ini gojek sebagai karya anak bangsa. Selain itu, dalam topik 1 gojek juga didefinisikan sebagai transportasi onlin. Namun, di sini juga ada topik tentang demo yang dilakukan oleh driver. Hal ini berkaitan dengan tagar savedriver gojek yang untuk mendiskusikan kebijakan tarif yang diterapkan oleh PT GI. 
