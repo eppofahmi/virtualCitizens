@@ -10,6 +10,7 @@ library(tidyverse)
 library(tidytext)
 library(stringr)
 library(tm)
+library(igraph)
 
 # Data ----
 saveojekonline <- read.csv("twit-saveojekonline.csv", sep = ";", header = FALSE, stringsAsFactors = FALSE)
@@ -48,6 +49,8 @@ twit_gojek <- twit_gojek %>%
   dplyr::mutate(is_duplicate = duplicated(tweets))
 
 # 2. user_all ===================================== 
+twit_gojek$tweets <- gsub("pic[^[:space:]]*", "", twit_gojek$tweets)
+
 twit_gojek$user_all <- sapply(str_extract_all(twit_gojek$tweets, "@\\S+", simplify = FALSE), paste, collapse=", ")
 
 # add @ if nedeed
@@ -60,6 +63,11 @@ twit_gojek$user_all <- paste(twit_gojek$user, twit_gojek$user_all, sep=" ")
 twit_gojek$user_all <- gsub("[^[:alpha:][:space:]@_]*", "", twit_gojek$user_all)
 
 # 3. user_count ==================================
+
+# removing space at the end of term/username
+twit_gojek$user_all <- gsub("[[:space:]]+$", "", twit_gojek$user_all)
+
+# counting usernames
 twit_gojek$user_count <- sapply(twit_gojek$user_all, 
                              function(x) length(unlist(strsplit(as.character(x), "@\\S+"))))
 
@@ -159,7 +167,7 @@ glimpse(twit_gojek)
 #twit_gojek <- twit_gojek %>%
 #  mutate(parameter = "#balitolakreklamasi")
 
-#10. save ----
+#10. save data ----
 
 names(twit_gojek)
 
@@ -168,4 +176,36 @@ twit_gojek <- twit_gojek %>%
 
 write_csv(twit_gojek, path = "wrangled data proj-2/twit-gojek.csv")
 
-# @poocongs - delete
+#11. net data ----
+net_twit_gojek <- twit_gojek %>%
+  filter(!user == "@poocongs") %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(user_count >= 2) %>%
+  select(user_all)
+
+colnames(net_twit_gojek) <- "Data"
+
+write_csv(net_twit_gojek, path = "wrangled data proj-2/net-twit-gojek.csv")
+
+# Trying
+# i was actually trying to make an input for gephi in r
+
+library(quanteda)
+dfm_gojek <- dfm(net_twit_gojek$user_all)
+
+nfeat(dfm_gojek)
+
+# construct a feature-ouccerances matrix (FCM
+gojek_fcm <- fcm(dfm_gojek)
+dim(gojek_fcm)
+
+feat <- names(topfeatures(gojek_fcm, 100))
+gojek_fcm <- fcm_select(gojek_fcm, feat)
+dim(gojek_fcm)
+
+size <- log(colSums(dfm_select(dfm_gojek, feat)))
+textplot_network(gojek_fcm, min_freq = 0.8, vertex_size = size / max(size) * 3)
+
+#12.igraph ----
+a <- net_twit_gojek %>%
+  head(n = 10)
