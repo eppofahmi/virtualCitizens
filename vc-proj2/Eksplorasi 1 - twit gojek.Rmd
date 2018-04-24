@@ -50,6 +50,8 @@ library(ggraph)
 library(topicmodels)
 library(SnowballC)
 library(RWeka) 
+library(quanteda)
+library(ggplot2)
 ```
 
 # Import Data
@@ -296,3 +298,30 @@ tm_twit_gojek
 ```
 
 Topik pertama cenderung membahas tentang apa gojek dalam persepsi username. Dalam hal ini gojek sebagai karya anak bangsa. Selain itu, dalam topik 1 gojek juga didefinisikan sebagai transportasi onlin. Namun, di sini juga ada topik tentang demo yang dilakukan oleh driver. Hal ini berkaitan dengan tagar savedriver gojek yang untuk mendiskusikan kebijakan tarif yang diterapkan oleh PT GI.
+
+# Eksplorasi 9 - Username' Network
+
+```{r}
+net_twit_gojek <- twit_gojek %>%
+  filter(!user == "@poocongs") %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(user_count >= 2) %>%
+  select(user_all, user_count)
+
+dfm_gojek <- dfm(net_twit_gojek$user_all)
+
+nfeat(dfm_gojek)
+
+# construct a feature-ouccerances matrix (FCM
+gojek_fcm <- fcm(dfm_gojek)
+dim(gojek_fcm)
+
+feat <- names(topfeatures(gojek_fcm, 75))
+gojek_fcm <- fcm_select(gojek_fcm, feat)
+dim(gojek_fcm)
+
+size <- log(colSums(dfm_select(dfm_gojek, feat)))
+textplot_network(gojek_fcm, min_freq = 0.8, vertex_size = size / max(size) * 3)
+```
+
+Gambar di atas menunjukkan username Twitter yang sering berada bersamaan. Dalam konteks ini, hal tersebut dapat diasumsikan sebagai username paling sering disebut (dimention) oleh pengguna twitter dalam twit yang didapat dengan parameter yang digunakan di sini.
