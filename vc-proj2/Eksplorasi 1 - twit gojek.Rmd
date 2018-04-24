@@ -207,8 +207,6 @@ Dengan menggunakan data di atas, juga dapat diketahui bahwa salah satu isu yang 
 Semantic network di sini dibuat berdasarkan posisi sebuah term dalam bigram. 
 
 ```{r, echo=FALSE, fig.cap="Semantic Network"}
-names(twit_words)
-
 bigram_counts <- twit_gojek %>%
   filter(is_duplicate == FALSE) %>%
   filter(!user == "@poocongs") %>%
