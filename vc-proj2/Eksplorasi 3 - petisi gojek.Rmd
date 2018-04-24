@@ -1,17 +1,18 @@
 ---
-title: "Comment to Gojek Apss"
-output: html_notebook
+title: "Komentar petisi gojek"
+output: 
+  html_notebook:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    number_sections: true
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 ```
 
-## Tentang Data
-Data di ambil dari komentar yang diberikan oleh pengunduh aplikasi gojek di playstore. 
-
-
-## Library
+# Library
 
 ```{r}
 if (Sys.info()['sysname'] == 'Darwin') {
@@ -19,7 +20,6 @@ if (Sys.info()['sysname'] == 'Darwin') {
   message (paste0('Load libjvm.dylib from: ',libjvm))
   dyn.load(libjvm)
 }
-
 
 library(lubridate)
 library(tidyverse)
@@ -36,13 +36,16 @@ library(SnowballC)
 library(RWeka) 
 ```
 
-## Tentang Data
+# Tentang Data
 
 Data yang digunakan di sini di ambil dari komentar dalam website change.org. Komentar diberikan oleh pemberi/pendukung petisi terhadap setiap petisi yang dilayangkan. Dalam hal ini petisi yang memiliki kata kunci gojek di dalam judulnya. 
 
 ```{r}
 dirwd <- paste(getwd(),"/wrangled data proj-2/",sep='')
 daftar_petisi <- read.csv(paste(dirwd,"daftar petisi ttg gojek.csv",sep=''), 
+                     header = TRUE, sep = ",", stringsAsFactors = FALSE)
+
+petisi_gojek <- read.csv(paste(dirwd,"petisi-gojek.csv",sep=''), 
                      header = TRUE, sep = ",", stringsAsFactors = FALSE)
 ```
 
@@ -64,17 +67,81 @@ daftar_petisi %>%
 
 Dari daftar tersebut diketahui bahwa ada beberapa petisi yang cukup populer. Salah satunya bahkan didukung oleh lebih dari 60 rb pendukung. 
 
-```{r}
-petisi1 <- read.csv(paste(dirwd,"2-cabut_larangan.csv",sep=''), 
-                     header = TRUE, sep = ";", stringsAsFactors = FALSE)
-petisi2 <- read.csv(paste(dirwd,"3-tolak_pencabutan.csv",sep=''), 
-                     header = TRUE, sep = ";", stringsAsFactors = FALSE)
-petisi3 <- read.csv(paste(dirwd,"5-kami_membutuhkan.csv",sep=''), 
-                     header = TRUE, sep = ";", stringsAsFactors = FALSE)
-petisi4 <- read.csv(paste(dirwd,"6-dukung_keberadaan.csv",sep=''), 
-                     header = TRUE, sep = ";", stringsAsFactors = FALSE)
-petisi5 <- read.csv(paste(dirwd,"7-hentikan_permenhub.csv",sep=''), 
-                     header = TRUE, sep = ";", stringsAsFactors = FALSE)
+1. petisi1 = Cabut larangan pengoperasian layanan transportasi berbasis online (Gojek, grabbike,dll)
+2. petisi2 = Tolak Pencabutan gojek Tasikmalaya!
+3. petisi3 = Jangan kembali renggut kebebasan masyarakat jawa barat untuk memilih transportasi!
+4. petisi4 = Kami membutuhkan gojek
+5. petisi5 = Dukung keberadaan gojek di purwokerto
+6. petisi6 = Hentikan permenhub 108
+
+Sejak kemunculannya, transportasi online mendapat beragam sambutan dari masyarakat dan pemerintah. Dalam hal ini, ada pemerintah daerah yang menolak, namun masyarakatnya justru mendukung karena mereka menilai transportasi online dapat memudahkan kegiatan mereka sehari-hari. Ketika transportasi online dilarang, masyarakat melayangkan petisi online melalui laman www.change.org agar larangan tersebut dicabut.
+
+
+# Distribusi petisi 
+
+```{r, fig.cap="Distribusi petisi ttg gojek"}
+daftar_petisi %>%
+  select(date) %>%
+  separate(date, into = c("tahun", "bulan"), sep = "-") %>%
+  count(tahun) %>% 
+  ggplot(aes(tahun, n)) + 
+  geom_bar(stat = "identity", position = "dodge") + geom_text(aes(label=n), vjust=0) +
+  labs(x = NULL, y=NULL)
 ```
 
+Sejak 2015, hampir setiap tahun ada petisi tentang gojek. Pada 2017, bahkan petisi terkait gojek ada 28, sementara angka terkecil pada tahun 2016, 2 petisi. 
+
+# Siapa yang dipetisi
+
+```{r}
+daftar_petisi %>%
+  select(terpetisi)
+```
+
+# Tf-idf dalam alasan
+
+```{r, echo=FALSE}
+
+# Cleaning text
+replace_reg <- "http://[A-Za-z]+|&amp;|&lt;|&gt;|RT|https|[@|#|pic]['_A-Za-z|[:punct:]|\\d]+"
+unnest_reg <- "([^A-Za-z])+"
+
+stopwords <- read.csv(paste(dirwd,"stopwords_indo.csv",sep=''), header = FALSE)
+
+cltext <- petisi_gojek %>%
+  select(judul_petisi, Alasan) %>%
+  mutate(text = str_replace_all(Alasan,replace_reg,"")) %>%
+  unnest_tokens(word, Alasan, token="regex",pattern=unnest_reg) %>%
+  filter(!word %in% stopwords$V1,str_detect(word,"[a-z]")) %>%
+  filter(nchar(word)>2) %>%
+  filter(!word %in% c('ed','co','bd','ri', "br", "is", "the", "jek")) %>%
+  select(judul_petisi, word) %>%
+  group_by(judul_petisi) %>%
+  unnest_tokens(kata, word, token = "ngrams", n = 2) %>%
+  count(kata, sort = TRUE)
+
+total_words <- cltext %>% 
+  group_by(judul_petisi) %>% 
+  summarize(total = sum(n))
+
+petisi_words <- left_join(cltext, total_words)
+
+petisi_words <- petisi_words %>%
+  bind_tf_idf(kata, judul_petisi, n) %>%
+  arrange(desc(tf_idf))
+
+# Visualisasi tf-idf
+petisi_words %>%
+  arrange(desc(tf_idf)) %>%
+  mutate(kata = factor(kata, levels = rev(unique(kata)))) %>% 
+  group_by(judul_petisi) %>% 
+  top_n(5) %>% 
+  ungroup %>%
+  ggplot(aes(reorder(kata,tf_idf), tf_idf, fill = judul_petisi)) +
+  geom_col(show.legend = FALSE) +
+  labs(x = NULL, y = "tf-idf") +
+  facet_wrap(~judul_petisi, ncol = 2, scales = "free") + 
+  labs(x = NULL, y = "tf-idf bigram to judul petisi") +
+  coord_flip()
+```
 
