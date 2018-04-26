@@ -38,6 +38,9 @@ change_raw <- change_raw %>%
   dplyr::mutate(is_duplicate = duplicated(tweets))
 
 # 2. user_all ===================================== 
+
+change_raw$tweets <- gsub("pic[^[:space:]]*", "", change_raw$tweets)
+
 change_raw$user_all <- sapply(str_extract_all(change_raw$tweets, "@\\S+", simplify = FALSE), paste, collapse=", ")
 
 # add @ if nedeed

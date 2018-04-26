@@ -34,6 +34,9 @@ bns_raw <- bns_raw %>%
   dplyr::mutate(is_duplicate = duplicated(tweets))
 
 # 2. user_all ===================================== 
+
+bns_raw$tweets <- gsub("pic[^[:space:]]*", "", bns_raw$tweets)
+
 bns_raw$user_all <- sapply(str_extract_all(bns_raw$tweets, "@\\S+", simplify = FALSE), paste, collapse=", ")
 
 # add @ if nedeed
