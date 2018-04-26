@@ -26,4 +26,3 @@ map_df(c(seq(from = 0, to = 490, by = 10)), function(i) {
              stringsAsFactors = FALSE)
   
 }) -> tes_chang
-
