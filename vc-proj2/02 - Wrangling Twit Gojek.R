@@ -186,26 +186,3 @@ net_twit_gojek <- twit_gojek %>%
 colnames(net_twit_gojek) <- "Data"
 
 write_csv(net_twit_gojek, path = "wrangled data proj-2/net-twit-gojek.csv")
-
-# Trying
-# i was actually trying to make an input for gephi in r
-
-library(quanteda)
-dfm_gojek <- dfm(net_twit_gojek$user_all)
-
-nfeat(dfm_gojek)
-
-# construct a feature-ouccerances matrix (FCM
-gojek_fcm <- fcm(dfm_gojek)
-dim(gojek_fcm)
-
-feat <- names(topfeatures(gojek_fcm, 100))
-gojek_fcm <- fcm_select(gojek_fcm, feat)
-dim(gojek_fcm)
-
-size <- log(colSums(dfm_select(dfm_gojek, feat)))
-textplot_network(gojek_fcm, min_freq = 0.8, vertex_size = size / max(size) * 3)
-
-#12.igraph ----
-a <- net_twit_gojek %>%
-  head(n = 10)
