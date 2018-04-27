@@ -1,0 +1,60 @@
+---
+title: 'Laporan 1: Tweets'' Mentioning Change'
+author: "Ujang fahmi"
+date: "4/26/2018"
+output:
+  html_notebook:
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+# Pendahuluan
+Eksplorasi 1 dilakukan sebagai studi pendahuluan tentang wacana yang berkembang dan dikembangkan oleh warga net di dunia maya dalam studi kasus keberadaan laman petisi daring [**Change Indonesia.**](https://www.change.org/) Data yang digunakan dalam eksplorasi satu berasal dari **Twitter**. Data didapat dengan melakukan scrapping terhadap twits yang memention akun @ChangeOrg_ID. Data yang digunakan dalam eksplorasi ini telah melalui tahap wrangling dan cleaning dengan script yang dapat dilihat dalam [tautan ini](https://bit.ly/2HV4DJC).
+
+Twit yang memention akun resmi milik **Change.org** dipilih sebagai langkah pertama untuk mengidentifikasi wacana yang berkembang. Berdasarkan wacana yang teridentifikasi dari data ini kemudian akan dipilih studi kasus untuk mendalami pengembangan sebuah nilai yang dilakukan oleh warga net secara virtual (di dunia maya).
+
+# Library
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(stringr)
+library(lubridate)
+library(topicmodels)
+library(tm)
+```
+
+```{r}
+dirwd <- paste(getwd(),"/wrangled data proj-3/",sep='')
+twit_to_change <- read_csv(paste(dirwd,"twit-mention-change.csv",sep=''), col_names = TRUE)
+```
+
+# Gambaran umum data
+
+Data dalam penelitian ini didapat dengan metode semi atutomatic scrapping (Fahmi et.al, 2018), yaitu dengan mendownload file html Twitter yang berisi twit dengan parameter nama akun. File html di dapat dengan memanfaatkan menu *advance search* di laman Twitter. Halaman tersebut dapat dilihat [di sini](https://twitter.com/search-advanced), di mana secara spesefik twit didapat dengan mengisi parameter *mentioning these account* pada laman tersebut dengan nama akun **@ChangeOrg_ID**. 
+
+Dari file html yang didapat selanjutnya konten diekstrak dan menjadi data mentah. Dalam hal ini, data mentah terdiri dari: 
+
+1. Tanggal twit diunggah (**date**)
+2. Jam pada saat twit diunggah (**time**)
+3. Isi twit (**tweets**)
+4. Username pengirim (**username**)
+5. Keterangan twit sebagai balasan atau bukan (**replying**)
+6. Jumlah reply yang didapat sebuah twit (**rep_count**)
+7. Jumlah retweet yang didapat sebuah twit (**ret_count**)
+8. Jumlah favorite yang didapat sebuah twit (**fav_count**)
+9. Link yang merujuk pada akun pengguna (**link**)
+
+Masing-masing kolom selanjutnya melalui proses wrangling, di mana data yang ada didalamnya dibuat menjadi data baru yang akan digunakan untuk melakukan eksplorasi. Proses wrangling dapat dilihat dan dicermati untuk data yang digunakan dalam laporan ini [di sini](https://bit.ly/2Huzb1C).
+
+
+
+
