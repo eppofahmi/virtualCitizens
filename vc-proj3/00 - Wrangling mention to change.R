@@ -21,7 +21,7 @@ library(stringr)
 library(tm)
 
 # Data mentah =====================================
-change_raw <- read.csv("change_012014-012018.csv", header = TRUE, 
+change_raw <- read.csv("twit-to change.csv", header = TRUE, 
                     stringsAsFactors = FALSE, sep = ";") 
 
 colnames(change_raw) <- c("date", "time", "user", "tweets", "replying", 
@@ -57,6 +57,9 @@ change_raw$user_count <- sapply(change_raw$user_all,
                              function(x) length(unlist(strsplit(as.character(x), "@\\S+"))))
 
 # 4. tagar =======================================
+
+change_raw$tweets <- gsub("pic[^[:space:]]*", "", change_raw$tweets)
+
 change_raw$hashtag <- sapply(str_extract_all(change_raw$tweets, "#\\S+", simplify = FALSE), 
                           paste, collapse=", ")
 
