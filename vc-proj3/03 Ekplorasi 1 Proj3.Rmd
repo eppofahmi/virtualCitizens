@@ -1,0 +1,398 @@
+---
+title: 'Laporan 1: Tweets'' Mentioning @ChangeOrg_ID'
+author: "Ujang fahmi"
+date: "4/26/2018"
+output:
+  rmarkdown::pdf_document:
+    fig_caption: yes
+    includes:
+      in_header: setup markdown.tex
+  html_notebook:
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.pos = "h")
+```
+
+# Pendahuluan
+Eksplorasi 1 dilakukan sebagai studi pendahuluan tentang wacana yang berkembang dan dikembangkan oleh warga net di dunia maya dalam studi kasus keberadaan laman petisi daring [**Change Indonesia.**](https://www.change.org/) Data yang digunakan dalam eksplorasi satu berasal dari **Twitter**. Data didapat dengan melakukan scrapping terhadap twits yang memention akun @ChangeOrg_ID. Data yang digunakan dalam eksplorasi ini telah melalui tahap wrangling dan cleaning dengan script yang dapat dilihat dalam [tautan ini](https://bit.ly/2HV4DJC).
+
+Twit yang memention akun resmi milik **Change.org** dipilih sebagai langkah pertama untuk mengidentifikasi wacana yang berkembang. Berdasarkan wacana yang teridentifikasi dari data ini kemudian akan dipilih studi kasus untuk mendalami pengembangan sebuah nilai yang dilakukan oleh warga net secara virtual (di dunia maya).
+
+```{r}
+# Runing RJava
+if (Sys.info()['sysname'] == 'Darwin') {
+  libjvm <- paste0(system2('/usr/libexec/java_home',stdout = TRUE)[1],'/jre/lib/server/libjvm.dylib')
+  message (paste0('Load libjvm.dylib from: ',libjvm))
+  dyn.load(libjvm)
+}
+
+library(tidyverse)
+library(ggplot2)
+library(stringr)
+library(lubridate)
+library(topicmodels)
+library(tm)
+library(tidytext)
+library(RWeka)
+library(reshape2)
+library(wordcloud)
+library(igraph)
+library(ggraph)
+library(quanteda)
+```
+
+```{r}
+dirwd <- paste(getwd(),"/wrangled data proj-3/",sep='')
+twit_to_change <- read_csv(paste(dirwd,"twit-mention-change.csv",sep=''), col_names = TRUE)
+```
+
+# Gambaran umum data
+
+Data dalam laporan ini didapat dengan metode semi atutomatic scrapping (Fahmi et.al, 2018), yaitu dengan mendownload file html Twitter yang berisi twit dengan parameter nama akun. File html di dapat dengan memanfaatkan menu *advance search* di laman Twitter. Halaman tersebut dapat dilihat [di sini](https://twitter.com/search-advanced), di mana secara spesefik twit didapat dengan mengisi parameter *mentioning these account* pada laman tersebut dengan nama akun **@ChangeOrg_ID**. 
+
+Dari file html yang didapat selanjutnya konten diekstrak dan menjadi data mentah. Dalam hal ini, data mentah terdiri dari: 
+
+1. Tanggal twit diunggah (**date**)
+2. Jam pada saat twit diunggah (**time**)
+3. Isi twit (**tweets**)
+4. Username pengirim (**username**)
+5. Keterangan twit sebagai balasan atau bukan (**replying**)
+6. Jumlah reply yang didapat sebuah twit (**rep_count**)
+7. Jumlah retweet yang didapat sebuah twit (**ret_count**)
+8. Jumlah favorite yang didapat sebuah twit (**fav_count**)
+9. Link yang merujuk pada akun pengguna (**link**)
+
+Masing-masing kolom selanjutnya melalui proses wrangling, di mana data yang ada didalamnya dibuat menjadi data baru yang akan digunakan untuk melakukan eksplorasi. Proses wrangling dapat dilihat dan dicermati untuk data yang digunakan dalam laporan ini [di sini](https://bit.ly/2Huzb1C). Gambar berikut menunjukkan data (twit) yang didapat sebelum dan setelah dibersihkan. 
+
+```{r}
+twit_to_change %>%
+  group_by(is_duplicate) %>%
+  count(is_duplicate) %>%
+  summarise(n) %>%
+  print()
+```
+
+Indikator **`is_duplicate`** dibuat berdasarkan konten twit, jika twit tersebut memiliki duplicate atau sama dengan twit lain yang lebih dulu diunggah berdasarkan kolom `date` maka pada kolom tersebut mendapat label **TRUE**, sebaliknya jika bukan labelnya **FALS.** Berdasarkan data di tabel maka twit yang akan dianalisis dalam laporan ini berjumlah **37410.** Sementara dilihat dari segi waktunya, data yang digunakan dapat dilihat pada gambar berikut. 
+
+```{r, fig.pos='h', fig.cap="Distribusi Twit yang memention akun @ChangeOrg_ID"}
+twit_to_change %>%
+  group_by(date) %>% count(date) %>% arrange(date) %>%
+  ggplot(aes(x = date, y = n)) + geom_line() + 
+  labs(x = "Tahun", y = "Jumlah Twit")
+```
+
+Data yang digunakan dalam laporan ini berasal dari 2013-12-31 hingga 2018-01-30. Dari data tersebut selanjutnya eksplorasi dilakukan terhadap kontent twit, mulai dari tagar hingga topik yang paling banyak muncul. Namun sebelum itu, terelih dahulu akan dilihat jumlah pengguna twitter yang menjadi pengirim dan yang terlibat dalam twit yang memention akun @ChangeOrg_ID. Eksplorasi terhadap akun atau username ini selanjutnya akan digunakan sebagai dasar analisis aktor yang lebih jauh dan mendalam. 
+
+# Akun Pengirim dan Akun yang terlibat
+Akun pengirim didapat dari kolom `username`, sedangkan akun yang terlibat merupakan gabung *term* dari kolom `username` dan `tweets` yang memiliki tanda awal `@`, misalnya `@user12_09`. Gabungan kedua kolom tersebut selanjutnya diletakan dalam kolom `user_all`.
+
+```{r, fig.cap="20 Akun pengirim twit terbanyak"}
+twit_to_change %>%
+  filter(is_duplicate == FALSE) %>%
+  count(user, sort = TRUE) %>%
+  filter(!str_detect(user, '@ChangeOrg_ID')) %>%
+  head(n = 20) %>%
+  ggplot(aes(x = reorder(user, n), y = n)) + coord_flip() +
+  geom_col(show.legend = FALSE) + 
+  labs(x = "Username Twitter", y = "Jumlah Twit yang dikirim")
+```
+
+Selain akun @ChangeOrg_ID, username Twitter yang menjadi pengirim twit terbanyak dapat dilihat pada gambar di atas. Namun secara keselurhan akun **@ChangeOrg_ID** merupakan pengirim terbanyak. Berikut adalah beberapa contoh twit yang dikirim oleh akun tersebut. 
+
+```{r}
+twit_to_change %>%
+  filter(str_detect(user, "@ChangeOrg_ID")) %>%
+  select(tweets) %>%
+  head(n = 2) %>% print(tweets)
+```
+
+Sementara twit yang dikirim oleh akun lain, contohnya dapat dilihat di bawah ini. Misalnya di sini kita ingin melihat oleh pengirim terbanyak kedua, yaitu akun **@wijayalabs**. 
+
+```{r}
+twit_to_change %>%
+  filter(str_detect(user, "@wijayalabs")) %>%
+  select(tweets) %>%
+  head(n = 2) %>% print(tweets)
+```
+
+Dari gambar dan contoh twit di atas, dapat dilihat bahwa twit yang memention akun @ChangeOrg_ID digunakan untuk mengampanyekan petisi yang ada di laman change.org. Sementara jika dilihat dari keselurahan akun Twitter yang ada dalam twit komposisinya dapat dilihat pada gambar di bawah ini. Di mana sekamin tinggi berarti semakin sering username tersebut disebut oleh pengguna twitter dalam twit yang memention akun parameter. 
+
+```{r, fig.cap="20 Akun yang paling sering dimention"}
+twit_to_change %>%
+  filter(is_duplicate == FALSE) %>%
+  unnest_tokens(user, user_all, to_lower = FALSE) %>%
+  count(user, sort = TRUE) %>%
+  filter(!str_detect(user, 'ChangeOrg_ID')) %>%
+  head(n = 20) %>%
+  ggplot(aes(x = reorder(user, n), y = n)) + coord_flip() +
+  geom_col(show.legend = FALSE) + 
+  labs(x = "Username Twitter", y = "Jumlah Keberadaan Username dalam Twit")
+```
+
+Sementara jika dilihat dari username yang terlibat seperti pada gambar di atas, dapat diketahui bahwa dalam twit yang memntion akun @ChangeOrg_ID juga terdapat akun-akun lain yang dimention. Dalam konteks ini, akun tersebut bisa jadi merupakan inisiator petisi atau akun milik seseorang yang dipetisi. Sebagai contoh, twit berikut ini menunjukkan twit yang di dalamnya terdapat akun **@SBYudhoyono**. 
+
+```{r}
+twit_to_change %>%
+  select(tweets) %>%
+  dplyr::filter(grepl('@SBYudhoyono', tweets)) %>%
+  head(n = 2)
+```
+
+# Tagar, Term, TF-IDF
+Eksplorasi ini digunakan untuk memudahkan interpretasi hasil `topic modelling` yang akan dilakukan setelah ini. Tagar dapat dijadikan sebagai tilikan konten yang dibahas. Term frekuensi dapat digunakan sebagai tilikan tentang popularitas sebuah topik dalam sebuah dokumen. Sedangkan TF-IDF dapat digunakan sebagai penilaian tentang urgensi sebuah term dalam sebuah dokumen.
+
+## Tagar
+Tagar diekstrak dari kolom `tweets` yang selanjutnya diletakan dalam kolom `hashtag`. Untuk melihat perkembangan tagar yang digunakan dalam twit, data dibagi menjadi lima periode berdasarkan tahun asalnya. Di mana periode 1 berasal dari tahun 2013 dan 2014 dan periode 5 berasal dari twit yang diunggah pada tahun 2018. 
+
+**Catatan:**
+Tagar dibagi menjadi empat periode karena pada tahun 2018 tagarnya terlalu sedikit. 
+
+```{r, fig.cap="Tagar yang digunakan"}
+tagar_periode1 <- twit_to_change %>%
+  filter(periode == "periode_1") %>%
+  select(hashtag, tag_count) %>%
+  filter(tag_count >= 1) %>%
+  unnest_tokens(tagar, hashtag) %>%
+  count(tagar, sort = TRUE)
+
+tagar_periode2 <- twit_to_change %>%
+  filter(periode == "periode_2") %>%
+  select(hashtag, tag_count) %>%
+  filter(tag_count >= 1) %>%
+  unnest_tokens(tagar, hashtag) %>%
+  count(tagar, sort = TRUE)
+
+tagar_periode3 <- twit_to_change %>%
+  filter(periode == "periode_3") %>%
+  select(hashtag, tag_count) %>%
+  filter(tag_count >= 1) %>%
+  unnest_tokens(tagar, hashtag) %>%
+  count(tagar, sort = TRUE)
+
+tagar_periode4 <- twit_to_change %>%
+  filter(periode == "periode_4") %>%
+  select(hashtag, tag_count) %>%
+  filter(tag_count >= 1) %>%
+  unnest_tokens(tagar, hashtag) %>%
+  count(tagar, sort = TRUE)
+
+tagar_periode5 <- twit_to_change %>%
+  filter(periode == "periode_5") %>%
+  select(hashtag, tag_count) %>%
+  filter(tag_count >= 1) %>%
+  unnest_tokens(tagar, hashtag) %>%
+  count(tagar, sort = TRUE)
+
+tagar_periode <- bind_rows(tagar_periode1 %>%
+                             mutate(periode = "periode_1"), 
+                           tagar_periode2 %>%
+                             mutate(periode = "periode_2"), 
+                           tagar_periode3 %>%
+                             mutate(periode = "periode_3"),
+                           tagar_periode4 %>%
+                             mutate(periode = "periode_4"),
+                           tagar_periode5 %>%
+                             mutate(periode = "periode_4"))
+
+tagar_periode %>%
+  acast(tagar ~ periode, value.var = "n", fill = 0) %>%
+  comparison.cloud(colors = c("darkturquoise", "coral1", "brown3", "lightseagreen"), max.words = 1329)
+
+```
+
+Gambar di atas menunjukkan lima tagar yang paling sering digunakan. Dari gambar tersebut diketahui bawah setiap tahunnya tagar yang digunakan oleh warga net terus berubah. Misalnya, pada tahun 2013/2014 atau periode tagar paling sering digunakan adalah **#saveshark**, kemudian **#dukungpilkadalangsung** dan **#revisiuumd** yang merujuk pada revisi **uu-md3 DPR**.
+
+## Term
+
+Term atau kata yang digunakan dalam bentuk dua kata berpasangan atau bigram yang diambil dari kolom `clean_text`. Kolom tersebut berisi twit yang sudah dibersihkan. Dalam laporan ini, bigram dihitung dari twit yang setelah dibersihkan memiliki minimal dua term. Di mana total term secara kesulurahn yang ada dari **33819** twit adalah **217897** term.
+
+```{r, fig.cap="Frekuensi Bigram dalam twit"}
+twit_to_change %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(word_count >= 2) %>%
+  select(date, clean_text, word_count, periode) %>%
+  unnest_tokens(kata, clean_text, token = "ngrams", n = 2) %>%
+  count(kata, sort = TRUE) %>%
+  head(n = 20) %>%
+  ggplot(aes(reorder(kata, n), n)) + geom_col() + coord_flip() +
+  labs(x = "bigram", y = "jumlah bigram")
+```
+
+Pasangan kata yang paling banyak muncul dalam twit adalah **teluk benua**. Kemungkinan besar, topic modelling yang dihasilkan juga salah satunya tentang kat tersebut. Teluk benua di sini merujuk pada kasus reklamasi yang dilakukan di teluk benua, Bali. 
+
+## TF-IDF
+
+```{r, fig.cap="TF-IDF bigram per periode"}
+twit_words <- twit_to_change %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(word_count >= 2) %>%
+  select(clean_text, periode) %>%
+  group_by(periode) %>%
+  unnest_tokens(kata, clean_text, token = "ngrams", n = 2) %>%
+  count(kata, sort = TRUE)
+
+total_words <- twit_words %>% 
+  group_by(periode) %>% 
+  summarize(total = sum(n))
+
+twit_words <- left_join(twit_words, total_words)
+
+twit_words <- twit_words %>%
+  bind_tf_idf(kata, periode, n) %>%
+  arrange(desc(tf_idf))
+
+# Visualisasi tf-idf
+twit_words %>%
+  arrange(desc(tf_idf)) %>%
+  mutate(kata = factor(kata, levels = rev(unique(kata)))) %>% 
+  group_by(periode) %>% 
+  top_n(7) %>% 
+  ungroup %>%
+  ggplot(aes(reorder(kata,tf_idf), tf_idf, fill = periode)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~periode, ncol = 2, scales = "free") + 
+  labs(x = "Bigram", y = "Value") +
+  coord_flip()
+```
+
+Di periode 1 bigram yang dianggap paling penting salah satunya adalah benua ubah dan ubah perpres. Hal ini berkaitan dengan adanya perpres yang juga terkait dengan teluk benua seperti dapat dilihat pada twit berikut.
+
+```{r}
+twit_to_change %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(str_detect(clean_text, "benoa ubah")) %>%
+  select(tweets) %>%
+  head(n = 1) %>% print(tweets)
+```
+
+
+# Topic modelling
+Topic modelling menggunakan data dari kolom `clean_text` dan filter `is_duplicate` = FALSE. Selain itu, karena topic modelling akan dilakukan dengan bigram twit yang setelah dibersihkan hanya memiliki 1 term dihilangkan dari data. Asumsinya, data dari twit tersebut tidak dapat memberikan konteks dari term yang ada secara lokal. Total twit yang dijadikan input topic modelling **33.819** twit. 
+
+```{r}
+# the LDA function using topicmodels package
+bigram_tm <- function(input_text, # should be a columm from a dataframe
+                       plot = T, # return a plot? TRUE by defult
+                       number_of_topics = 4) # number of topics (4 by default)
+{    
+  set.seed(2016)
+  # create a corpus (type of object expected by tm) and document term matrix
+  Corpus <- VCorpus(VectorSource(input_text)) # make a VCorpus object spec for RWeka
+  
+  # function for creating bigram in the DTM
+  BigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min=2, max=2))
+  # you can explore which term combination gave the most interpretable topic for you
+  # by changing numbers inside Weka_control
+  
+  DTM <- DocumentTermMatrix(Corpus, control=list(tokenize=BigramTokenizer))
+  
+  # remove any empty rows in our document term matrix (if there are any 
+  # we'll get an error when we try to run our LDA)
+  unique_indexes <- unique(DTM$i) # get the index of each unique value
+  DTM <- DTM[unique_indexes,] # get a subset of only those indexes
+  
+  # preform LDA & get the words/topic in a tidy text format
+  lda <- LDA(DTM, k = number_of_topics, control = list(seed = 1234))
+  topics <- tidy(lda, matrix = "beta")
+  
+  # get the top ten terms for each topic
+  top_terms <- topics  %>% # take the topics data frame and..
+    group_by(topic) %>% # treat each topic as a different group
+    top_n(10, beta) %>% # get the top 10 most informative words
+    ungroup() %>% # ungroup
+    arrange(topic, -beta) # arrange words in descending informativeness
+  
+  # if the user asks for a plot (TRUE by default)
+  if(plot == T){
+    # plot the top ten terms for each topic in order
+    top_terms %>% # take the top terms
+      mutate(term = reorder(term, beta)) %>% # sort terms by beta value 
+      ggplot(aes(term, beta, fill = factor(topic))) + # plot beta by theme
+      geom_col(show.legend = FALSE) + # as a bar plot
+      facet_wrap(~ topic, scales = "free") + # which each topic in a seperate plot
+      labs(x = NULL, y = "Beta") + # no x label, change y label 
+      coord_flip() # turn bars sideways
+  }else{ 
+    # if the user does not request a plot
+    # return a list of sorted terms instead
+    return(top_terms)
+  }
+}
+```
+
+
+```{r, fig.cap="Topik Modelling Twit"}
+tm_tochange <- twit_to_change %>%
+  filter(is_duplicate == FALSE) %>%
+  select(date, user,clean_text, word_count, parameter) %>%
+  filter(word_count >= 2)
+
+tm_twit <- bigram_tm(tm_tochange$clean_text, number_of_topics = 4)
+tm_twit
+```
+
+Hasil topik modelling di atas menunjukkan beberapa topik yang dibahas oleh warga net di Twitter. Topik pertama kemungkinan besar tentang kasus adanya revisi uum md3 yang dipetisi oleh masyarakat. Topik kedua yang dibahas adalah tentang peraturan yang mengatur hukuman untuk predator seksual dan jual beli hewan. Topik ketiga tentang kasus reklamasi teluk benua, dan topik keempat tentang penayangan dan benyamin. 
+
+# Network Analysis
+Terdapat dua network analisis yang dilakukan dalam laporan ini. Pertama, untuk mengetahui hubungan antar term/kata atau dapat disebut *semantic network*. Kedua untuk mengetahui posisi aktor-aktor yang direpresentasikan oleh username atau dapat disebut *social network analysis*. 
+
+## Semantic Network
+Semantic network didapat dengan skenario bigram, yaitu hubungan dua kata dalam sebuah atau dalam konteks ini konten twit.
+
+```{r, fig.cap= "Word network dalam twit yang memention akun @ChangeOrg_ID"}
+bigram_counts <- twit_to_change %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(word_count >= 2) %>%
+  select(clean_text) %>%
+  unnest_tokens(bigram, clean_text, token = "ngrams", n = 2) %>%
+  count(bigram, sort = TRUE) %>%
+  separate(bigram, into = c("word1", "word2"))
+
+library(widyr)
+
+bigram_counts %>%
+  filter(n >= 250) %>%
+  graph_from_data_frame() %>%
+  ggraph(layout = "fr") +
+  geom_edge_link(aes(edge_alpha = n, edge_width = n), edge_colour = "cyan4") +
+  geom_node_point(size = 5) +
+  geom_node_text(aes(label = name), repel = TRUE, 
+                 point.padding = unit(0.2, "lines")) +
+  theme_void()
+```
+
+Dari gambar di atas dapat dilihat dengan jelas bahwa beberapa kata cenderung berdampingan dengan kata lain seara konsisten yang ditunjukkan dengan frekuensi yang tinggi atau warna semakin gelap. Sebagai contoh, kata teluk (pojok kiri atas) berdampingan dengan benoa, perpres, dan ubah. 
+
+## Social Network
+Skenario yang sama dengan semantic network di atas juga dapat diaplikasikan pada aktor, untuk melihat keterhubungannya secara sekilas. Namun untuk social network yang lebih kompleks dapat dilakuka di gephi. Untuk itu, di sini (di R), saya hanya menyiapkan filenya saja. 
+
+```{r}
+to_change_network <- twit_to_change %>%
+  filter(user_count >= 2) %>% # memilih twit yang melibatkan minimal 2 atau lebih user
+  select(Data = user_all)
+
+#write_csv(to_change_network, path = "wrangled data proj-3/to_change_network.csv")
+```
+
+Dari hasil SNA dapat diketahui jumlah nodes (username yang memiliki koneksi) dalam twit yang memention akun @ChangeOrg_ID berjumlah **27295**. Sedangkan edges- nya berjumlah **52506**. Berikut ini adalah hasil visualisasi yang dilakukan di Gephi terhadap network tersebut. 
+
+![Akun Twitter Network](/Volumes/mydata/RStudio/virtualCitizens/vc-proj3/wrangled data proj-3/toChangeNetwork.png)
+
+**Keterangan:**
+
+- Gambar hanya menampilkan nodes dengan minimum degree 10 atau 2.63 persen dari total node, dan 9.22 persen dari total edges. 
+- Akun @ChangeOrg_ID yang berlaku sebagi parameter dihilangkan dari visualiasi
+- Referensi betweenness centrality: Ulrik Brandes, A Faster Algorithm for Betweenness Centrality, in Journal of Mathematical Sociology 25(2):163-177, (2001)
+
+# Simpulan dan Rekomendasi
+Berdasarkan data yang digunakan dalam laporan ini, yaitu twit yang memention akun @ChangeOrg_Id dari Desember 2013 hingga Maret 2018 diketahui beberapa hal: 
+
+1. Warga net menggunakan twitter untuk melakukan kampanye terkait dengan petisi yang sedang mereka lakukan atau yang ada di laman change.org. 
+2. Di dalam twitter, selain terdapat akun pengirim juga terdapat akun lain yang dapat diidentifikasi sebagai akun milik orang atau lembaga yang menjadi tujuan petisi dan alasan petisi. 
+3. Berdasarkan data juga diketahui bahwa ada beberapa topik yang cukup populer dan menarik perhatian warga net. Hasil topic modelling menunjukkan bahwa dalam twit terdapat topik tentang uu-md3 yang dalam beberapa waktu terakhir memang banyak dibicarakan. Selain itu, juga ada pelarangan perdagangan hewan untuk dikonsumsi dan beberapa topik lainnya. Salah satu topik yang dapat dianggap paling populer dibanding yang lainnya adalah tentang reklamasi teluk benoa. Topik tentang teluk benoa dianggap paling popluer karena selain  muncul dalam topic modelling juga memiliki kata (bigram) yang cukup mendominasi (lihat bagian term, tf-idf, dan semantic network). 
+4. Oleh karena itu, topik teluk benoa layak untuk dikaji lebih mendalam dengan asumsi memiliki jangkangan yang cukup panjang dari segi waktu dan data yang cukup banyak untuk dianalisis secara otomatis dengan menggunakan machine learning.

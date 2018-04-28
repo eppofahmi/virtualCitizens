@@ -97,7 +97,7 @@ tweet_cleaner2 <- function(input_text) # nama kolom yang akan dibersihkan
   corpusku <- tm_map(corpusku, stripWhitespace)
   corpusku <- tm_map(corpusku, content_transformer(tolower)) 
   #stopwords bahasa indonesia
-  stopwords <- read.csv("stopwords_indo.csv", header = FALSE)
+  stopwords <- read.csv("stopwords_indo_change.csv", header = FALSE)
   stopwords <- as.character(stopwords$V1)
   stopwords <- c(stopwords, stopwords())
   corpusku <- tm_map(corpusku, removeWords, stopwords)
