@@ -95,7 +95,7 @@ Akun pengirim didapat dari kolom `username`, sedangkan akun yang terlibat merupa
 twit_to_change %>%
   filter(is_duplicate == FALSE) %>%
   count(user, sort = TRUE) %>%
-  filter(!str_detect(user, '@ChangeOrg_ID')) %>%
+  filter(!str_detect(user, 'ChangeOrg_ID')) %>%
   head(n = 20) %>%
   ggplot(aes(x = reorder(user, n), y = n)) + coord_flip() +
   geom_col(show.legend = FALSE) + 
@@ -106,7 +106,7 @@ Selain akun @ChangeOrg_ID, username Twitter yang menjadi pengirim twit terbanyak
 
 ```{r}
 twit_to_change %>%
-  filter(str_detect(user, "@ChangeOrg_ID")) %>%
+  filter(str_detect(user, "ChangeOrg_ID")) %>%
   select(tweets) %>%
   head(n = 2) %>% print(tweets)
 ```
@@ -115,7 +115,7 @@ Sementara twit yang dikirim oleh akun lain, contohnya dapat dilihat di bawah ini
 
 ```{r}
 twit_to_change %>%
-  filter(str_detect(user, "@wijayalabs")) %>%
+  filter(str_detect(user, "wijayalabs")) %>%
   select(tweets) %>%
   head(n = 2) %>% print(tweets)
 ```
@@ -198,11 +198,6 @@ tagar_periode <- bind_rows(tagar_periode1 %>%
                              mutate(periode = "periode_4"),
                            tagar_periode5 %>%
                              mutate(periode = "periode_4"))
-
-tagar_periode %>%
-  acast(tagar ~ periode, value.var = "n", fill = 0) %>%
-  comparison.cloud(colors = c("darkturquoise", "coral1", "brown3", "lightseagreen"), max.words = 1329)
-
 ```
 
 Gambar di atas menunjukkan lima tagar yang paling sering digunakan. Dari gambar tersebut diketahui bawah setiap tahunnya tagar yang digunakan oleh warga net terus berubah. Misalnya, pada tahun 2013/2014 atau periode tagar paling sering digunakan adalah **#saveshark**, kemudian **#dukungpilkadalangsung** dan **#revisiuumd** yang merujuk pada revisi **uu-md3 DPR**.
@@ -270,7 +265,6 @@ twit_to_change %>%
   head(n = 1) %>% print(tweets)
 ```
 
-
 # Topic modelling
 Topic modelling menggunakan data dari kolom `clean_text` dan filter `is_duplicate` = FALSE. Selain itu, karena topic modelling akan dilakukan dengan bigram twit yang setelah dibersihkan hanya memiliki 1 term dihilangkan dari data. Asumsinya, data dari twit tersebut tidak dapat memberikan konteks dari term yang ada secara lokal. Total twit yang dijadikan input topic modelling **33.819** twit. 
 
@@ -332,7 +326,7 @@ tm_tochange <- twit_to_change %>%
   select(date, user,clean_text, word_count, parameter) %>%
   filter(word_count >= 2)
 
-tm_twit <- bigram_tm(tm_tochange$clean_text, number_of_topics = 4)
+tm_twit <- bigram_tm(tm_tochange$clean_text, number_of_topics = 5)
 tm_twit
 ```
 
@@ -376,7 +370,7 @@ to_change_network <- twit_to_change %>%
   filter(user_count >= 2) %>% # memilih twit yang melibatkan minimal 2 atau lebih user
   select(Data = user_all)
 
-#write_csv(to_change_network, path = "wrangled data proj-3/to_change_network.csv")
+write_csv(to_change_network, path = "wrangled data proj-3/to_change_network.csv")
 ```
 
 Dari hasil SNA dapat diketahui jumlah nodes (username yang memiliki koneksi) dalam twit yang memention akun @ChangeOrg_ID berjumlah **27295**. Sedangkan edges- nya berjumlah **52506**. Berikut ini adalah hasil visualisasi yang dilakukan di Gephi terhadap network tersebut. 

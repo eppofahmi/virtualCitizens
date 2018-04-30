@@ -37,29 +37,22 @@ bns_raw <- bns_raw %>%
   dplyr::mutate(is_duplicate = duplicated(tweets))
 
 # 2. user_all ===================================== 
-
 bns_raw$user <- (gsub('[@]', ' ', bns_raw$user))
-
 bns_raw$tweets <- gsub("pic[^[:space:]]*", "", bns_raw$tweets)
 bns_raw$tweets <- gsub("http[^[:space:]]*", "", bns_raw$tweets)
 bns_raw$tweets <- gsub("https[^[:space:]]*", "", bns_raw$tweets)
 
 bns_raw$user_all <- sapply(str_extract_all(bns_raw$tweets, "(?<=@)[^\\s:]+", simplify = FALSE), paste, collapse=", ")
 
-# add @ if nedeed
-#user_change$User <- paste("@", user_change$User, sep=", ")
-
 # merge column user and user_all
 bns_raw$user_all <- paste(bns_raw$user, bns_raw$user_all, sep=", ")
 
-# Remove ChangeOrg_ID
-bns_raw$user_all <- gsub("ChangeOrg_ID", " ", bns_raw$user_all)
-
-# removing white space at the and
-bns_raw$user_all <- gsub("[[:space:]]+$", "", bns_raw$user_all)
-
 # removing punct
-bns_raw$user_all <- (gsub('[,]', ' ', bns_raw$user_all))
+bns_raw$user_all <- gsub("[^[:alnum:][:space:]_]", " ", bns_raw$user_all)
+
+# removing white space at the start and end of strings
+bns_raw$user_all <- gsub("^[[:space:]]+", "", bns_raw$user_all)
+bns_raw$user_all <- gsub("[[:space:]]+$", "", bns_raw$user_all)
 
 # 3. user_count ==================================
 bns_raw$user_count <- sapply(bns_raw$user_all, function(x) length(unlist(strsplit(as.character(x), "\\S+"))))
@@ -67,20 +60,15 @@ bns_raw$user_count <- sapply(bns_raw$user_all, function(x) length(unlist(strspli
 # 4. tagar =======================================
 bns_raw$hashtag <- sapply(str_extract_all(bns_raw$tweets, "(?<=#)[^\\s]+", simplify = FALSE), paste, collapse=", ")
 
-bns_raw$hashtag <- (gsub('[,]', ' ', bns_raw$hashtag))
-bns_raw$hashtag <- (gsub('[:]', ' ', bns_raw$hashtag))
-bns_raw$hashtag <- (gsub('[.]', ' ', bns_raw$hashtag))
-bns_raw$hashtag <- (gsub('[?]', ' ', bns_raw$hashtag))
-bns_raw$hashtag <- (gsub('["]', ' ', bns_raw$hashtag))
-bns_raw$hashtag <- (gsub('[+]', ' ', bns_raw$hashtag))
-bns_raw$hashtag <- (gsub('[!]', ' ', bns_raw$hashtag))
+# removing punct in hashtag
+bns_raw$hashtag <- gsub("[^[:alnum:][:space:]-]", " ", bns_raw$hashtag)
 
-# removing white space at the and
+# removing white space at the start
+bns_raw$hashtag <- gsub("^[[:space:]]+", "", bns_raw$hashtag)
 bns_raw$hashtag <- gsub("[[:space:]]+$", "", bns_raw$hashtag)
 
 # 5. tag_count ===================================
 bns_raw$tag_count <- sapply(bns_raw$hashtag, function(x) length(unlist(strsplit(as.character(x), "\\S+"))))
-
 
 # 6. clean_text ==================================
 tweet_cleaner2 <- function(input_text) # nama kolom yang akan dibersihkan
@@ -115,7 +103,7 @@ tweet_cleaner2 <- function(input_text) # nama kolom yang akan dibersihkan
   stopwords <- c(stopwords, stopwords())
   corpusku <- tm_map(corpusku, removeWords, stopwords)
   #kata khusus yang dihapus
-  corpusku <- tm_map(corpusku, removeWords, c("rt", "cc", "via", "jrx", "balitolakreklamasi", "acehjakartajambisurabayabalintbpaluambon", "bali", "selamat", "pagi", "bli", "paraf", "petisi", "yks", "thn", "ri", "sign", "can", "go", "mr", "dlm", "recruiterutmsourcesharepetitionutmmediumtwitterutmcampaignsharetwittermobile"))
+  corpusku <- tm_map(corpusku, removeWords, c("rt", "cc", "via", "jrx", "balitolakreklamasi","bali", "selamat", "pagi", "bli", "paraf", "petisi", "yks", "thn", "ri", "sign", "can", "go", "mr", "dlm"))
   corpusku <- tm_map(corpusku, stripWhitespace)
   #removing white space in the begining
   rem_spc_front <- function(x) gsub("^[[:space:]]+", "", x)
@@ -137,8 +125,7 @@ a <- clean_text %>%
 rm(a)
 
 # 7. word_count ==================================
-clean_text$word_count <- sapply(clean_text$clean_text, 
-                                function(x) length(unlist(strsplit(as.character(x), "\\W+"))))
+clean_text$word_count <- sapply(clean_text$clean_text, function(x) length(unlist(strsplit(as.character(x), "\\W+"))))
 
 bns_raw <- bind_cols(bns_raw, clean_text)
 rm(clean_text)

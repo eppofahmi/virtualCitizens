@@ -38,17 +38,12 @@ change_raw <- change_raw %>%
   dplyr::mutate(is_duplicate = duplicated(tweets))
 
 # 2. user_all ===================================== 
-
 change_raw$user <- (gsub('[@]', ' ', change_raw$user))
-
 change_raw$tweets <- gsub("pic[^[:space:]]*", "", change_raw$tweets)
 change_raw$tweets <- gsub("http[^[:space:]]*", "", change_raw$tweets)
 change_raw$tweets <- gsub("https[^[:space:]]*", "", change_raw$tweets)
 
 change_raw$user_all <- sapply(str_extract_all(change_raw$tweets, "(?<=@)[^\\s:]+", simplify = FALSE), paste, collapse=", ")
-
-# add @ if nedeed
-#user_change$User <- paste("@", user_change$User, sep=", ")
 
 # merge column user and user_all
 change_raw$user_all <- paste(change_raw$user, change_raw$user_all, sep=", ")
@@ -56,11 +51,14 @@ change_raw$user_all <- paste(change_raw$user, change_raw$user_all, sep=", ")
 # Remove ChangeOrg_ID
 change_raw$user_all <- gsub("ChangeOrg_ID", " ", change_raw$user_all)
 
+# removing punct
+change_raw$user_all <- gsub("[^[:alnum:][:space:]_]", "", change_raw$user_all)
+
+# removing white space at the start
+change_raw$user_all <- gsub("^[[:space:]]+", "", change_raw$user_all)
+
 # removing white space at the and
 change_raw$user_all <- gsub("[[:space:]]+$", "", change_raw$user_all)
-
-# removing punct
-change_raw$user_all <- (gsub('[,]', ' ', change_raw$user_all))
 
 # 3. user_count ==================================
 change_raw$user_count <- sapply(change_raw$user_all, function(x) length(unlist(strsplit(as.character(x), "\\S+"))))
@@ -68,15 +66,11 @@ change_raw$user_count <- sapply(change_raw$user_all, function(x) length(unlist(s
 # 4. tagar =======================================
 change_raw$hashtag <- sapply(str_extract_all(change_raw$tweets, "(?<=#)[^\\s]+", simplify = FALSE), paste, collapse=", ")
 
-change_raw$hashtag <- (gsub('[,]', ' ', change_raw$hashtag))
-change_raw$hashtag <- (gsub('[:]', ' ', change_raw$hashtag))
-change_raw$hashtag <- (gsub('[.]', ' ', change_raw$hashtag))
-change_raw$hashtag <- (gsub('[?]', ' ', change_raw$hashtag))
-change_raw$hashtag <- (gsub('["]', ' ', change_raw$hashtag))
-change_raw$hashtag <- (gsub('[+]', ' ', change_raw$hashtag))
-change_raw$hashtag <- (gsub('[!]', ' ', change_raw$hashtag))
+# removing punct
+change_raw$hashtag <- gsub("[^[:alnum:][:space:]_]", "", change_raw$hashtag)
 
-# removing white space at the and
+# removing white space at the start and end of string
+change_raw$hashtag <- gsub("^[[:space:]]+", "", change_raw$hashtag)
 change_raw$hashtag <- gsub("[[:space:]]+$", "", change_raw$hashtag)
 
 # 5. tag_count ===================================
@@ -91,6 +85,13 @@ change_raw$tweets <- gsub("-ecruiter=.*","",change_raw$tweets)
 # -dan-ruu-kuhap-dari-dpr? - add space 
 #gsub("((?:\b| )?([.,:;!?()]+)(?: |\b)?)", " \\1 ", x, perl=T)
 
+# trans number to alphabhet----
+# a = 1, b = 2, c = 3, d = 4, e = 5, f = 6, g = 7, h = 8, i = 9, j = 0
+change_raw$tweets <- gsub("MD3", "mdc", change_raw$tweets)
+change_raw$tweets <- gsub("88", "hh", change_raw$tweets)
+change_raw$tweets <- gsub("2013", "bjac", change_raw$tweets)
+change_raw$tweets <- gsub("65", "fe", change_raw$tweets)
+change_raw$tweets <- gsub("2007", "bjjg", change_raw$tweets)
 
 # cleaning function
 tweet_cleaner2 <- function(input_text) # nama kolom yang akan dibersihkan
@@ -125,7 +126,7 @@ tweet_cleaner2 <- function(input_text) # nama kolom yang akan dibersihkan
   stopwords <- c(stopwords, stopwords())
   corpusku <- tm_map(corpusku, removeWords, stopwords)
   #kata khusus yang dihapus
-  corpusku <- tm_map(corpusku, removeWords, c("rt", "cc", "via", "jrx", "acehjakartajambisurabayabalintbpaluambon", "bali", "selamat", "pagi", "bli", "paraf", "petisi", "yks", "thn", "ri", "sign", "can", "go", "mr", "dlm"))
+  corpusku <- tm_map(corpusku, removeWords, c("rt", "cc", "via", "jrx", "acehjakartajambisurabayabalintbpaluambon", "selamat", "pagi", "bli", "paraf", "petisi", "yks", "thn", "ri", "sign", "can", "go", "mr", "dlm"))
   corpusku <- tm_map(corpusku, stripWhitespace)
   #removing white space in the begining
   rem_spc_front <- function(x) gsub("^[[:space:]]+", "", x)
@@ -147,8 +148,7 @@ a <- clean_text %>%
 rm(a)
 
 # 7. word_count ==================================
-clean_text$word_count <- sapply(clean_text$clean_text, 
-                                function(x) length(unlist(strsplit(as.character(x), "\\W+"))))
+clean_text$word_count <- sapply(clean_text$clean_text, function(x) length(unlist(strsplit(as.character(x), "\\W+"))))
 
 change_raw <- bind_cols(change_raw, clean_text)
 rm(clean_text)

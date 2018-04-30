@@ -49,37 +49,49 @@ twit_gojek <- twit_gojek %>%
   dplyr::mutate(is_duplicate = duplicated(tweets))
 
 # 2. user_all ===================================== 
-twit_gojek$tweets <- gsub("pic[^[:space:]]*", "", twit_gojek$tweets)
+twit_gojek$user <- (gsub('[@]', ' ', twit_gojek$user))
 
-twit_gojek$user_all <- sapply(str_extract_all(twit_gojek$tweets, "@\\S+", simplify = FALSE), paste, collapse=", ")
+twit_gojek$tweets <- gsub("pic[^[:space:]]*", "", twit_gojek$tweets)
+twit_gojek$tweets <- gsub("http[^[:space:]]*", "", twit_gojek$tweets)
+twit_gojek$tweets <- gsub("https[^[:space:]]*", "", twit_gojek$tweets)
+
+twit_gojek$user_all <- sapply(str_extract_all(twit_gojek$tweets, "(?<=@)[^\\s:]+", simplify = FALSE), paste, collapse=", ")
 
 # add @ if nedeed
-#user_change$User <- paste("@", user_change$User, sep="")
+#user_change$User <- paste("@", user_change$User, sep=", ")
 
 # merge column user and user_all
-twit_gojek$user_all <- paste(twit_gojek$user, twit_gojek$user_all, sep=" ")
+twit_gojek$user_all <- paste(twit_gojek$user, twit_gojek$user_all, sep=", ")
 
-# removing punct
-twit_gojek$user_all <- gsub("[^[:alpha:][:space:]@_]*", "", twit_gojek$user_all)
+# Remove ChangeOrg_ID
+twit_gojek$user_all <- gsub("ChangeOrg_ID", " ", twit_gojek$user_all)
 
-# 3. user_count ==================================
-
-# removing space at the end of term/username
+# removing white space at the and
 twit_gojek$user_all <- gsub("[[:space:]]+$", "", twit_gojek$user_all)
 
-# counting usernames
-twit_gojek$user_count <- sapply(twit_gojek$user_all, 
-                             function(x) length(unlist(strsplit(as.character(x), "@\\S+"))))
+# removing punct
+twit_gojek$user_all <- (gsub('[,]', ' ', twit_gojek$user_all))
+
+# 3. user_count ==================================
+twit_gojek$user_count <- sapply(twit_gojek$user_all, function(x) length(unlist(strsplit(as.character(x), "\\S+"))))
+
 
 # 4. tagar =======================================
-twit_gojek$hashtag <- sapply(str_extract_all(twit_gojek$tweets, "#\\S+", simplify = FALSE), 
-                          paste, collapse=", ")
+twit_gojek$hashtag <- sapply(str_extract_all(twit_gojek$tweets, "(?<=#)[^\\s]+", simplify = FALSE), paste, collapse=", ")
 
-twit_gojek$hashtag <- gsub("[^[:alpha:][:space:]#]*", "", twit_gojek$hashtag)
+twit_gojek$hashtag <- (gsub('[,]', ' ', twit_gojek$hashtag))
+twit_gojek$hashtag <- (gsub('[:]', ' ', twit_gojek$hashtag))
+twit_gojek$hashtag <- (gsub('[.]', ' ', twit_gojek$hashtag))
+twit_gojek$hashtag <- (gsub('[?]', ' ', twit_gojek$hashtag))
+twit_gojek$hashtag <- (gsub('["]', ' ', twit_gojek$hashtag))
+twit_gojek$hashtag <- (gsub('[+]', ' ', twit_gojek$hashtag))
+twit_gojek$hashtag <- (gsub('[!]', ' ', twit_gojek$hashtag))
+
+# removing white space at the and
+twit_gojek$hashtag <- gsub("[[:space:]]+$", "", twit_gojek$hashtag)
 
 # 5. tag_count ===================================
-twit_gojek$tag_count <- sapply(twit_gojek$hashtag, 
-                            function(x) length(unlist(strsplit(as.character(x), "#\\S+"))))
+twit_gojek$tag_count <- sapply(twit_gojek$hashtag, function(x) length(unlist(strsplit(as.character(x), "\\S+"))))
 
 # 6. clean_text ==================================
 tweet_cleaner2 <- function(input_text) # nama kolom yang akan dibersihkan
@@ -114,11 +126,7 @@ tweet_cleaner2 <- function(input_text) # nama kolom yang akan dibersihkan
   stopwords <- c(stopwords, stopwords())
   corpusku <- tm_map(corpusku, removeWords, stopwords)
   #kata khusus yang dihapus
-  corpusku <- tm_map(corpusku, removeWords, c("rt", "cc", "via", "jrx", "balitolakreklamasi", 
-                                              "acehjakartajambisurabayabalintbpaluambon", "bali", 
-                                              "selamat", "pagi", "bli", 'ed','co','bd','ri','gl','leb','ra','dun', 'hat',
-                                              'onl', 'rv', 'mem', 'gad', 'ket', 'set', 'mungk', 'orang', 'www', 
-                                              'gojek', 'indones', "ter", 'bero'))
+  corpusku <- tm_map(corpusku, removeWords, c("rt", "cc", "via", "jrx", "balitolakreklamasi", "acehjakartajambisurabayabalintbpaluambon", "bali", "selamat", "pagi", "bli", 'ed','co','bd','ri','gl','leb','ra','dun', 'hat', 'onl', 'rv', 'mem', 'gad', 'ket', 'set', 'mungk', 'orang', 'www', 'gojek', 'indones', "ter", 'bero'))
   corpusku <- tm_map(corpusku, stripWhitespace)
   #removing white space in the begining
   rem_spc_front <- function(x) gsub("^[[:space:]]+", "", x)

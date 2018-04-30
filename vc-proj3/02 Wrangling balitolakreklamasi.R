@@ -38,29 +38,22 @@ btr_raw <- btr_raw %>%
   dplyr::mutate(is_duplicate = duplicated(tweets))
 
 # 2. user_all ===================================== 
-
 btr_raw$user <- (gsub('[@]', ' ', btr_raw$user))
-
 btr_raw$tweets <- gsub("pic[^[:space:]]*", "", btr_raw$tweets)
 btr_raw$tweets <- gsub("http[^[:space:]]*", "", btr_raw$tweets)
 btr_raw$tweets <- gsub("https[^[:space:]]*", "", btr_raw$tweets)
 
 btr_raw$user_all <- sapply(str_extract_all(btr_raw$tweets, "(?<=@)[^\\s:]+", simplify = FALSE), paste, collapse=", ")
 
-# add @ if nedeed
-#user_change$User <- paste("@", user_change$User, sep=", ")
-
 # merge column user and user_all
 btr_raw$user_all <- paste(btr_raw$user, btr_raw$user_all, sep=", ")
 
-# Remove ChangeOrg_ID
-btr_raw$user_all <- gsub("ChangeOrg_ID", " ", btr_raw$user_all)
-
-# removing white space at the and
-btr_raw$user_all <- gsub("[[:space:]]+$", "", btr_raw$user_all)
-
 # removing punct
-btr_raw$user_all <- (gsub('[,]', ' ', btr_raw$user_all))
+btr_raw$user_all <- gsub("[^[:alnum:][:space:]_]", "", btr_raw$user_all)
+
+# removing white space at the start and at the end of string
+btr_raw$user_all <- gsub("^[[:space:]]+", "", btr_raw$user_all)
+btr_raw$user_all <- gsub("[[:space:]]+$", "", btr_raw$user_all)
 
 # 3. user_count ==================================
 btr_raw$user_count <- sapply(btr_raw$user_all, function(x) length(unlist(strsplit(as.character(x), "\\S+"))))
@@ -68,24 +61,23 @@ btr_raw$user_count <- sapply(btr_raw$user_all, function(x) length(unlist(strspli
 # 4. tagar =======================================
 btr_raw$hashtag <- sapply(str_extract_all(btr_raw$tweets, "(?<=#)[^\\s]+", simplify = FALSE), paste, collapse=", ")
 
-btr_raw$hashtag <- (gsub('[,]', ' ', btr_raw$hashtag))
-btr_raw$hashtag <- (gsub('[:]', ' ', btr_raw$hashtag))
-btr_raw$hashtag <- (gsub('[.]', ' ', btr_raw$hashtag))
-btr_raw$hashtag <- (gsub('[?]', ' ', btr_raw$hashtag))
-btr_raw$hashtag <- (gsub('["]', ' ', btr_raw$hashtag))
-btr_raw$hashtag <- (gsub('[+]', ' ', btr_raw$hashtag))
-btr_raw$hashtag <- (gsub('[!]', ' ', btr_raw$hashtag))
+# removing punct
+btr_raw$hashtag <- gsub("[^[:alnum:][:space:]_]", "", btr_raw$hashtag)
 
-# removing white space at the and
+# removing white space at the start and at the end of string
+btr_raw$hashtag <- gsub("^[[:space:]]+", "", btr_raw$hashtag)
 btr_raw$hashtag <- gsub("[[:space:]]+$", "", btr_raw$hashtag)
 
 # 5. tag_count ===================================
 btr_raw$tag_count <- sapply(btr_raw$hashtag, function(x) length(unlist(strsplit(as.character(x), "\\S+"))))
 
+# trans number to alphabhet----
+# a = 1, b = 2, c = 3, d = 4, e = 5, f = 6, g = 7, h = 8, i = 9, j = 0
 
+btr_raw$tweets <- gsub("51", "limasatu", btr_raw$tweets)
+btr_raw$tweets <- gsub("2014", "bjad", btr_raw$tweets)
 
 # 6. clean_text ==================================
-
 tweet_cleaner2 <- function(input_text) # nama kolom yang akan dibersihkan
 {    
   # create a corpus (type of object expected by tm) and document term matrix
@@ -118,9 +110,7 @@ tweet_cleaner2 <- function(input_text) # nama kolom yang akan dibersihkan
   stopwords <- c(stopwords, stopwords())
   corpusku <- tm_map(corpusku, removeWords, stopwords)
   #kata khusus yang dihapus
-  corpusku <- tm_map(corpusku, removeWords, c("rt", "cc", "via", "jrx", "balitolakreklamasi", 
-                                              "acehjakartajambisurabayabalintbpaluambon", "bali", 
-                                              "selamat", "pagi", "bli"))
+  corpusku <- tm_map(corpusku, removeWords, c("rt", "cc", "via", "jrx", "balitolakreklamasi", "bali", "selamat", "pagi", "bli"))
   corpusku <- tm_map(corpusku, stripWhitespace)
   #removing white space in the begining
   rem_spc_front <- function(x) gsub("^[[:space:]]+", "", x)
@@ -142,8 +132,7 @@ a <- clean_text %>%
 rm(a)
 
 # 7. word_count ==================================
-clean_text$word_count <- sapply(clean_text$clean_text, 
-                                function(x) length(unlist(strsplit(as.character(x), "\\W+"))))
+clean_text$word_count <- sapply(clean_text$clean_text, function(x) length(unlist(strsplit(as.character(x), "\\W+"))))
 
 btr_raw <- bind_cols(btr_raw, clean_text)
 rm(clean_text)
