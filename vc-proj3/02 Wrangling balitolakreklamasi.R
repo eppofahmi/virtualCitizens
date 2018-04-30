@@ -21,15 +21,17 @@ library(stringr)
 library(tm)
 
 # Data mentah =====================================
-btr_raw <- read.csv("btr2014-2018.csv", header = FALSE, 
-                    stringsAsFactors = FALSE, sep = ";") 
+btr_raw <- read.csv("twit-btr.csv", header = TRUE, 
+                       stringsAsFactors = FALSE, sep = ";") 
 
 colnames(btr_raw) <- c("date", "time", "user", "tweets", "replying", 
-                       "rep_count", "ret_count", "fav_count","link")
+                          "rep_count", "ret_count", "fav_count","link")
 
 # converting date format
-btr_raw$date <- as.Date(btr_raw$date,format='%d %b %Y')
+btr_raw$date <- as.Date(btr_raw$date,format='%d/%m/%y')
 btr_raw$ret_count <- as.integer(btr_raw$ret_count)
+
+glimpse(btr_raw)
 
 # 1. is_duplicate =================================
 btr_raw <- btr_raw %>%
@@ -37,34 +39,53 @@ btr_raw <- btr_raw %>%
 
 # 2. user_all ===================================== 
 
-btr_raw$tweets <- gsub("pic[^[:space:]]*", "", btr_raw$tweets)
+btr_raw$user <- (gsub('[@]', ' ', btr_raw$user))
 
-btr_raw$user_all <- sapply(str_extract_all(btr_raw$tweets, "@\\S+", simplify = FALSE), paste, collapse=", ")
+btr_raw$tweets <- gsub("pic[^[:space:]]*", "", btr_raw$tweets)
+btr_raw$tweets <- gsub("http[^[:space:]]*", "", btr_raw$tweets)
+btr_raw$tweets <- gsub("https[^[:space:]]*", "", btr_raw$tweets)
+
+btr_raw$user_all <- sapply(str_extract_all(btr_raw$tweets, "(?<=@)[^\\s:]+", simplify = FALSE), paste, collapse=", ")
 
 # add @ if nedeed
-#user_change$User <- paste("@", user_change$User, sep="")
+#user_change$User <- paste("@", user_change$User, sep=", ")
 
 # merge column user and user_all
-btr_raw$user_all <- paste(btr_raw$user, btr_raw$user_all, sep=" ")
+btr_raw$user_all <- paste(btr_raw$user, btr_raw$user_all, sep=", ")
+
+# Remove ChangeOrg_ID
+btr_raw$user_all <- gsub("ChangeOrg_ID", " ", btr_raw$user_all)
+
+# removing white space at the and
+btr_raw$user_all <- gsub("[[:space:]]+$", "", btr_raw$user_all)
 
 # removing punct
-btr_raw$user_all <- gsub("[^[:alpha:][:space:]@_]*", "", btr_raw$user_all)
+btr_raw$user_all <- (gsub('[,]', ' ', btr_raw$user_all))
 
 # 3. user_count ==================================
-btr_raw$user_count <- sapply(btr_raw$user_all, 
-                                function(x) length(unlist(strsplit(as.character(x), "@\\S+"))))
+btr_raw$user_count <- sapply(btr_raw$user_all, function(x) length(unlist(strsplit(as.character(x), "\\S+"))))
 
 # 4. tagar =======================================
-btr_raw$hashtag <- sapply(str_extract_all(btr_raw$tweets, "#\\S+", simplify = FALSE), 
-                          paste, collapse=", ")
+btr_raw$hashtag <- sapply(str_extract_all(btr_raw$tweets, "(?<=#)[^\\s]+", simplify = FALSE), paste, collapse=", ")
 
-btr_raw$hashtag <- gsub("[^[:alpha:][:space:]#]*", "", btr_raw$hashtag)
+btr_raw$hashtag <- (gsub('[,]', ' ', btr_raw$hashtag))
+btr_raw$hashtag <- (gsub('[:]', ' ', btr_raw$hashtag))
+btr_raw$hashtag <- (gsub('[.]', ' ', btr_raw$hashtag))
+btr_raw$hashtag <- (gsub('[?]', ' ', btr_raw$hashtag))
+btr_raw$hashtag <- (gsub('["]', ' ', btr_raw$hashtag))
+btr_raw$hashtag <- (gsub('[+]', ' ', btr_raw$hashtag))
+btr_raw$hashtag <- (gsub('[!]', ' ', btr_raw$hashtag))
+
+# removing white space at the and
+btr_raw$hashtag <- gsub("[[:space:]]+$", "", btr_raw$hashtag)
 
 # 5. tag_count ===================================
-btr_raw$tag_count <- sapply(btr_raw$hashtag, 
-                               function(x) length(unlist(strsplit(as.character(x), "#\\S+"))))
+btr_raw$tag_count <- sapply(btr_raw$hashtag, function(x) length(unlist(strsplit(as.character(x), "\\S+"))))
+
+
 
 # 6. clean_text ==================================
+
 tweet_cleaner2 <- function(input_text) # nama kolom yang akan dibersihkan
 {    
   # create a corpus (type of object expected by tm) and document term matrix

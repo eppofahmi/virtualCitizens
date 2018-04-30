@@ -20,14 +20,17 @@ library(tidytext)
 library(stringr)
 library(tm)
 
-# Data mentah =====================================
-bns_raw <- read.csv("bns.csv", header = FALSE, 
-                       stringsAsFactors = FALSE, sep = ";") 
+bns_raw <- read.csv("twit-bnfs.csv", header = TRUE, 
+                    stringsAsFactors = FALSE, sep = ";") 
 
 colnames(bns_raw) <- c("date", "time", "user", "tweets", "replying", 
-                          "rep_count", "ret_count", "fav_count","link")
+                       "rep_count", "ret_count", "fav_count","link")
+
 # converting date format
-bns_raw$date <- as.Date(bns_raw$date, format='%d %b %Y')
+bns_raw$date <- as.Date(bns_raw$date,format='%d/%m/%y')
+bns_raw$ret_count <- as.integer(bns_raw$ret_count)
+
+glimpse(bns_raw)
 
 # 1. is_duplicate =================================
 bns_raw <- bns_raw %>%
@@ -35,32 +38,49 @@ bns_raw <- bns_raw %>%
 
 # 2. user_all ===================================== 
 
-bns_raw$tweets <- gsub("pic[^[:space:]]*", "", bns_raw$tweets)
+bns_raw$user <- (gsub('[@]', ' ', bns_raw$user))
 
-bns_raw$user_all <- sapply(str_extract_all(bns_raw$tweets, "@\\S+", simplify = FALSE), paste, collapse=", ")
+bns_raw$tweets <- gsub("pic[^[:space:]]*", "", bns_raw$tweets)
+bns_raw$tweets <- gsub("http[^[:space:]]*", "", bns_raw$tweets)
+bns_raw$tweets <- gsub("https[^[:space:]]*", "", bns_raw$tweets)
+
+bns_raw$user_all <- sapply(str_extract_all(bns_raw$tweets, "(?<=@)[^\\s:]+", simplify = FALSE), paste, collapse=", ")
 
 # add @ if nedeed
-#user_change$User <- paste("@", user_change$User, sep="")
+#user_change$User <- paste("@", user_change$User, sep=", ")
 
 # merge column user and user_all
-bns_raw$user_all <- paste(bns_raw$user, bns_raw$user_all, sep=" ")
+bns_raw$user_all <- paste(bns_raw$user, bns_raw$user_all, sep=", ")
+
+# Remove ChangeOrg_ID
+bns_raw$user_all <- gsub("ChangeOrg_ID", " ", bns_raw$user_all)
+
+# removing white space at the and
+bns_raw$user_all <- gsub("[[:space:]]+$", "", bns_raw$user_all)
 
 # removing punct
-bns_raw$user_all <- gsub("[^[:alpha:][:space:]@_]*", "", bns_raw$user_all)
+bns_raw$user_all <- (gsub('[,]', ' ', bns_raw$user_all))
 
 # 3. user_count ==================================
-bns_raw$user_count <- sapply(bns_raw$user_all, 
-                                function(x) length(unlist(strsplit(as.character(x), "@\\S+"))))
+bns_raw$user_count <- sapply(bns_raw$user_all, function(x) length(unlist(strsplit(as.character(x), "\\S+"))))
 
 # 4. tagar =======================================
-bns_raw$hashtag <- sapply(str_extract_all(bns_raw$tweets, "#\\S+", simplify = FALSE), 
-                             paste, collapse=", ")
+bns_raw$hashtag <- sapply(str_extract_all(bns_raw$tweets, "(?<=#)[^\\s]+", simplify = FALSE), paste, collapse=", ")
 
-bns_raw$hashtag <- gsub("[^[:alpha:][:space:]#]*", "", bns_raw$hashtag)
+bns_raw$hashtag <- (gsub('[,]', ' ', bns_raw$hashtag))
+bns_raw$hashtag <- (gsub('[:]', ' ', bns_raw$hashtag))
+bns_raw$hashtag <- (gsub('[.]', ' ', bns_raw$hashtag))
+bns_raw$hashtag <- (gsub('[?]', ' ', bns_raw$hashtag))
+bns_raw$hashtag <- (gsub('["]', ' ', bns_raw$hashtag))
+bns_raw$hashtag <- (gsub('[+]', ' ', bns_raw$hashtag))
+bns_raw$hashtag <- (gsub('[!]', ' ', bns_raw$hashtag))
+
+# removing white space at the and
+bns_raw$hashtag <- gsub("[[:space:]]+$", "", bns_raw$hashtag)
 
 # 5. tag_count ===================================
-bns_raw$tag_count <- sapply(bns_raw$hashtag, 
-                               function(x) length(unlist(strsplit(as.character(x), "#\\S+"))))
+bns_raw$tag_count <- sapply(bns_raw$hashtag, function(x) length(unlist(strsplit(as.character(x), "\\S+"))))
+
 
 # 6. clean_text ==================================
 tweet_cleaner2 <- function(input_text) # nama kolom yang akan dibersihkan
@@ -146,4 +166,3 @@ bns_raw <- bns_raw %>%
   select(sumber_data, parameter, date, time, periode, user, user_all, user_count, tweets,clean_text, word_count, hashtag, tag_count, is_duplicate, replying, fav_count, rep_count, ret_count, link)
 
 write_csv(bns_raw, path = "wrangled data proj-3/twit-tagar-balinotforsale.csv")
-

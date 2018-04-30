@@ -85,9 +85,12 @@ change_raw$tag_count <- sapply(change_raw$hashtag, function(x) length(unlist(str
 # 6. clean_text ==================================
 # recruiter= 
 # -ecruiter=
-
 change_raw$tweets <- gsub("recruiter=.*","",change_raw$tweets)
 change_raw$tweets <- gsub("-ecruiter=.*","",change_raw$tweets)
+
+# -dan-ruu-kuhap-dari-dpr? - add space 
+#gsub("((?:\b| )?([.,:;!?()]+)(?: |\b)?)", " \\1 ", x, perl=T)
+
 
 # cleaning function
 tweet_cleaner2 <- function(input_text) # nama kolom yang akan dibersihkan
@@ -122,7 +125,7 @@ tweet_cleaner2 <- function(input_text) # nama kolom yang akan dibersihkan
   stopwords <- c(stopwords, stopwords())
   corpusku <- tm_map(corpusku, removeWords, stopwords)
   #kata khusus yang dihapus
-  corpusku <- tm_map(corpusku, removeWords, c("rt", "cc", "via", "jrx", "acehjakartajambisurabayabalintbpaluambon", "bali", "selamat", "pagi", "bli", "paraf", "petisi", "yks", "thn", "ri", "sign", "can", "go", "mr", "dlm", "recruiterutmsourcesharepetitionutmmediumtwitterutmcampaignsharetwittermobile"))
+  corpusku <- tm_map(corpusku, removeWords, c("rt", "cc", "via", "jrx", "acehjakartajambisurabayabalintbpaluambon", "bali", "selamat", "pagi", "bli", "paraf", "petisi", "yks", "thn", "ri", "sign", "can", "go", "mr", "dlm"))
   corpusku <- tm_map(corpusku, stripWhitespace)
   #removing white space in the begining
   rem_spc_front <- function(x) gsub("^[[:space:]]+", "", x)
@@ -173,5 +176,7 @@ names(change_raw)
 
 change_raw <- change_raw %>%
   select(sumber_data, parameter, date, time, periode, user, user_all, user_count, tweets,clean_text, word_count, hashtag, tag_count, is_duplicate, replying, fav_count, rep_count, ret_count, link)
+
+glimpse(change_raw)
 
 write_csv(change_raw, path = "wrangled data proj-3/twit-mention-change.csv")
