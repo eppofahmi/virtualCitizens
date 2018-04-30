@@ -39,37 +39,57 @@ change_raw <- change_raw %>%
 
 # 2. user_all ===================================== 
 
-change_raw$tweets <- gsub("pic[^[:space:]]*", "", change_raw$tweets)
+change_raw$user <- (gsub('[@]', ' ', change_raw$user))
 
-change_raw$user_all <- sapply(str_extract_all(change_raw$tweets, "@\\S+", simplify = FALSE), paste, collapse=", ")
+change_raw$tweets <- gsub("pic[^[:space:]]*", "", change_raw$tweets)
+change_raw$tweets <- gsub("http[^[:space:]]*", "", change_raw$tweets)
+change_raw$tweets <- gsub("https[^[:space:]]*", "", change_raw$tweets)
+
+change_raw$user_all <- sapply(str_extract_all(change_raw$tweets, "(?<=@)[^\\s:]+", simplify = FALSE), paste, collapse=", ")
 
 # add @ if nedeed
-#user_change$User <- paste("@", user_change$User, sep="")
+#user_change$User <- paste("@", user_change$User, sep=", ")
 
 # merge column user and user_all
-change_raw$user_all <- paste(change_raw$user, change_raw$user_all, sep=" ")
+change_raw$user_all <- paste(change_raw$user, change_raw$user_all, sep=", ")
+
+# Remove ChangeOrg_ID
+change_raw$user_all <- gsub("ChangeOrg_ID", " ", change_raw$user_all)
+
+# removing white space at the and
+change_raw$user_all <- gsub("[[:space:]]+$", "", change_raw$user_all)
 
 # removing punct
-change_raw$user_all <- gsub("[^[:alpha:][:space:]@_]*", "", change_raw$user_all)
+change_raw$user_all <- (gsub('[,]', ' ', change_raw$user_all))
 
 # 3. user_count ==================================
-change_raw$user_count <- sapply(change_raw$user_all, 
-                             function(x) length(unlist(strsplit(as.character(x), "@\\S+"))))
+change_raw$user_count <- sapply(change_raw$user_all, function(x) length(unlist(strsplit(as.character(x), "\\S+"))))
 
 # 4. tagar =======================================
+change_raw$hashtag <- sapply(str_extract_all(change_raw$tweets, "(?<=#)[^\\s]+", simplify = FALSE), paste, collapse=", ")
 
-change_raw$tweets <- gsub("pic[^[:space:]]*", "", change_raw$tweets)
+change_raw$hashtag <- (gsub('[,]', ' ', change_raw$hashtag))
+change_raw$hashtag <- (gsub('[:]', ' ', change_raw$hashtag))
+change_raw$hashtag <- (gsub('[.]', ' ', change_raw$hashtag))
+change_raw$hashtag <- (gsub('[?]', ' ', change_raw$hashtag))
+change_raw$hashtag <- (gsub('["]', ' ', change_raw$hashtag))
+change_raw$hashtag <- (gsub('[+]', ' ', change_raw$hashtag))
+change_raw$hashtag <- (gsub('[!]', ' ', change_raw$hashtag))
 
-change_raw$hashtag <- sapply(str_extract_all(change_raw$tweets, "#\\S+", simplify = FALSE), 
-                          paste, collapse=", ")
-
-change_raw$hashtag <- gsub("[^[:alpha:][:space:]#]*", "", change_raw$hashtag)
+# removing white space at the and
+change_raw$hashtag <- gsub("[[:space:]]+$", "", change_raw$hashtag)
 
 # 5. tag_count ===================================
-change_raw$tag_count <- sapply(change_raw$hashtag, 
-                            function(x) length(unlist(strsplit(as.character(x), "#\\S+"))))
+change_raw$tag_count <- sapply(change_raw$hashtag, function(x) length(unlist(strsplit(as.character(x), "\\S+"))))
 
 # 6. clean_text ==================================
+# recruiter= 
+# -ecruiter=
+
+change_raw$tweets <- gsub("recruiter=.*","",change_raw$tweets)
+change_raw$tweets <- gsub("-ecruiter=.*","",change_raw$tweets)
+
+# cleaning function
 tweet_cleaner2 <- function(input_text) # nama kolom yang akan dibersihkan
 {    
   # create a corpus (type of object expected by tm) and document term matrix
@@ -82,14 +102,14 @@ tweet_cleaner2 <- function(input_text) # nama kolom yang akan dibersihkan
   corpusku <- tm_map(corpusku, content_transformer(removeURL2))
   #remove username 
   TrimUsers <- function(x) {
-    str_replace_all(x, '(@[[:alnum:]_]*)', '')
+    str_replace_all(x, '(?<=@)[^\\s]+', '')
   }
   corpusku <- tm_map(corpusku, TrimUsers)
   #remove all "#Hashtag1"
-  removehashtag <- function(x) gsub("#\\S+", "", x)
+  removehashtag <- function(x) gsub("?<=#)[^\\s]+", "", x)
   corpusku <- tm_map(corpusku, content_transformer(removehashtag))
   #merenggangkan tanda baca
-  #tandabaca1 <- function(x) gsub("((?:\b| )?([.,:;!?()]+)(?: |\b)?)", " \\1 ", x, perl=T)
+  tandabaca1 <- function(x) gsub("((?:\b| )?([.,:;!?()]+)(?: |\b)?)", " \\1 ", x, perl=T)
   #corpusku <- tm_map(corpusku, content_transformer(tandabaca1))
   #remove puntuation
   removeNumPunct <- function(x) gsub("[^[:alpha:][:space:]]*", "", x)
@@ -102,7 +122,7 @@ tweet_cleaner2 <- function(input_text) # nama kolom yang akan dibersihkan
   stopwords <- c(stopwords, stopwords())
   corpusku <- tm_map(corpusku, removeWords, stopwords)
   #kata khusus yang dihapus
-  corpusku <- tm_map(corpusku, removeWords, c("rt", "cc", "via", "jrx", "balitolakreklamasi", "acehjakartajambisurabayabalintbpaluambon", "bali", "selamat", "pagi", "bli", "paraf", "petisi", "yks", "thn", "ri", "sign", "can", "go", "mr", "dlm", "recruiterutmsourcesharepetitionutmmediumtwitterutmcampaignsharetwittermobile"))
+  corpusku <- tm_map(corpusku, removeWords, c("rt", "cc", "via", "jrx", "acehjakartajambisurabayabalintbpaluambon", "bali", "selamat", "pagi", "bli", "paraf", "petisi", "yks", "thn", "ri", "sign", "can", "go", "mr", "dlm", "recruiterutmsourcesharepetitionutmmediumtwitterutmcampaignsharetwittermobile"))
   corpusku <- tm_map(corpusku, stripWhitespace)
   #removing white space in the begining
   rem_spc_front <- function(x) gsub("^[[:space:]]+", "", x)
