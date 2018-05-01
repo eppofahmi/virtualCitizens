@@ -21,14 +21,14 @@ library(stringr)
 library(tm)
 
 # Data mentah =====================================
-btr_raw <- read.csv("twit-btr.csv", header = TRUE, 
+btr_raw <- read.csv("twit-btr.csv", header = FALSE, 
                        stringsAsFactors = FALSE, sep = ";") 
 
 colnames(btr_raw) <- c("date", "time", "user", "tweets", "replying", 
                           "rep_count", "ret_count", "fav_count","link")
 
 # converting date format
-btr_raw$date <- as.Date(btr_raw$date,format='%d/%m/%y')
+btr_raw$date <- as.Date(btr_raw$date,format='%d %b %Y')
 btr_raw$ret_count <- as.integer(btr_raw$ret_count)
 
 glimpse(btr_raw)
@@ -43,10 +43,14 @@ btr_raw$tweets <- gsub("pic[^[:space:]]*", "", btr_raw$tweets)
 btr_raw$tweets <- gsub("http[^[:space:]]*", "", btr_raw$tweets)
 btr_raw$tweets <- gsub("https[^[:space:]]*", "", btr_raw$tweets)
 
+# 2.1 Merenggangkan ---- 
+btr_raw$tweets <- gsub("([[:alnum:]])([^[:alnum:][:space:]_])", "\\1 \\2", btr_raw$tweets)
+
+# 2.2 extracting username
 btr_raw$user_all <- sapply(str_extract_all(btr_raw$tweets, "(?<=@)[^\\s:]+", simplify = FALSE), paste, collapse=", ")
 
 # merge column user and user_all
-btr_raw$user_all <- paste(btr_raw$user, btr_raw$user_all, sep=", ")
+btr_raw$user_all <- paste(btr_raw$user, btr_raw$user_all, sep=" ")
 
 # removing punct
 btr_raw$user_all <- gsub("[^[:alnum:][:space:]_]", "", btr_raw$user_all)
@@ -149,10 +153,6 @@ btr_raw <- btr_raw %>%
     TRUE ~ "periode_3")) %>%
   mutate(periode = factor(periode, levels = c("periode_1", "periode_2", "periode_3")))
 
-#periode_1 <- subset(btr_raw, date >= "2013-07-01" & date <= "2014-03-31")
-#periode_2 <- subset(btr_raw, date >= "2014-04-01" & date <= "2014-08-31")
-#periode_3 <- subset(btr_raw, date >= "2014-09-01" & date <= "2018-03-31")
-
 glimpse(btr_raw)
 
 #9. Parameter pencarian======================
@@ -169,3 +169,4 @@ btr_raw <- btr_raw %>%
   select(sumber_data, parameter, date, time, periode, user, user_all, user_count, tweets,clean_text, word_count, hashtag, tag_count, is_duplicate, replying, fav_count, rep_count, ret_count, link)
 
 write_csv(btr_raw, path = "wrangled data proj-3/twit-tagar-balitolakreklamasi.csv")
+

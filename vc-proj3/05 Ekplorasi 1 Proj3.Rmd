@@ -198,6 +198,16 @@ tagar_periode <- bind_rows(tagar_periode1 %>%
                              mutate(periode = "periode_4"),
                            tagar_periode5 %>%
                              mutate(periode = "periode_4"))
+
+tagar_periode %>%
+  group_by(periode) %>%
+  top_n(10, n) %>%
+  ggplot(aes(reorder(tagar, n), n, fill = periode)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ periode, scales = "free", ncol = 2) +
+  coord_flip() +
+  labs(x = NULL, 
+       y = "Jumlah twit yang diunggah")
 ```
 
 Gambar di atas menunjukkan lima tagar yang paling sering digunakan. Dari gambar tersebut diketahui bawah setiap tahunnya tagar yang digunakan oleh warga net terus berubah. Misalnya, pada tahun 2013/2014 atau periode tagar paling sering digunakan adalah **#saveshark**, kemudian **#dukungpilkadalangsung** dan **#revisiuumd** yang merujuk pada revisi **uu-md3 DPR**.

@@ -36,5 +36,3 @@ Nama dan keterangan isi kolom:
 17. "rep_count" = jumlah reply yang didapat per baris/twit
 18. "ret_count" = jumlah retweet yang didapat per baris/twit
 19. "link" = link twitter.com ke pengguna aslinya
-
-Next ----> scrapping uu-md3 twit

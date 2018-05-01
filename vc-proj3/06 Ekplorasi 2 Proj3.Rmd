@@ -1,0 +1,389 @@
+---
+title: 'Laporan 2: Twit tentang Teluk Benua'
+author: "Ujang fahmi"
+date: "4/30/2018"
+output: 
+  html_notebook:
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  rmarkdown::pdf_document:
+    fig_caption: yes
+    includes:
+      in_header: setup markdown.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.pos = "h")
+```
+
+# Pendahuluan
+Berdasarkan hasil eksplorasi 1 pada twit yang memention akun @ChangeOrg_ID diketahui bahwa salah satu topik yang menjadi topik pembahasan warga net adalah tentang Teluk Benoa. Topik tersebut berkaiatan dengan penolakan warga net terhadap rencana reklamasi teluk benua di Bali. Oleh karena itu dalam eksplorasi 2 ini data yang digunakan adalah twit yang membahas tentang reklamasi tersebut. Twit dikumpulkan dengan metode semi automatic scrapping dengan dua parameter yaitu tagar **#balitolakreklamasi** dan **balinotforsale**. dua parameter tersebut menghasilkan twit sebanyak **72.640** dan **9.974** twit. Setelah dilakukan pengecekan konten duplikat didapat twit seperti dapat dilihat pada tabel di bawah ini. Jumlah twit tersebut kemudian akan digunakan dalam laporan ini. 
+
+```{r}
+# Runing RJava
+if (Sys.info()['sysname'] == 'Darwin') {
+  libjvm <- paste0(system2('/usr/libexec/java_home',stdout = TRUE)[1],'/jre/lib/server/libjvm.dylib')
+  message (paste0('Load libjvm.dylib from: ',libjvm))
+  dyn.load(libjvm)
+}
+
+library(tidyverse)
+library(ggplot2)
+library(stringr)
+library(lubridate)
+library(topicmodels)
+library(tm)
+library(tidytext)
+library(RWeka)
+library(reshape2)
+library(wordcloud)
+library(igraph)
+library(ggraph)
+library(quanteda)
+```
+
+```{r}
+dirwd <- paste(getwd(),"/wrangled data proj-3/",sep='')
+btr_raw <- read_csv(paste(dirwd,"twit-tagar-balitolakreklamasi.csv",sep=''), col_names = TRUE)
+bns_raw <- read_csv(paste(dirwd,"twit-tagar-balinotforsale.csv",sep=''), col_names = TRUE)
+
+tb_raw <- bind_rows(btr_raw, bns_raw)
+
+tb_raw %>%
+  group_by(is_duplicate) %>%
+  count(is_duplicate) %>%
+  summarise(n) %>%
+  print()
+```
+
+Dari total **82.616** twit terdapat **13.603** twit yang merupakan twit duplikat atau memiliki konten yang sama. Oleh karena itu, dalam eksplorasi selanjutnya hanya akan menggunakan **69.013** twit. Distribusi twit tersebut dapat dilihat pada gambar di bawah ini.
+
+```{r, fig.pos='h', fig.cap="Distribusi Twit yang memention akun @ChangeOrg_ID"}
+tb_raw <- tb_raw %>%
+  filter(is_duplicate == FALSE)
+
+tb_raw %>%
+  group_by(date) %>% count(date) %>% arrange(date) %>%
+  ggplot(aes(x = date, y = n)) + geom_line(show.legend = FALSE) + 
+  labs(x = "Tahun", y = "Jumlah Twit")
+```
+
+Twit yang digunakan dalam laporan merupakan twit yang diunggah dengan tagar #balitolakreklamasi dan #balinotforsale dalam **6.5 tahun** terakhir. Twit pertama diunggah pada **2012-06-05**, sementara twit terakhir diunggah pada **2018-03-27**.
+
+Twit dibagi menjadi tiga periode waktu sesuai dengan alur kejadian di darat. Periode 1 berasal dari twit yang diunggah dari 2012-06-05 sampai 2014-03-31. Periode 2 dari 2014-04-01 sampai 2014-08-31. Periode 3 dari 2014-09-01 sampai 2018-03-31. 
+
+```{r}
+tb_raw %>%
+  group_by(parameter) %>%
+  count(periode)
+```
+
+# Analisis Aktor
+## Akun pengirim
+
+```{r, fig.cap="20 Akun pengirim twit terbanyak"}
+tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  count(user, sort = TRUE) %>%
+  filter(!str_detect(user, 'ChangeOrg_ID')) %>%
+  head(n = 20) %>%
+  ggplot(aes(x = reorder(user, n), y = n)) + coord_flip() +
+  geom_col(show.legend = FALSE) + 
+  labs(x = "Username Twitter", y = "Jumlah Twit yang dikirim")
+```
+
+## Akun terlibat
+
+
+```{r, fig.cap="20 Akun yang paling sering dimention"}
+tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  unnest_tokens(user, user_all, to_lower = FALSE) %>%
+  count(user, sort = TRUE) %>%
+  filter(!str_detect(user, 'ChangeOrg_ID')) %>%
+  head(n = 20) %>%
+  ggplot(aes(x = reorder(user, n), y = n)) + coord_flip() +
+  geom_col(show.legend = FALSE) + 
+  labs(x = "Username Twitter", y = "Jumlah Keberadaan Username dalam Twit")
+```
+
+## Social network analysis
+
+```{r}
+input_net_btr <- tb_raw %>%
+  select(Data = user_all, user_count)
+
+#input_net_btr$Data <- gsub("[^[:alpha:][:space:]@_]*", "", input_net_btr$Data)
+
+write_csv(input_net_btr, path = "wrangled data proj-3/net_benua.csv")
+```
+
+
+# Analisis Konten
+## Tagar
+
+```{r, fig.cap="Tagar yang digunakan"}
+tagar_periode1 <- tb_raw %>%
+  filter(periode == "periode_1") %>%
+  select(hashtag, tag_count) %>%
+  filter(tag_count >= 1) %>%
+  unnest_tokens(tagar, hashtag) %>%
+  count(tagar, sort = TRUE)
+
+tagar_periode2 <- tb_raw %>%
+  filter(periode == "periode_2") %>%
+  select(hashtag, tag_count) %>%
+  filter(tag_count >= 1) %>%
+  unnest_tokens(tagar, hashtag) %>%
+  count(tagar, sort = TRUE)
+
+tagar_periode3 <- tb_raw %>%
+  filter(periode == "periode_3") %>%
+  select(hashtag, tag_count) %>%
+  filter(tag_count >= 1) %>%
+  unnest_tokens(tagar, hashtag) %>%
+  count(tagar, sort = TRUE)
+
+tagar_periode <- bind_rows(tagar_periode1 %>%
+                             mutate(periode = "periode_1"), 
+                           tagar_periode2 %>%
+                             mutate(periode = "periode_2"), 
+                           tagar_periode3 %>%
+                             mutate(periode = "periode_3"))
+
+tagar_periode %>%
+  filter(!str_detect(tagar, 'balitolakreklamasi')) %>%
+  filter(!str_detect(tagar, 'balinotforsale')) %>%
+  filter(!str_detect(tagar, 'tolakreklamasi')) %>%
+  filter(!str_detect(tagar, 'indonesia')) %>%
+  filter(!str_detect(tagar, 'repost')) %>%
+  filter(!str_detect(tagar, 'share')) %>%
+  filter(!str_detect(tagar, 'bali')) %>%
+  filter(!str_detect(tagar, '2')) %>%
+  filter(!str_detect(tagar, '1')) %>%
+  filter(!str_detect(tagar, '4')) %>%
+  filter(!str_detect(tagar, '5')) %>%
+  filter(!str_detect(tagar, '3')) %>%
+  group_by(periode) %>%
+  top_n(10, n) %>%
+  ggplot(aes(reorder(tagar, n), n, fill = periode)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ periode, scales = "free", ncol = 2) +
+  coord_flip() +
+  labs(x = NULL, 
+       y = "Jumlah twit yang diunggah")
+```
+Berikut adalah tagar yang tidak diikutsertakan dalam visualiasi: 
+
+1. balitolakreklamasi
+2. balinotforsale
+3. tolakreklamasi
+4. indonesia
+5. repost
+6. share
+7. bali
+
+
+## Term
+
+
+```{r, fig.cap="Frekuensi Bigram dalam twit"}
+tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(word_count >= 2) %>%
+  select(date, clean_text, word_count, periode) %>%
+  unnest_tokens(kata, clean_text, token = "ngrams", n = 2) %>%
+  count(kata, sort = TRUE) %>%
+  head(n = 20) %>%
+  ggplot(aes(reorder(kata, n), n)) + geom_col() + coord_flip() +
+  labs(x = "bigram", y = "jumlah bigram")
+```
+
+## Semantic network
+
+
+```{r, fig.cap= "Word network dalam twit yang memention akun @ChangeOrg_ID"}
+bigram_counts <- tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(word_count >= 2) %>%
+  select(clean_text) %>%
+  unnest_tokens(bigram, clean_text, token = "ngrams", n = 2) %>%
+  count(bigram, sort = TRUE) %>%
+  separate(bigram, into = c("word1", "word2"))
+
+library(widyr)
+
+bigram_counts %>%
+  filter(n >= 100) %>%
+  graph_from_data_frame() %>%
+  ggraph(layout = "fr") +
+  geom_edge_link(aes(edge_alpha = n, edge_width = n), edge_colour = "cyan4") +
+  geom_node_point(size = 5) +
+  geom_node_text(aes(label = name), repel = TRUE, 
+                 point.padding = unit(0.2, "lines")) +
+  theme_void()
+```
+
+
+## Tf-idf
+
+
+```{r, fig.cap="TF-IDF bigram per periode"}
+twit_words <- tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(word_count >= 2) %>%
+  select(clean_text, periode) %>%
+  group_by(periode) %>%
+  unnest_tokens(kata, clean_text, token = "ngrams", n = 2) %>%
+  count(kata, sort = TRUE)
+
+total_words <- twit_words %>% 
+  group_by(periode) %>% 
+  summarize(total = sum(n))
+
+twit_words <- left_join(twit_words, total_words)
+
+twit_words <- twit_words %>%
+  bind_tf_idf(kata, periode, n) %>%
+  arrange(desc(tf_idf))
+
+# Visualisasi tf-idf
+twit_words %>%
+  arrange(desc(tf_idf)) %>%
+  mutate(kata = factor(kata, levels = rev(unique(kata)))) %>% 
+  group_by(periode) %>% 
+  top_n(10) %>% 
+  ungroup %>%
+  ggplot(aes(reorder(kata,tf_idf), tf_idf, fill = periode)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~periode, ncol = 2, scales = "free") + 
+  labs(x = "Bigram", y = "Value") +
+  coord_flip()
+```
+
+## Topic Modelling
+
+```{r}
+# the LDA function using topicmodels package
+bigram_tm <- function(input_text, # should be a columm from a dataframe
+                       plot = T, # return a plot? TRUE by defult
+                       number_of_topics = 4) # number of topics (4 by default)
+{    
+  set.seed(2016)
+  # create a corpus (type of object expected by tm) and document term matrix
+  Corpus <- VCorpus(VectorSource(input_text)) # make a VCorpus object spec for RWeka
+  
+  # function for creating bigram in the DTM
+  BigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min=2, max=2))
+  # you can explore which term combination gave the most interpretable topic for you
+  # by changing numbers inside Weka_control
+  
+  DTM <- DocumentTermMatrix(Corpus, control=list(tokenize=BigramTokenizer))
+  
+  # remove any empty rows in our document term matrix (if there are any 
+  # we'll get an error when we try to run our LDA)
+  unique_indexes <- unique(DTM$i) # get the index of each unique value
+  DTM <- DTM[unique_indexes,] # get a subset of only those indexes
+  
+  # preform LDA & get the words/topic in a tidy text format
+  lda <- LDA(DTM, k = number_of_topics, control = list(seed = 1234))
+  topics <- tidy(lda, matrix = "beta")
+  
+  # get the top ten terms for each topic
+  top_terms <- topics  %>% # take the topics data frame and..
+    group_by(topic) %>% # treat each topic as a different group
+    top_n(10, beta) %>% # get the top 10 most informative words
+    ungroup() %>% # ungroup
+    arrange(topic, -beta) # arrange words in descending informativeness
+  
+  # if the user asks for a plot (TRUE by default)
+  if(plot == T){
+    # plot the top ten terms for each topic in order
+    top_terms %>% # take the top terms
+      mutate(term = reorder(term, beta)) %>% # sort terms by beta value 
+      ggplot(aes(term, beta, fill = factor(topic))) + # plot beta by theme
+      geom_col(show.legend = FALSE) + # as a bar plot
+      facet_wrap(~ topic, scales = "free") + # which each topic in a seperate plot
+      labs(x = NULL, y = "Beta") + # no x label, change y label 
+      coord_flip() # turn bars sideways
+  }else{ 
+    # if the user does not request a plot
+    # return a list of sorted terms instead
+    return(top_terms)
+  }
+}
+```
+
+### Topic modelling all
+
+- filter = wordcount >= 2
+- total twit = 55067
+
+```{r, fig.cap="Topic modelling dari seluruh twit"}
+# taking data for topic modelling
+tm_teluk_benoa <- tb_raw %>%
+  select(date, user,clean_text, word_count, parameter) %>%
+  filter(word_count >= 2)
+
+# topic modelling
+tm_twit <- bigram_tm(tm_teluk_benoa$clean_text, number_of_topics = 6)
+tm_twit
+```
+
+### Topic modelling periode 1
+
+- filter = wordcount >= 2
+- total twit = 15209
+
+```{r, fig.cap="Topic modelling dari twit tentang Teluk Benoa periode 1"}
+# taking data for topic modelling
+tm_tb_periode1 <- tb_raw %>%
+  filter(periode == "periode_1") %>%
+  select(date, user,clean_text, word_count, parameter) %>%
+  filter(word_count >= 2)
+
+# topic modelling
+tm_tb_p1 <- bigram_tm(tm_tb_periode1$clean_text, number_of_topics = 4)
+tm_tb_p1
+```
+
+### Topic modelling periode 2
+
+- filter = wordcount >= 2
+- total twit = 17186
+
+```{r, fig.cap="Topic modelling dari twit tentang Teluk Benoa periode 1"}
+# taking data for topic modelling
+tm_tb_periode2 <- tb_raw %>%
+  filter(periode == "periode_2") %>%
+  select(date, user,clean_text, word_count, parameter) %>%
+  filter(word_count >= 2)
+
+# topic modelling
+tm_tb_p2 <- bigram_tm(tm_tb_periode2$clean_text, number_of_topics = 4)
+tm_tb_p2
+```
+
+
+### Topic modelling periode 3
+
+- filter = wordcount >= 2
+- total twit = 22672
+
+```{r, fig.cap="Topic modelling dari twit tentang Teluk Benoa periode 1"}
+# taking data for topic modelling
+tm_tb_periode3 <- tb_raw %>%
+  filter(periode == "periode_3") %>%
+  select(date, user,clean_text, word_count, parameter) %>%
+  filter(word_count >= 2)
+
+# topic modelling
+tm_tb_p3 <- bigram_tm(tm_tb_periode3$clean_text, number_of_topics = 4)
+tm_tb_p3
+```
+
+# Penutup
+## Simpulan
+## Rekomendasi

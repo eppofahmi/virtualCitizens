@@ -20,14 +20,11 @@ library(tidytext)
 library(stringr)
 library(tm)
 
-bns_raw <- read.csv("twit-bnfs.csv", header = TRUE, 
-                    stringsAsFactors = FALSE, sep = ";") 
-
-colnames(bns_raw) <- c("date", "time", "user", "tweets", "replying", 
-                       "rep_count", "ret_count", "fav_count","link")
+bns_raw <- read.csv("twit-bnfs.csv", header = FALSE, stringsAsFactors = FALSE, sep = ";") 
+colnames(bns_raw) <- c("date", "time", "user", "tweets", "replying", "rep_count", "ret_count", "fav_count","link")
 
 # converting date format
-bns_raw$date <- as.Date(bns_raw$date,format='%d/%m/%y')
+bns_raw$date <- as.Date(bns_raw$date,format='%d %b %Y')
 bns_raw$ret_count <- as.integer(bns_raw$ret_count)
 
 glimpse(bns_raw)
@@ -42,6 +39,10 @@ bns_raw$tweets <- gsub("pic[^[:space:]]*", "", bns_raw$tweets)
 bns_raw$tweets <- gsub("http[^[:space:]]*", "", bns_raw$tweets)
 bns_raw$tweets <- gsub("https[^[:space:]]*", "", bns_raw$tweets)
 
+# put space 
+bns_raw$tweets <- gsub("([[:alnum:]])([^[:alnum:][:space:]_])", "\\1 \\2", bns_raw$tweets)
+
+# extracting
 bns_raw$user_all <- sapply(str_extract_all(bns_raw$tweets, "(?<=@)[^\\s:]+", simplify = FALSE), paste, collapse=", ")
 
 # merge column user and user_all
