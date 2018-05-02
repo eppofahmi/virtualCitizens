@@ -50,15 +50,14 @@ twit_gojek <- twit_gojek %>%
 
 # 2. user_all ===================================== 
 twit_gojek$user <- (gsub('[@]', ' ', twit_gojek$user))
-
 twit_gojek$tweets <- gsub("pic[^[:space:]]*", "", twit_gojek$tweets)
 twit_gojek$tweets <- gsub("http[^[:space:]]*", "", twit_gojek$tweets)
 twit_gojek$tweets <- gsub("https[^[:space:]]*", "", twit_gojek$tweets)
 
-twit_gojek$user_all <- sapply(str_extract_all(twit_gojek$tweets, "(?<=@)[^\\s:]+", simplify = FALSE), paste, collapse=", ")
+# put space 
+twit_gojek$tweets <- gsub("([[:alnum:]])([^[:alnum:][:space:]_])", "\\1 \\2", twit_gojek$tweets)
 
-# add @ if nedeed
-#user_change$User <- paste("@", user_change$User, sep=", ")
+twit_gojek$user_all <- sapply(str_extract_all(twit_gojek$tweets, "(?<=@)[^\\s:]+", simplify = FALSE), paste, collapse=", ")
 
 # merge column user and user_all
 twit_gojek$user_all <- paste(twit_gojek$user, twit_gojek$user_all, sep=", ")
