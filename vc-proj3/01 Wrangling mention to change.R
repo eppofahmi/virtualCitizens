@@ -43,6 +43,8 @@ change_raw$tweets <- gsub("pic[^[:space:]]*", "", change_raw$tweets)
 change_raw$tweets <- gsub("http[^[:space:]]*", "", change_raw$tweets)
 change_raw$tweets <- gsub("https[^[:space:]]*", "", change_raw$tweets)
 
+change_raw$tweets <- gsub("([[:alnum:]])([^[:alnum:][:space:]_])", "\\1 \\2", change_raw$tweets)
+
 change_raw$user_all <- sapply(str_extract_all(change_raw$tweets, "(?<=@)[^\\s:]+", simplify = FALSE), paste, collapse=", ")
 
 # merge column user and user_all

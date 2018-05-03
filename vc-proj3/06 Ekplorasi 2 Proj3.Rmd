@@ -112,12 +112,14 @@ tb_raw %>%
 ## Social network analysis
 
 ```{r}
-input_net_btr <- tb_raw %>%
-  select(Data = user_all, user_count)
+tb_net <- tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  select(date, time, user, tweets)
 
-#input_net_btr$Data <- gsub("[^[:alpha:][:space:]@_]*", "", input_net_btr$Data)
+# add @
+tb_net$user <- paste("@", tb_net$user, sep="")
 
-write_csv(input_net_btr, path = "wrangled data proj-3/net_benua.csv")
+write_csv(tb_net, path = "wrangled data proj-3/tb_net.csv", col_names = FALSE)
 ```
 
 
