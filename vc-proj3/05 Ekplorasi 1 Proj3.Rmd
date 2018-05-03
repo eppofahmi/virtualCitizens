@@ -81,6 +81,7 @@ Indikator **`is_duplicate`** dibuat berdasarkan konten twit, jika twit tersebut 
 
 ```{r, fig.pos='h', fig.cap="Distribusi Twit yang memention akun @ChangeOrg_ID"}
 twit_to_change %>%
+  filter(is_duplicate == FALSE) %>%
   group_by(date) %>% count(date) %>% arrange(date) %>%
   ggplot(aes(x = date, y = n)) + geom_line() + 
   labs(x = "Tahun", y = "Jumlah Twit")
@@ -376,11 +377,14 @@ Dari gambar di atas dapat dilihat dengan jelas bahwa beberapa kata cenderung ber
 Skenario yang sama dengan semantic network di atas juga dapat diaplikasikan pada aktor, untuk melihat keterhubungannya secara sekilas. Namun untuk social network yang lebih kompleks dapat dilakuka di gephi. Untuk itu, di sini (di R), saya hanya menyiapkan filenya saja. 
 
 ```{r}
-to_change_network <- twit_to_change %>%
-  filter(user_count >= 2) %>% # memilih twit yang melibatkan minimal 2 atau lebih user
-  select(Data = user_all)
+to_change_net <- twit_to_change %>%
+  filter(is_duplicate == FALSE) %>%
+  select(date, time, user, tweets)
 
-write_csv(to_change_network, path = "wrangled data proj-3/to_change_network.csv")
+# add @
+to_change_net$user <- paste("@", to_change_net$user, sep="")
+
+write_csv(to_change_net, path = "wrangled data proj-3/to_change_net.csv", col_names = FALSE)
 ```
 
 Dari hasil SNA dapat diketahui jumlah nodes (username yang memiliki koneksi) dalam twit yang memention akun @ChangeOrg_ID berjumlah **27295**. Sedangkan edges- nya berjumlah **52506**. Berikut ini adalah hasil visualisasi yang dilakukan di Gephi terhadap network tersebut. 
