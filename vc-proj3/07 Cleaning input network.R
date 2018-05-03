@@ -206,7 +206,7 @@ net_user <- net_data %>%
 net_data <- net_data %>%
   select(Data)
 
-write_csv(net_data, path = "wrangled data proj-3/net_tb_clean.csv")
+#write_csv(net_data, path = "wrangled data proj-3/net_tb_clean.csv")
 
 # create graph file ----
 library(igraph)
