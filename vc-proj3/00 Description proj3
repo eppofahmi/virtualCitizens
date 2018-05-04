@@ -5,16 +5,16 @@ Data yang digunakan bersumber dari:
    1a. twit yang memention akun @changeOrg_ID (sudah)
    1b. twit dengan tagar #balitolakreklamasi (sudah)
    1c. twit dengan tagar #balinotforsale (sudah)
-   1c. twit dengan tagar #uumd3 (belum)
-   1d. twit yang mengandung kata "uum-md3" (belum)
    
 2. Change
-   2a. komentar petisi dengan kata kunci "teluk benua"
-   2b. komentar petisi dengan kata kunci "uu-md3"
-
+   2a. Daftar petisi teluk benua
+   2b. petisi dengan judul: "Segera Cabut SK Reklamasi Teluk Benoa"
+   2c. petisi dengan judul: "Pak @Jokowi, Segera Batalkan Perpres 51 Tahun 2014"
+   2d. petisi dengan judul: "Revoke the reclamation permit of Benoa gulf, immediately!"
+   
 3. Media Online
-   - berita bali
-   - bali post
+   - berita bali, kata kunci: "reklamasi teluk benoa"
+   - bali post: kata kunci "reklamasi teluk benoa"
 
 Nama dan keterangan isi kolom: 
 1. "sumber_data" = Jenis sumber data (twitter, change)  
