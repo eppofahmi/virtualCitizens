@@ -174,7 +174,6 @@ net_data$Data <- gsub("\\bBobbyalcoholic\\b", "bobbyalcoholic", net_data$Data)
 net_data$Data <- gsub("\\bBobbyAlcoholic\\b", "bobbyalcoholic", net_data$Data)
 net_data$Data <- gsub("\\bbobbyalcoholicrider\\b", "bobbyalcoholic", net_data$Data)
 net_data$Data <- gsub("\\berx_bastard\\b", "ERX_BASTARD", net_data$Data)
-net_data$Data <- gsub("\\bBobbyBiKul\\b", "ERX_BASTARD", net_data$Data)
 
 net_data$Data <- gsub("\\b8rianna_punkrocklowrider\\b", "8rianna_ punkrocklowrider", net_data$Data)
 net_data$Data <- gsub("\\b8rianna_Selamat\\b", "8rianna_", net_data$Data)
