@@ -6,18 +6,23 @@ Data yang digunakan bersumber dari:
    1b. twit dengan tagar #savegojek (sudah)
    1c. twit dengan tagar #savedrivergojek (sudah)
    1d. twit dengan tagar #saveojekonline (sudah)
-   1e. twit dari timeline @CeritaTranspOL
+   1e. twit dari timeline @CeritaTranspOL (sudah)
    1f. twit yang mengandung frasa "transportasi online" dalam bahasa Indonesia
 
 2. change.org
    2a. daftar petisi dengan kata kunci "gojek" (sudah)
    2b. komentar terhadap petisi yang ada dalam daftar 2b
-   2c. daftar petisi dengan kata kunci "uumd3"
+   2c. daftar petisi dengan kata kunci "uumd3" 
    2d. komentar terhadap petisi yang ada dalam daftar 2c 
    
 3. playstore (sudah)
    3a. komentar user tentang aplikasi gojek (sudah)
    3b. komentra user pada aplikasi gojek driver (sudah)
+   
+4. media onlie
+   4.a. detik.com dengan kata kunci "transportasi online"
+   4.b. tempo dengan kata kunci "transportasi online"
+   4.c. kompas dengan kata kunci "transportasi online"
    
 Nama dan keterangan isi kolom: 
 1. "sumber_data" = Jenis sumber data (twitter, change, playstore)  
