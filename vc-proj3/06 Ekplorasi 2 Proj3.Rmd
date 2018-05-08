@@ -16,6 +16,8 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.pos = "h")
+
+set.seed(2018)
 ```
 
 # Pendahuluan
@@ -30,12 +32,12 @@ if (Sys.info()['sysname'] == 'Darwin') {
 }
 
 library(tidyverse)
+library(tidytext)
 library(ggplot2)
 library(stringr)
 library(lubridate)
 library(topicmodels)
 library(tm)
-library(tidytext)
 library(RWeka)
 library(reshape2)
 library(wordcloud)
@@ -96,7 +98,6 @@ tb_raw %>%
 
 ## Akun terlibat
 
-
 ```{r, fig.cap="20 Akun yang paling sering dimention"}
 tb_raw %>%
   filter(is_duplicate == FALSE) %>%
@@ -121,7 +122,6 @@ tb_net$user <- paste("@", tb_net$user, sep="")
 
 write_csv(tb_net, path = "wrangled data proj-3/tb_net.csv", col_names = FALSE)
 ```
-
 
 # Analisis Konten
 ## Tagar
@@ -190,7 +190,6 @@ Berikut adalah tagar yang tidak diikutsertakan dalam visualiasi:
 
 ## Term
 
-
 ```{r, fig.cap="Frekuensi Bigram dalam twit"}
 tb_raw %>%
   filter(is_duplicate == FALSE) %>%
@@ -204,7 +203,6 @@ tb_raw %>%
 ```
 
 ## Semantic network
-
 
 ```{r, fig.cap= "Word network dalam twit yang memention akun @ChangeOrg_ID"}
 bigram_counts <- tb_raw %>%
@@ -228,9 +226,7 @@ bigram_counts %>%
   theme_void()
 ```
 
-
 ## Tf-idf
-
 
 ```{r, fig.cap="TF-IDF bigram per periode"}
 twit_words <- tb_raw %>%
@@ -387,5 +383,54 @@ tm_tb_p3
 ```
 
 # Penutup
+
 ## Simpulan
+periode 1 - konser untuk mempopulerkan keresahan tentang tolak reklamasi bali 
+periode 2 - 
+
 ## Rekomendasi
+
+
+# Close Reading
+## Konser mini
+
+```{r}
+tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(str_detect(clean_text, "konser mini")) %>%
+  select(tweets) %>%
+  head(n = 50) %>% 
+  print(tweets)
+```
+
+## Twit aktor
+
+```{r}
+gendovara <- tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(str_detect(user, "gendovara")) %>%
+  select(date,tweets, periode) %>%
+  print(tweets)
+
+JRX_SID <- tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(str_detect(user, "JRX_SID")) %>%
+  select(date,tweets, periode) %>%
+  print(tweets)
+
+forbali13 <- tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(str_detect(user, "ForBALI13")) %>%
+  select(date,tweets, periode) %>%
+  print(tweets)
+
+twit_aktor <- bind_rows(gendovara %>%
+                          mutate(person = "gendovara"), 
+                        JRX_SID %>%
+                          mutate(person = "JRX_SID"), 
+                        forbali13 %>%
+                          mutate(person = "forbali13"))
+
+write_csv(twit_aktor, path = "wrangled data proj-3/twit_aktor.csv")
+```
+
