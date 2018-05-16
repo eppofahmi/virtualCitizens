@@ -53,6 +53,9 @@ bns_raw <- read_csv(paste(dirwd,"twit-tagar-balinotforsale.csv",sep=''), col_nam
 
 tb_raw <- bind_rows(btr_raw, bns_raw)
 
+net_telukBenua <- read_csv(paste(dirwd,"net_tb_clean.csv",sep=''), col_names = TRUE)
+
+# print is duplicate
 tb_raw %>%
   group_by(is_duplicate) %>%
   count(is_duplicate) %>%
@@ -62,7 +65,7 @@ tb_raw %>%
 
 Dari total **82.616** twit terdapat **13.603** twit yang merupakan twit duplikat atau memiliki konten yang sama. Oleh karena itu, dalam eksplorasi selanjutnya hanya akan menggunakan **69.013** twit. Distribusi twit tersebut dapat dilihat pada gambar di bawah ini.
 
-```{r, fig.pos='h', fig.cap="Distribusi Twit yang memention akun @ChangeOrg_ID"}
+```{r, fig.pos='h', fig.cap="Distribusi Twit yang menggunakan tagar bns atau btr"}
 tb_raw <- tb_raw %>%
   filter(is_duplicate == FALSE)
 
@@ -99,9 +102,8 @@ tb_raw %>%
 ## Akun terlibat
 
 ```{r, fig.cap="20 Akun yang paling sering dimention"}
-tb_raw %>%
-  filter(is_duplicate == FALSE) %>%
-  unnest_tokens(user, user_all, to_lower = FALSE) %>%
+net_telukBenua %>%
+  unnest_tokens(user, Data, to_lower = FALSE) %>%
   count(user, sort = TRUE) %>%
   filter(!str_detect(user, 'ChangeOrg_ID')) %>%
   head(n = 20) %>%
@@ -109,6 +111,8 @@ tb_raw %>%
   geom_col(show.legend = FALSE) + 
   labs(x = "Username Twitter", y = "Jumlah Keberadaan Username dalam Twit")
 ```
+
+User terlibat di ambil berdasarkan frekuensi keberadaan user baik sebagai akun pengirim twit maupun akun yang dimention di dalam twit. Gambar diatas merupakan hasil perhitungan dari twit yang sebelumnya telah di filter, yaitu twit yang melibatkan minimal dua username. 
 
 ## Social network analysis
 
@@ -202,9 +206,13 @@ tb_raw %>%
   labs(x = "bigram", y = "jumlah bigram")
 ```
 
+Pasangan kata yang paling banyak muncul dari twit dengan dua tagar yang jadi parameter adalah konser mini. Hal tersebut menunjukkan bahwa dua kata tersebut rutin di gunakan oleh pengguna twitter. Selain itu, berdaraskan frekuensinya, pasangan kata yang muncul selanjutnya adalah metro dan tv, yang menujukkan sebuah stasiun tv nasional. Penyebab dua kata tersebut sering muncul kemungkinan besar dipicu oleh adanya acara yang mengundang tokoh/aktor gerakan bali tolak reklamasi. Pasangan kata berikutnya adalah perpres limasatu yang merujuk pada perpres no 51 tahun 2014 tentang reklamasi teluk benoa. Kemunculan kata ini secara tidak langsung telah mengonfirmasi bahwa twit yang digunakan berisi pendapat warga net seputar reklamasi teluk benoa. 
+
+Kata atau pasangan kata berikutnya juga dapat dinterpretasikan dengan pola yang sama, yaitu dengan merujuk pada cerita baik yang didapat dari data darat. Interpretasi juga dapat dilakukan dengan merujuk pada hasil `close reading` twit aktor utama. 
+
 ## Semantic network
 
-```{r, fig.cap= "Word network dalam twit yang memention akun @ChangeOrg_ID"}
+```{r, fig.cap= "Word network dalam twit yang menggunakan tagar bns atau btr"}
 bigram_counts <- tb_raw %>%
   filter(is_duplicate == FALSE) %>%
   filter(word_count >= 2) %>%
@@ -225,6 +233,10 @@ bigram_counts %>%
                  point.padding = unit(0.2, "lines")) +
   theme_void()
 ```
+
+Tujuan utama dibuat `network of term` adalah untuk mengetahui pasangan kata yang lebih jauh dari bigram. Dalm konteks ini, pasangan kata dengan garis paling tebal kurang lebih sama dengan hasil yang ditunjukkan dalam visualisasi frekeunsi bigram di atas. Namun di sini, kita juga dapat melihat, misalnya kata **TV** itu berpasangan bukan hanya dengan **Metro** tapi juga dengan **kompas** yang merujuk pada kompasTV. Artinya, kemungkinan besar cerita tentang bali tolak reklamasi ini juga dimiliki oleh kompas tv atau aktor BTR juga diundang oleh tv tersebut. 
+
+**Hint: interpretasi dilakukan dengan visualisasi saja, yaitu dengan melihat kata-kata yang ada dalam satu garis.** 
 
 ## Tf-idf
 
@@ -432,5 +444,14 @@ twit_aktor <- bind_rows(gendovara %>%
                           mutate(person = "forbali13"))
 
 write_csv(twit_aktor, path = "wrangled data proj-3/twit_aktor.csv")
+```
+
+# Twit terbanyak 
+
+```{r}
+tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  count(user, sort = TRUE) %>%
+  filter(!str_detect(user, 'ChangeOrg_ID'))
 ```
 

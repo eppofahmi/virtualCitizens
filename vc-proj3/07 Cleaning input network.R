@@ -6,9 +6,8 @@ library(stringr)
 
 # data ----
 dirwd <- paste(getwd(),"/wrangled data proj-3/",sep='')
-net_data <- read.csv(paste(dirwd,"net_tb.csv",sep=''), header = FALSE, stringsAsFactors = FALSE)
-
-colnames(net_data) <- "Data"
+net_data <- read.csv(paste(dirwd,"net_benoa.csv",sep=''), header = TRUE
+                     , stringsAsFactors = FALSE)
 
 # removing raw username that contain only 1 or 2 chr
 net_user <- net_data %>%
@@ -195,6 +194,7 @@ net_data$Data <- gsub("\\bleak_bali4\\b", "leakBALI_", net_data$Data)
 net_data$Data <- gsub("\\bleakBali_\\b", "leakBALI_", net_data$Data)
 
 
+
 # rechecking username ----
 net_user <- net_data %>%
   unnest_tokens(user, Data, to_lower = FALSE, drop = FALSE) %>%
@@ -205,10 +205,11 @@ net_user <- net_data %>%
 net_data <- net_data %>%
   select(Data)
 
-#write_csv(net_data, path = "wrangled data proj-3/net_tb_clean.csv")
+write_csv(net_data, path = "wrangled data proj-3/net_tb_clean.csv")
 
 # create graph file ----
 library(igraph)
+library("rgexf")
 
 dataSet1 <- net_data %>%
   select(Data) %>%
@@ -230,4 +231,4 @@ nodes_df <- data.frame(ID = c(1:vcount(graph_file)), NAME = V(graph_file)$name)
 edges_df <- as.data.frame(get.edges(graph_file, c(1:ecount(graph_file))))
 
 # save and bring to gephi
-write.gexf(nodes = nodes_df, edges = edges_df, defaultedgetype = "undirected", output = "net_teluk_benua.gexf")
+write.gexf(nodes = nodes_df, edges = edges_df, defaultedgetype = "undirected", output = "net_teluk_benua_test.gexf")
