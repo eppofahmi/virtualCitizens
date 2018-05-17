@@ -76,6 +76,8 @@ tb_media$konten <- gsub("\\bBALIPOST.com\\b", '', tb_media$konten)
 tb_media$konten <- gsub("\\bBeritabali.com\\b", '', tb_media$konten)
 tb_media$konten <- gsub("\\bBeritaBali.com\\b", '', tb_media$konten)
 
+head(n = 2, tb_media$konten)
+
 # punct and symbol normalisation ----
 tb_media$konten <- replace_white(tb_media$konten) # replacing white space
 tb_media$konten <- add_comma_space(tb_media$konten)
@@ -95,3 +97,4 @@ tb_media$konten <- replace_number(tb_media$konten, num.paste = TRUE, remove = FA
 
 # Eksplorasi 2 ----
 
+head(n = 2, tb_media$konten)

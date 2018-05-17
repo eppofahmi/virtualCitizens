@@ -160,9 +160,9 @@ tagar_periode <- bind_rows(tagar_periode1 %>%
                              mutate(periode = "periode_3"))
 
 tagar_periode %>%
-  filter(!str_detect(tagar, 'balitolakreklamasi')) %>%
-  filter(!str_detect(tagar, 'balinotforsale')) %>%
-  filter(!str_detect(tagar, 'tolakreklamasi')) %>%
+  #filter(!str_detect(tagar, 'balitolakreklamasi')) %>%
+  #filter(!str_detect(tagar, 'balinotforsale')) %>%
+  #filter(!str_detect(tagar, 'tolakreklamasi')) %>%
   filter(!str_detect(tagar, 'indonesia')) %>%
   filter(!str_detect(tagar, 'repost')) %>%
   filter(!str_detect(tagar, 'share')) %>%
@@ -173,7 +173,7 @@ tagar_periode %>%
   filter(!str_detect(tagar, '5')) %>%
   filter(!str_detect(tagar, '3')) %>%
   group_by(periode) %>%
-  top_n(10, n) %>%
+  top_n(15, n) %>%
   ggplot(aes(reorder(tagar, n), n, fill = periode)) +
   geom_col(show.legend = FALSE) +
   facet_wrap(~ periode, scales = "free", ncol = 2) +
@@ -332,6 +332,7 @@ bigram_tm <- function(input_text, # should be a columm from a dataframe
 - total twit = 55067
 
 ```{r, fig.cap="Topic modelling dari seluruh twit"}
+set.seed(2018)
 # taking data for topic modelling
 tm_teluk_benoa <- tb_raw %>%
   select(date, user,clean_text, word_count, parameter) %>%
@@ -359,6 +360,20 @@ tm_tb_p1 <- bigram_tm(tm_tb_periode1$clean_text, number_of_topics = 4)
 tm_tb_p1
 ```
 
+```{r}
+tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(periode == "periode_1") %>%
+  filter(str_detect(clean_text, "konser mini")) %>%
+  select(date, user,tweets) %>%
+  #head(n = 20) %>% 
+  print()
+```
+
+
+
+
 ### Topic modelling periode 2
 
 - filter = wordcount >= 2
@@ -375,6 +390,30 @@ tm_tb_periode2 <- tb_raw %>%
 tm_tb_p2 <- bigram_tm(tm_tb_periode2$clean_text, number_of_topics = 4)
 tm_tb_p2
 ```
+
+**Batalkan perpres**
+```{r}
+tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(periode == "periode_2") %>%
+  filter(str_detect(clean_text, "batalkan perpres")) %>%
+  select(tweets) %>%
+  head(n = 10) %>% 
+  print(tweets)
+```
+
+**Dukung gerakan**
+
+```{r}
+tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(periode == "periode_2") %>%
+  filter(str_detect(clean_text, "dukung gerakan")) %>%
+  select(tweets) %>%
+  head(n = 10) %>% 
+  print(tweets)
+```
+
 
 
 ### Topic modelling periode 3
@@ -411,7 +450,7 @@ tb_raw %>%
   filter(is_duplicate == FALSE) %>%
   filter(str_detect(clean_text, "konser mini")) %>%
   select(tweets) %>%
-  head(n = 50) %>% 
+  head(n = 50) %>%
   print(tweets)
 ```
 
