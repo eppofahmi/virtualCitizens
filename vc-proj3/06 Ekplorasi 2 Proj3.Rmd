@@ -44,16 +44,35 @@ library(wordcloud)
 library(igraph)
 library(ggraph)
 library(quanteda)
+library(googledrive)
 ```
 
+
+# Downloading data
+
 ```{r}
-dirwd <- paste(getwd(),"/wrangled data proj-3/",sep='')
-btr_raw <- read_csv(paste(dirwd,"twit-tagar-balitolakreklamasi.csv",sep=''), col_names = TRUE)
-bns_raw <- read_csv(paste(dirwd,"twit-tagar-balinotforsale.csv",sep=''), col_names = TRUE)
+id0 <- "1RAalTLYhpprDCpE_wos48ymufN8mjMG_" #twit-mention-change.csv 
+id1 <- "11WTedaaE79EtT4vOGNU2vfG7xgcLtJcE" # twit-tagar-balitolakreklamasi.csv
+id2 <- "1984jmFur63PmYvoC8Ab6P2iwfUQYVp71" # twit-tagar-balinotforsale.csv
+
+twit_to_change <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id0))
+btr_raw <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id1))
+bns_raw <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id2))
+
+glimpse(btr_raw)
+
+```
+
+
+
+```{r}
+#dirwd <- paste(getwd(),"/wrangled data proj-3/",sep='')
+#btr_raw <- read_csv(paste(dirwd,"twit-tagar-balitolakreklamasi.csv",sep=''), col_names = TRUE)
+#bns_raw <- read_csv(paste(dirwd,"twit-tagar-balinotforsale.csv",sep=''), col_names = TRUE)
 
 tb_raw <- bind_rows(btr_raw, bns_raw)
 
-net_telukBenua <- read_csv(paste(dirwd,"net_tb_clean.csv",sep=''), col_names = TRUE)
+#net_telukBenua <- read_csv(paste(dirwd,"net_tb_clean.csv",sep=''), col_names = TRUE)
 
 # print is duplicate
 tb_raw %>%
