@@ -95,6 +95,17 @@ tb_media$konten <- strip(tb_media$konten, char.keep = c("/"), digit.remove = FAL
 # replacing number with chr
 tb_media$konten <- replace_number(tb_media$konten, num.paste = TRUE, remove = FALSE)
 
-# Eksplorasi 2 ----
+# judul ----
+tb_media$judul <- add_comma_space(tb_media$judul)
+tb_media$judul <- replace_symbol(tb_media$judul)
+tb_media$judul <- replace_non_ascii(tb_media$judul, remove.nonconverted = TRUE)
+tb_media$judul <- replace_white(tb_media$judul) # replacing white space
+tb_media$judul <- strip(tb_media$judul, char.keep = c("-", "/"), digit.remove = FALSE, apostrophe.remove = TRUE, lower.case = FALSE)
 
 head(n = 2, tb_media$konten)
+
+# Eksplorasi 2 ----
+
+
+
+

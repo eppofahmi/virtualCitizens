@@ -2,12 +2,15 @@
 title: 'Laporan 2: Twit tentang Teluk Benua'
 author: "Ujang fahmi"
 date: "4/30/2018"
-output: 
+output:
   html_notebook:
     number_sections: yes
     toc: yes
     toc_depth: 3
     toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
   rmarkdown::pdf_document:
     fig_caption: yes
     includes:
@@ -45,24 +48,23 @@ library(igraph)
 library(ggraph)
 library(quanteda)
 library(googledrive)
+library(textclean)
 ```
 
 
-# Downloading data
+# Data
 
 ```{r}
-id0 <- "1RAalTLYhpprDCpE_wos48ymufN8mjMG_" #twit-mention-change.csv 
+id0 <- "1RAalTLYhpprDCpE_wos48ymufN8mjMG_" # twit-mention-change.csv 
 id1 <- "11WTedaaE79EtT4vOGNU2vfG7xgcLtJcE" # twit-tagar-balitolakreklamasi.csv
 id2 <- "1984jmFur63PmYvoC8Ab6P2iwfUQYVp71" # twit-tagar-balinotforsale.csv
+id3 <- "1Pw0WZIuou9bw7nog1xCJqOVZDR-TCk88" # cleaned username_all 
 
 twit_to_change <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id0))
 btr_raw <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id1))
 bns_raw <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id2))
-
-glimpse(btr_raw)
-
+net_telukBenua <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id3))
 ```
-
 
 
 ```{r}
@@ -72,7 +74,8 @@ glimpse(btr_raw)
 
 tb_raw <- bind_rows(btr_raw, bns_raw)
 
-#net_telukBenua <- read_csv(paste(dirwd,"net_tb_clean.csv",sep=''), col_names = TRUE)
+tb_raw$tweets <- replace_white(tb_raw$tweets) # replacing white space
+tb_raw$tweets <- replace_non_ascii(tb_raw$tweets, remove.nonconverted = TRUE)
 
 # print is duplicate
 tb_raw %>%
@@ -105,7 +108,10 @@ tb_raw %>%
 ```
 
 # Analisis Aktor
+Aktor dalam twit merupakan username atau nama akun yang terdapat dalam twitter. Aktor dibedakan menjadi, yaitu aktor sebagai pengirim twit yang selanjutnya disebut pengirim dan aktor yang terlibat. Aktor yang terlibat juga dapat menjadi aktor pengirim twit, namun di sini aktor terlbat didapat dari body twit yang posisinya berada setelah akun pertama yang dianggap sebagai pengirim. 
+
 ## Akun pengirim
+Akun pengirim twit yang mengandung dua tagar dapat dilihat pada gambar di bawah ini. Di mana dalam gambar dapat dilihat akun `ForBALI13` menjadi pengirim terbanyak. Akun tersebut merupakan akun resmi gerakan, sebagaimana dikonfirmasi oleh kordinator gerakan.
 
 ```{r, fig.cap="20 Akun pengirim twit terbanyak"}
 tb_raw %>%
@@ -117,8 +123,10 @@ tb_raw %>%
   geom_col(show.legend = FALSE) + 
   labs(x = "Username Twitter", y = "Jumlah Twit yang dikirim")
 ```
+Selain akun `ForBALI13` juga terdapat beberapa akun lain yang cukup banyak mengirimkan twit tentang tolak reklamasi teluk benoa. Akun-akun tersebut juga rata-rata memiliki follower cukup banyak. Hal ini membuat twit tentang tolak reklamasi menyebar cukup cepat. Hal ini juga menjadi salah satu strategi gerakan dengan melibatkan "artis" atau aktor yang telah lebih dulu populer. Sebagai contoh, JRX_SID yang juga merupakan anggota band SID memiliki 364 ribu lebih follower Twitter. 
 
 ## Akun terlibat
+Gambar di bawah ini menunjukkan akun-akun yang terlibat atau yang berada dalam twit (termasuk akun pengirim). Di mana selain akun-akun yang juga muncul dalam daftar pengirim twit juga terdapat akun lain yang juga cukup populer seperti akun `@SBYudhoyono` dan `@jokowi`. 
 
 ```{r, fig.cap="20 Akun yang paling sering dimention"}
 net_telukBenua %>%
@@ -131,23 +139,37 @@ net_telukBenua %>%
   labs(x = "Username Twitter", y = "Jumlah Keberadaan Username dalam Twit")
 ```
 
-User terlibat di ambil berdasarkan frekuensi keberadaan user baik sebagai akun pengirim twit maupun akun yang dimention di dalam twit. Gambar diatas merupakan hasil perhitungan dari twit yang sebelumnya telah di filter, yaitu twit yang melibatkan minimal dua username. 
+Gambar di atas menunjukkan bahwa dalam twit terdapat dua kelompok akun yang popler. *Pertama* akun yang juga muncul dalam daftar pengirim atau juga dapat dikategorikan sebagai pendukung gerakan. *Kedua* kelompok akun yang menjadi "sasaran" dari gerakan, termasuk akun menteri Susi (menteri kelautan dan lingkungan hidup) yang berkaitan dengan pemberian izin reklamasi. Adanya dua kelompok tersebut dapat menginfirmasi asumsi tentang penggunaan media sosial sebagai media komunikasi antara masyarakat dengan pemerintah. Dalam konteks gerakan, hal tersebut juga menjadi salah satu penyuaraan kepentingan dan "preferensi" publik.
 
 ## Social network analysis
+Network analysis dilakukan melalui perangkat lunak gephi, termasuk perhitungan komponen dari network seperti modularity, dan centrality. Di mana `nodes` merupakan username Twitte dan `edges` merupakan keberadaan dalam twit yang sama atau `cooccurrance`. 
+![Network Teluk Benoa](/Volumes/mydata/RStudio/virtualCitizens/vc-proj3/wrangled data proj-3/teluk benoa network.png)
+**Keterangan:** Warna dalam gambar dibuat berdasarkan *modularity class* dan besar nodes dibuat berdasarkan *eigenvector centrality*. Gambar hanya menampilkan nodes dengan minimum degree 20. 
+
+Gambar di bawah ini menunjukkan bahwa pengguna twitter tidak memiliki perbedaan yang cukup mencolok karena masing-masing akun berada cukup berdekatan satu sama lain. Di satu sisi hal tersebut dapat menjadi indikator positif yang menunjukkan adanya kesamaan pandangan tentang reklamasi. Di sisi lain, keberadaannya yang cukup berdekatan tersebut juga menjadi salah satu indikator adanya satu aktor kunci yang cukup dominan. Hal tersebut bukan hal yang buruk, namun ketika terjadi akun tersebut berhenti dapat memengaruhi gerakan secara keseluruhan. Gambar berikut menunjukkan posisi 10 akun dengan `eigencentrality` tertinggi.
 
 ```{r}
-tb_net <- tb_raw %>%
-  filter(is_duplicate == FALSE) %>%
-  select(date, time, user, tweets)
+id4 <- "1WImYxfSR8Nzutfv8ZV74Xa_O2GTZ2zye" # network analysis
+net_analysis <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id4))
 
-# add @
-tb_net$user <- paste("@", tb_net$user, sep="")
-
-write_csv(tb_net, path = "wrangled data proj-3/tb_net.csv", col_names = FALSE)
+net_analysis %>%
+  select(Label, eigencentrality) %>%
+  arrange(desc(eigencentrality)) %>%
+  head(n = 10) %>%
+  ggplot(aes(reorder(Label, eigencentrality), eigencentrality)) + 
+  coord_flip() + geom_col() + 
+  labs(x = "Nama Akun", y = "eigencentrality")
 ```
 
+Tiga akun pertama dalam gambar di atas merupakan akun dengan eigencentrality tertinggi dalam jaringan. Artinya, akun-akun tersebut memiliki kecenderungan untuk terhubung dengan aktor-aktor (username) lain yang juga penting **(lihat: konsep eigencentrality)**. Sehingga secara matematis juga dapat disimpulkan bahwa akun tersebut memiliki pengetahuan dan mungkin menjadi penggerak dalam jaringan gerakan bali tolak reklamasi. Sementara dua akun di bawahnya yang juga diketahui merupakan akun resmi milik mantan presiden dan presiden saat ini mengindikasikan bahwa kasus penolakan reklamasi mencoba untuk dibawa menjadi ketingkat tertinggi pemerintahan, yaitu presiden. Dengan kata lain, isu ini mencoba dibawa menjadi isu nasional dengan menggunakan media sosial. 
+
+Kenapa media sosia? dapat dijawab dengan data dari media serta hasil wawancara dengan **gendovara**.
+
 # Analisis Konten
+Analisis konten **twit** atau tulisan yang diunggah oleh warga net melalui media sosial **Twitter** dapat dilakukan melalui beberapa tahapan. Tahap pertama dapat dilakukan melalui tagar atau tanda pagar (en: *hashtag*). Gambar di bawah ini menunjukkan beberapa tagar yang digunakan dalam setiap periode.  
+
 ## Tagar
+Tagar merupakan salah satu indikator utama yang dapat digunakan untuk melihat sebuah konten media sosial. Dalam hal ini, tagar sering digunakan oleh pengguna media sosial sebagai penanda sebuah pembahasan, termasuk dalam Twitter. 
 
 ```{r, fig.cap="Tagar yang digunakan"}
 tagar_periode1 <- tb_raw %>%
@@ -181,7 +203,10 @@ tagar_periode <- bind_rows(tagar_periode1 %>%
 tagar_periode %>%
   #filter(!str_detect(tagar, 'balitolakreklamasi')) %>%
   #filter(!str_detect(tagar, 'balinotforsale')) %>%
-  #filter(!str_detect(tagar, 'tolakreklamasi')) %>%
+  filter(!str_detect(tagar, 'tolakreklamasi')) %>%
+  filter(!str_detect(tagar, 'nw')) %>%
+  filter(!str_detect(tagar, 'np')) %>%
+  filter(!str_detect(tagar, 'ff')) %>%
   filter(!str_detect(tagar, 'indonesia')) %>%
   filter(!str_detect(tagar, 'repost')) %>%
   filter(!str_detect(tagar, 'share')) %>%
@@ -195,23 +220,32 @@ tagar_periode %>%
   top_n(15, n) %>%
   ggplot(aes(reorder(tagar, n), n, fill = periode)) +
   geom_col(show.legend = FALSE) +
-  facet_wrap(~ periode, scales = "free", ncol = 2) +
+  facet_wrap(~ periode, scales = "free", ncol = 3) +
   coord_flip() +
-  labs(x = NULL, 
+  labs(x = "Tagar", 
        y = "Jumlah twit yang diunggah")
 ```
-Berikut adalah tagar yang tidak diikutsertakan dalam visualiasi: 
 
-1. balitolakreklamasi
-2. balinotforsale
-3. tolakreklamasi
-4. indonesia
-5. repost
-6. share
-7. bali
+Gambar di atas menunjukkan tagara (kecuali tagar balitolakreklamasi dan balinotforsale) yang menjadi **parameter** mendapatkan data. Asumsinya, ketia dua tagar tersebut digunakan akan menjadi terlalui dominan dalam visualisasi karena semua twit menggunakan tagar tersebut. Selain dua tagar tersebut terdapat beberapa tagar lain yang juga tidak diikutsertakan karena dianggap tidak relevan, misalnya tagar repost, share, dan beberapa angka yang tidak memiliki arti seperti 1, 2, 3 dst. 
 
+Secara umum tagar-tagar yang digunakan oleh pengguna Twitter mengalami perkembangan dari waktu ke waktu. Hal ini sejalan dengan salah satu pernyataan dari nara sumber yang mengatakan bahwa tagar yang digunakan dipilih dan disesuaikan dengan momen yang berkembang saat itu. Bali not for sale sendiri telah lebih dulu digunakan dibanding tagar balitolakreklamasi, dan setelahnya tagar terus berkembang hingga pada akhir periode ada juga tagar **#kecewaamasusi**. Tagar kecewaamasusi diantaranya dapat dilihat pada twit-twit berikut ini. 
+
+```{r}
+tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(str_detect(tweets, "#KecewaAmaSusi")) %>%
+  arrange(desc(ret_count)) %>%
+  select(tweets) %>%
+  head(n = 5) %>% 
+  print()
+```
+
+Twit di atas menunjukkan twit-twit yang memiliki tagar #KecewaAmaSusi dan diurutkan berdasarkan jumlah retweet terbanyak. Isi dari twit secara seklias dapat menggambarkan bahwa twit diunggah sebagai respons terhadap sikap menteri Susi terkait dengan reklamasi yang mereka hadapi. Selain itu, di sana juga mereka menyatakan bahwa pilihannya hanya menolak reklamasi. 
+
+Kasus ini sendiri muncul karena pada waktu itu, ijin reklamasi akan segara habis dan harus mendapat perpanjangan ijin. Pemeberian ijin menjadi salah satu kewenangan yang dapat diberikan oleh menteri kelautan, yaitu Susi. Namun, menurut penuturan salah seorang partisipan menteri tersebut memilih untuk diam, sehingga secara otomatis ijin pun berlanjut. Karena hal tersebutlah kemudian mereka membuat tagar **#KecewaAmaSusi**. 
 
 ## Term
+Term atau kata diambil dari isi twit selain usernme dan tagar. Gambar di bawah ini menunjukkan term dalam bentuk bigram. Di mana bigram dibuat berdasarkan keberadaan term dalam twit yang sama. Misalnya, sebuah twit berisi kalimat **"aku suka makan nasi"** maka bigram yang dapat dibuat dari kalimat tersebut adalah **"aku suka"**, **"suka makan"**, dan **"makan nasi."** 
 
 ```{r, fig.cap="Frekuensi Bigram dalam twit"}
 tb_raw %>%
@@ -230,6 +264,7 @@ Pasangan kata yang paling banyak muncul dari twit dengan dua tagar yang jadi par
 Kata atau pasangan kata berikutnya juga dapat dinterpretasikan dengan pola yang sama, yaitu dengan merujuk pada cerita baik yang didapat dari data darat. Interpretasi juga dapat dilakukan dengan merujuk pada hasil `close reading` twit aktor utama. 
 
 ## Semantic network
+Selain dengan bigram di atas, hubungan antar kata dari sebuah korpus juga dapat dilihat melalui semantic network. Di mana satu term memiliki hubungan dengan term lain berdasarkan keberadaannya. Gambar di bawah ini menunjukkan hubungan antar term yang terjadi minimal 100 kali. 
 
 ```{r, fig.cap= "Word network dalam twit yang menggunakan tagar bns atau btr"}
 bigram_counts <- tb_raw %>%
@@ -253,11 +288,31 @@ bigram_counts %>%
   theme_void()
 ```
 
-Tujuan utama dibuat `network of term` adalah untuk mengetahui pasangan kata yang lebih jauh dari bigram. Dalm konteks ini, pasangan kata dengan garis paling tebal kurang lebih sama dengan hasil yang ditunjukkan dalam visualisasi frekeunsi bigram di atas. Namun di sini, kita juga dapat melihat, misalnya kata **TV** itu berpasangan bukan hanya dengan **Metro** tapi juga dengan **kompas** yang merujuk pada kompasTV. Artinya, kemungkinan besar cerita tentang bali tolak reklamasi ini juga dimiliki oleh kompas tv atau aktor BTR juga diundang oleh tv tersebut. 
+Dari gambar di atas kita dapat mengetahui bahwa gerakan telah diliput oleh tv, diantaranya adalah oleh metro dan kompas tv. Hal ini ditunjukkan oleh munculnya tiga kata tersebut dalam satu jaringan yang sama. Untuk menginfirmasi hal ini, kita dapat melihatnya secara langsung dalam isi twit berikut. 
 
-**Hint: interpretasi dilakukan dengan visualisasi saja, yaitu dengan melihat kata-kata yang ada dalam satu garis.** 
+**Twit dengan kata kunci tv**
+```{r}
+tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(str_detect(tweets, "Tv")) %>%
+  arrange(desc(ret_count)) %>%
+  select(tweets) %>%
+  head(n = 5) %>% 
+  print()
+```
+**Twit dengan kata kunci kompas tv**
+```{r}
+tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(str_detect(tweets, "Kompas TV")) %>%
+  arrange(desc(ret_count)) %>%
+  select(tweets) %>%
+  head(n = 5) %>% 
+  print()
+```
 
 ## Tf-idf
+Penjelasan tentang TF-IDF secara umum dapat ditemukan di sini. Secara umum TF-IDF merupakan sebuah upaya untuk menemukan term yang penting dalam sebuah dokumen dengan membandingkan frekuensi dalam dokumen yang spesifik dengan frekuensi dalam dokumen secara umum. Sebagai ilustrasi, kita dapat menemukan term yang hampir pasti memiliki frekuensi yang tinggi dalam setiap dokumen, misalnya kata di, dan dan dalam. Kata-kata tersebut sering disebut *stopwords*. Namun karena kata tersebut tidak bersifat unik, dan juga ada dalam dokumen yang lain, maka nilai tf-idfnya akan turun. Sebaliknya, jika sebuah term memiliki frekuensi tinggi dalam sebuah dokumen dan tidak dalam dokumen yang lain, kata atau term tersebut akan memiliki nilai yang tinggi. Gambar di bawah ini, menunjukkan kata-kata dengan tf-idf tertinggi dalam setiap periode. 
 
 ```{r, fig.cap="TF-IDF bigram per periode"}
 twit_words <- tb_raw %>%
@@ -292,51 +347,81 @@ twit_words %>%
   coord_flip()
 ```
 
+Gambar di atas menunjukkan kata atau pasangan kata yang dianggap lebih penting dibanding kata lainnya dalam setiap periode. Pada periode pertama kata terpentingnya adalah **"dprd berperang."** Jika merujuk pada twit yang mengandung kata tersebut, makan kata **dprd berperang** dapat diinterpretasikan sebagai upaya perlawanan masyarakat Bali untuk menolak reklamasi teluk benoa dengan cara berdemonstrasi di gedung dprd Bali. Hal tersebut dapat dilihat dalam beberapa twit di bahwah ini. 
+
+```{r}
+tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(periode == "periode_1") %>%
+  filter(!str_detect(tweets, "RT")) %>%
+  filter(str_detect(clean_text, "dprd berperang")) %>%
+  select(tweets) %>%
+  head(n = 5) %>% 
+  print()
+```
+Sementara dalam periode dua, kita menemukan term yang cukup unik yaity **ve fooled**. Tanpa membaca lebih jauh term tersebut susah untuk diinterpretasikan. Untuk itu, beberapa twit di bawah ini mungkin dapat memberikan gambaran tentang isi twit dengan kata tersebut. 
+
+```{r}
+tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(periode == "periode_2") %>%
+  filter(!str_detect(tweets, "RT")) %>%
+  arrange(desc(ret_count)) %>%
+  filter(str_detect(clean_text, "ve fooled")) %>%
+  select(tweets) %>%
+  head(n = 5) %>% 
+  print()
+```
+Dari twit di atas, ternyata term **ve fooled** berkaitan dengan keberadaan Cristiano Ronaldo ke Bali. Term ve sendiri ternyata berasal dari 've fooled atau u've been fooled. Dengan kata lain, melalui term tersebut kita dapat mengetahui bahwa warga net menganggap Cristiano telah dibohongi oleh akun yang juga ditunjukkan dalam twit tersebut.
+
+Kata terpenting dari periode ketiga adalah **art event.** Term ini berkaitan dengan kegiatan yang dilakukan untuk menyuarakan penolakan reklamasi. Hal ini tercermin dalam twit di bawah ini. 
+
+```{r}
+tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(periode == "periode_3") %>%
+  filter(!str_detect(tweets, "RT")) %>%
+  arrange(desc(ret_count)) %>%
+  filter(str_detect(clean_text, "art event")) %>%
+  select(tweets) %>%
+  head(n = 5) %>% 
+  print()
+```
+
+
 ## Topic Modelling
+Topic modelling di sini dibagi menjadi tiga bagian berdasarkan periode waktu twit diunggah. Namun sebelumnya terlebih dahulu akan dilihat topic secara umum dari data. Topik-topik yang muncul per periode selanjutnya dapat dilihat pada gambar-gambara di bawah ini. Untuk keterangan lebih lanjut dengan topic modelling dengan algoritme LDA dapat dilihat [di sini](http://www.jmlr.org/papers/volume3/blei03a/blei03a.pdf). 
 
 ```{r}
 # the LDA function using topicmodels package
-bigram_tm <- function(input_text, # should be a columm from a dataframe
-                       plot = T, # return a plot? TRUE by defult
-                       number_of_topics = 4) # number of topics (4 by default)
+bigram_tm <- function(input_text, 
+                       plot = T, 
+                       number_of_topics = 4)
 {    
   set.seed(2016)
-  # create a corpus (type of object expected by tm) and document term matrix
-  Corpus <- VCorpus(VectorSource(input_text)) # make a VCorpus object spec for RWeka
+  Corpus <- VCorpus(VectorSource(input_text))
   
-  # function for creating bigram in the DTM
   BigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min=2, max=2))
-  # you can explore which term combination gave the most interpretable topic for you
-  # by changing numbers inside Weka_control
-  
   DTM <- DocumentTermMatrix(Corpus, control=list(tokenize=BigramTokenizer))
-  
-  # remove any empty rows in our document term matrix (if there are any 
-  # we'll get an error when we try to run our LDA)
-  unique_indexes <- unique(DTM$i) # get the index of each unique value
-  DTM <- DTM[unique_indexes,] # get a subset of only those indexes
-  
-  # preform LDA & get the words/topic in a tidy text format
+  unique_indexes <- unique(DTM$i)
+  DTM <- DTM[unique_indexes,]
   lda <- LDA(DTM, k = number_of_topics, control = list(seed = 1234))
   topics <- tidy(lda, matrix = "beta")
-  
-  # get the top ten terms for each topic
-  top_terms <- topics  %>% # take the topics data frame and..
-    group_by(topic) %>% # treat each topic as a different group
-    top_n(10, beta) %>% # get the top 10 most informative words
-    ungroup() %>% # ungroup
-    arrange(topic, -beta) # arrange words in descending informativeness
+  top_terms <- topics  %>% 
+    group_by(topic) %>% 
+    top_n(10, beta) %>%
+    ungroup() %>%
+    arrange(topic, -beta)
   
   # if the user asks for a plot (TRUE by default)
   if(plot == T){
-    # plot the top ten terms for each topic in order
-    top_terms %>% # take the top terms
-      mutate(term = reorder(term, beta)) %>% # sort terms by beta value 
-      ggplot(aes(term, beta, fill = factor(topic))) + # plot beta by theme
-      geom_col(show.legend = FALSE) + # as a bar plot
-      facet_wrap(~ topic, scales = "free") + # which each topic in a seperate plot
-      labs(x = NULL, y = "Beta") + # no x label, change y label 
-      coord_flip() # turn bars sideways
+    top_terms %>%
+      mutate(term = reorder(term, beta)) %>% 
+      ggplot(aes(term, beta, fill = factor(topic))) +
+      geom_col(show.legend = FALSE) + 
+      facet_wrap(~ topic, scales = "free") +
+      labs(x = NULL, y = "Beta") + 
+      coord_flip()
   }else{ 
     # if the user does not request a plot
     # return a list of sorted terms instead
@@ -347,8 +432,10 @@ bigram_tm <- function(input_text, # should be a columm from a dataframe
 
 ### Topic modelling all
 
+Di dalam analisis ini twit yang digunakan hanya 55067, karena sebelumnya telah dilakukan beberapa filterisasi. Pertama, twit yang memiliki konten yang sama dihilangkan, kedua, twit yang setelah dilakukan cleaning hanya memiliki satu *term* dan atau koosong juga dihilangkan. Sehingga topic modelling dihasilkan dari twit yang memiliki minimal dua *term* setelah cleaning. 
+
 - filter = wordcount >= 2
-- total twit = 55067
+- total twit = **55067**
 
 ```{r, fig.cap="Topic modelling dari seluruh twit"}
 set.seed(2018)
@@ -358,15 +445,48 @@ tm_teluk_benoa <- tb_raw %>%
   filter(word_count >= 2)
 
 # topic modelling
-tm_twit <- bigram_tm(tm_teluk_benoa$clean_text, number_of_topics = 6)
+tm_twit <- bigram_tm(tm_teluk_benoa$clean_text, number_of_topics = 4)
 tm_twit
 ```
 
-### Topic modelling periode 1
+**Topik 1 - aksi demonstrasi**
 
+Gambar nomor satu menunjukkab beberapa topik terkait dengan penolakan reklamasi teluk benoa di Balik. Di sini kita dapat melihat bahwa salah satu aksi dilakukan dengan cara melakukan demonstrasi di kantor **DPRD BALI**. Beberapa warga net juga menganggap aksi mereka sebagai upaya memerangi penguasa dan pengusaha yang berupaya melakukan/mendukung reklamasi dilakukan. Di sisi lain, mereka menganggap reklamasi akan merusak alam yang seharusnya dilestarikan. Hal tersebut tercermin dalam twit-twit yang menggunakan tagar balinotforsale dan atau balitolakreklamasi. Contoh twit dari periode tersebut adalah sebagai berikut: 
+
+```{r}
+tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(periode == "periode_1") %>%
+  filter(!str_detect(tweets, "RT")) %>%
+  arrange(desc(ret_count)) %>%
+  select(tweets) %>%
+  head(n = 5) %>% 
+  print()
+```
+
+
+**Topik 2 - konsolidasi aksi dan representasi aski**
+
+
+**Topik 3 - objek yang ditolak**
+
+
+**Topik 4 - pernyataan sikap melalui aksi**
+
+
+```{r}
+tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(str_detect(clean_text, "kantor dprd")) %>%
+  select(tweets) %>%
+  head(n = 5) %>% 
+  print()
+```
+
+
+### Topic modelling periode 1
 - filter = wordcount >= 2
 - total twit = 15209
-
 ```{r, fig.cap="Topic modelling dari twit tentang Teluk Benoa periode 1"}
 # taking data for topic modelling
 tm_tb_periode1 <- tb_raw %>%
@@ -382,11 +502,10 @@ tm_tb_p1
 ```{r}
 tb_raw %>%
   filter(is_duplicate == FALSE) %>%
-  filter(is_duplicate == FALSE) %>%
   filter(periode == "periode_1") %>%
   filter(str_detect(clean_text, "konser mini")) %>%
-  select(date, user,tweets) %>%
-  #head(n = 20) %>% 
+  select(tweets) %>%
+  head(n = 5) %>% 
   print()
 ```
 
@@ -394,7 +513,6 @@ tb_raw %>%
 
 
 ### Topic modelling periode 2
-
 - filter = wordcount >= 2
 - total twit = 17186
 
@@ -417,7 +535,7 @@ tb_raw %>%
   filter(periode == "periode_2") %>%
   filter(str_detect(clean_text, "batalkan perpres")) %>%
   select(tweets) %>%
-  head(n = 10) %>% 
+  head(n = 5) %>% 
   print(tweets)
 ```
 
@@ -429,11 +547,9 @@ tb_raw %>%
   filter(periode == "periode_2") %>%
   filter(str_detect(clean_text, "dukung gerakan")) %>%
   select(tweets) %>%
-  head(n = 10) %>% 
+  head(n = 5) %>% 
   print(tweets)
 ```
-
-
 
 ### Topic modelling periode 3
 
@@ -457,59 +573,4 @@ tm_tb_p3
 ## Simpulan
 periode 1 - konser untuk mempopulerkan keresahan tentang tolak reklamasi bali 
 periode 2 - 
-
-## Rekomendasi
-
-
-# Close Reading
-## Konser mini
-
-```{r}
-tb_raw %>%
-  filter(is_duplicate == FALSE) %>%
-  filter(str_detect(clean_text, "konser mini")) %>%
-  select(tweets) %>%
-  head(n = 50) %>%
-  print(tweets)
-```
-
-## Twit aktor
-
-```{r}
-gendovara <- tb_raw %>%
-  filter(is_duplicate == FALSE) %>%
-  filter(str_detect(user, "gendovara")) %>%
-  select(date,tweets, periode) %>%
-  print(tweets)
-
-JRX_SID <- tb_raw %>%
-  filter(is_duplicate == FALSE) %>%
-  filter(str_detect(user, "JRX_SID")) %>%
-  select(date,tweets, periode) %>%
-  print(tweets)
-
-forbali13 <- tb_raw %>%
-  filter(is_duplicate == FALSE) %>%
-  filter(str_detect(user, "ForBALI13")) %>%
-  select(date,tweets, periode) %>%
-  print(tweets)
-
-twit_aktor <- bind_rows(gendovara %>%
-                          mutate(person = "gendovara"), 
-                        JRX_SID %>%
-                          mutate(person = "JRX_SID"), 
-                        forbali13 %>%
-                          mutate(person = "forbali13"))
-
-write_csv(twit_aktor, path = "wrangled data proj-3/twit_aktor.csv")
-```
-
-# Twit terbanyak 
-
-```{r}
-tb_raw %>%
-  filter(is_duplicate == FALSE) %>%
-  count(user, sort = TRUE) %>%
-  filter(!str_detect(user, 'ChangeOrg_ID'))
-```
 
