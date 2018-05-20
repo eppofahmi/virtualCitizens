@@ -68,10 +68,6 @@ net_telukBenua <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=down
 
 
 ```{r}
-#dirwd <- paste(getwd(),"/wrangled data proj-3/",sep='')
-#btr_raw <- read_csv(paste(dirwd,"twit-tagar-balitolakreklamasi.csv",sep=''), col_names = TRUE)
-#bns_raw <- read_csv(paste(dirwd,"twit-tagar-balinotforsale.csv",sep=''), col_names = TRUE)
-
 tb_raw <- bind_rows(btr_raw, bns_raw)
 
 tb_raw$tweets <- replace_white(tb_raw$tweets) # replacing white space
@@ -430,8 +426,6 @@ bigram_tm <- function(input_text,
 }
 ```
 
-### Topic modelling all
-
 Di dalam analisis ini twit yang digunakan hanya 55067, karena sebelumnya telah dilakukan beberapa filterisasi. Pertama, twit yang memiliki konten yang sama dihilangkan, kedua, twit yang setelah dilakukan cleaning hanya memiliki satu *term* dan atau koosong juga dihilangkan. Sehingga topic modelling dihasilkan dari twit yang memiliki minimal dua *term* setelah cleaning. 
 
 - filter = wordcount >= 2
@@ -449,44 +443,92 @@ tm_twit <- bigram_tm(tm_teluk_benoa$clean_text, number_of_topics = 4)
 tm_twit
 ```
 
-**Topik 1 - aksi demonstrasi**
+### Topik 1 - aksi penolakan
 
 Gambar nomor satu menunjukkab beberapa topik terkait dengan penolakan reklamasi teluk benoa di Balik. Di sini kita dapat melihat bahwa salah satu aksi dilakukan dengan cara melakukan demonstrasi di kantor **DPRD BALI**. Beberapa warga net juga menganggap aksi mereka sebagai upaya memerangi penguasa dan pengusaha yang berupaya melakukan/mendukung reklamasi dilakukan. Di sisi lain, mereka menganggap reklamasi akan merusak alam yang seharusnya dilestarikan. Hal tersebut tercermin dalam twit-twit yang menggunakan tagar balinotforsale dan atau balitolakreklamasi. Contoh twit dari periode tersebut adalah sebagai berikut: 
 
 ```{r}
 tb_raw %>%
   filter(is_duplicate == FALSE) %>%
-  filter(periode == "periode_1") %>%
   filter(!str_detect(tweets, "RT")) %>%
   arrange(desc(ret_count)) %>%
   select(tweets) %>%
   head(n = 5) %>% 
   print()
 ```
+Selain dengan melakukan aksi demonstrasi, penolakan reklamasi juga dilakukan melalui aksi konser. Dalam hal ini, konser disebut sebagai konser bali not for sale yang juga menjadi salah satu tagar. Namun jika dilihat berdasarkan waktu keberadaannya, tagar ini digunakan lebih dulu dibanding tagar balitolakreklamasi. Dengan demikian, dapat diketahui bahwa gerakan sosial ini berusaha menggunakan kegiatan-kegiatan seni sebagai salah satu aksinya. 
 
+### Topik 2 - pernyataan sebagai sebuah gerakan
 
-**Topik 2 - konsolidasi aksi dan representasi aski**
-
-
-**Topik 3 - objek yang ditolak**
-
-
-**Topik 4 - pernyataan sikap melalui aksi**
-
+Topik nomor dua dapat diinterpretasikan sebagai pernyataan bahwa penggunaan media sosial dengan tagar balitolakreklamasi dan balinotforsale sebagai sebuah gerakan. Dalam hal ini kemungkinan pernyataan tersebut juga disampaikan pada sebuah acara konser yang disebut konser svara bumi. Hal ini diantaranya dapat dilihat pada twit berikut.
 
 ```{r}
 tb_raw %>%
   filter(is_duplicate == FALSE) %>%
-  filter(str_detect(clean_text, "kantor dprd")) %>%
+  filter(!str_detect(tweets, "RT")) %>%
+  filter(str_detect(clean_text, "ribuan")) %>%
+  arrange(desc(ret_count)) %>%
+  select(tweets) %>%
+  head(n = 2) %>% 
+  print()
+```
+
+```{r}
+tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(!str_detect(tweets, "RT")) %>%
+  filter(str_detect(clean_text, "svara bumi")) %>%
+  arrange(desc(ret_count)) %>%
+  select(tweets) %>%
+  head(n = 2) %>% 
+  print()
+```
+
+### Topik 3 - objek yang ditolak
+
+Topik yang ketiga berkaitan dengan salah satu tuntutan gerakan dan aksi, yaitu pembatalan perpres no. 51. Hal ini dapat dilihat baik dari twit maupun dari frekuensi bigram (lihat bagain **Term**). Berikut adalah beberapa twit tentang perpres tersebut. 
+
+```{r}
+tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(!str_detect(tweets, "RT")) %>%
+  filter(str_detect(clean_text, "perpres")) %>%
+  arrange(desc(ret_count)) %>%
   select(tweets) %>%
   head(n = 5) %>% 
   print()
 ```
 
+### Topik 4 - pernyataan sikap melalui aksi
 
-### Topic modelling periode 1
-- filter = wordcount >= 2
-- total twit = 15209
+Sebelum lebih jauh, pada topik ke empat ada satu term yang mungkin cukup unik yaitu don. term ini berasal dari don't dalam bahasa inggris. Berikut ini adalah beberapa twit dengan term tersebut. 
+```{r}
+tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(!str_detect(tweets, "RT")) %>%
+  filter(str_detect(clean_text, "\\bpart don\\b")) %>%
+  arrange(desc(ret_count)) %>%
+  select(tweets) %>%
+  head(n = 5) %>% 
+  print()
+```
+```{r}
+tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(!str_detect(tweets, "RT")) %>%
+  filter(str_detect(clean_text, "\\bdon\\b")) %>%
+  arrange(desc(ret_count)) %>%
+  select(tweets) %>%
+  head(n = 3) %>% 
+  print()
+```
+Topik keempat disini kurang lebih menyatakan kembali tujuan gerakan. Selain itu, topik 4 juga berkaitan dengan perjuangan yang yang dilakukan oleh warga net yang menjadi tuntutan yang harus dipenuhi. Dalam konteks ini, warga net pendukung gerakan menganggap bahwa pembatalan perperes 51 tahun 2014 dan reklamasi teluk benoa harus tercapai. Namun hingga saat ini (2018) tuntutan tersebut belum dapat dipenuhi oleh pemerintah. Mungkin karena itu pula, beragam aksi baik di dunia nyata maupun aksi di dunia maya melalui twit dengan tagar, atau penggunaan media sosial lain terus dilakukan. 
+
+Berdasarkan topik modelling pada semua data, diketahui bahwa setidaknya ada empat hal yang dibahas oleh warga net melalui twit dengan tagar balitolakreklamasi dan bali not for sale. Pertama tentang aksi penolakan. Kedua tentang penyataan sebagai sebuah gerakan. Ketiga, tuntutan gerakan, dan terakhir tentang sikap warga net terkait dengan reklamasi. Untuk memahami wacana secara lebih detil, topik modelling juga dilakukan pada twit yang telah diklasifikasikan terlebih dahulu menjadi tiga periode. Di mana setiap periode ditentukan berdasarkan waktu pengunggahan twit. Periode pertama, sebelum perpres terbit. Periode kedua setelah perpres terbit. Periode ketiga, pasca aksi atau respons.
+
+## Topic modelling periode 1
+Periode pertama ditandai dengan twit-twit yang diunggah sebelum diterbitakannya perpres 51 tahun 2014. Dalam hal ini terdapat **15209** twit yang dapat dilakukan topik modelling. Twit tersebut terpilih setelah dilakukan beberapa klasifikasi seperti yang sudah dijelaskan pada bagian sebelumnya. Gambar di bawah ini menunjukkan beberapa topik yang menjadi perhatian warga net di periode pertama. 
+
 ```{r, fig.cap="Topic modelling dari twit tentang Teluk Benoa periode 1"}
 # taking data for topic modelling
 tm_tb_periode1 <- tb_raw %>%
@@ -499,22 +541,27 @@ tm_tb_p1 <- bigram_tm(tm_tb_periode1$clean_text, number_of_topics = 4)
 tm_tb_p1
 ```
 
+Jika dilihat dari gambar di atas, maka topik pada periode pertama terdiri dari aksi yang dilakukan di lap renon, dan juga liputan di metro tv. Selain itu pada periode pertama juga terjadi peristiwa demonstrasi di dprd. Hal ini menunjukkan bahwa setidaknya dalam gerakan bali tolak reklamasi (BTR) terdapat dua pola aksi yang utama, yaitu akasi kesenian dan juga demonstrasi. Aksi kesenian dilakukan melalui penggelaran konser yang juga sering disebut konser mini. Dalam konser ini banyak artis baik nasional maupun lokal yang dilibatkan. Orang yang datang ke konser tersebut harus membayar, dan hasil dari konser-konser tersebut dijadikan sebagai dana gerakan. 
+
+Periode pertama juga dapat disebut sebagai periode promosi gerakan. Hal ini ditunjukkan oleh adanya topik "bantu promo", yang jika dilihat dari twit yang mengandung kata tersebut dapat diinterpretasikan sebagai ajakan untuk menyauarakan kepentingan rakyat, dan juga menyebarluaskan gerakan. Berikut adalah beberapa contoh twitnya. 
+
 ```{r}
 tb_raw %>%
   filter(is_duplicate == FALSE) %>%
   filter(periode == "periode_1") %>%
-  filter(str_detect(clean_text, "konser mini")) %>%
+  filter(str_detect(clean_text, "bantu promosikan")) %>%
   select(tweets) %>%
   head(n = 5) %>% 
   print()
 ```
+Dari twit di atas dapat dilihat dengan jelas bahwa ajakan yang dilakukan terutama ditujukan pada wisatwan yang datang ke Bali, khususnya selebritis. Di masa awal sebuah gerakan hal ini cukup masuk akal untuk dilakukan, karena selebitis pada umumnya sudah memiliki *follower* yang banyak. Sehingga dengan terlibatnya selebritis dalam gerakan yang dalam konteks ini dapat dilakukan dengan hanya membuat twit dengan tagar BTR, tuntutan atau gaung gerakan tersebar lebih luas. 
 
+Langkah atau ajakan tersebut pun membuat beberapa selebritis akhirnya ikut serta dalam gerakan atau penggunaan tagar. Hal ini dibuktikan dengan munculnya akun milik iwan fals (yang juga pernah terlibat dalam konser BTR), smilingdiana, dan Melani Subono (both of them are celebrity). Selain artis nasional juga tentunya banyak artis lokal yang dalam konteks ini diwakili oleh para personel band dari berbagai aliran musik yang terlibat. 
 
+Selain mengajak selebitis, gerakan BTR juga membuat media promosi lainnya seperti pembuatan video dan poster. Di mana hasil dari topik modelling juga menunjukkan adanya ajakan untuk mengunduh video klip musik yang juga terkaiat dengan penolakan reklamasi. Dengan kata lain, pada periode pertama gerakan BTR, twitter digunakan sebagai media komunikasi, kordinasi, sekaligus penyebarluasan pesan penolakan reklamasi terhadap warga net. 
 
-
-### Topic modelling periode 2
-- filter = wordcount >= 2
-- total twit = 17186
+## Topic modelling periode 2
+Data untuk topik modelling 2 ini berasal dari twit yang diunggah setelah ada atau terbitnya perpres nomor 51 tahun 2014. Berikut adalah hasil topic modelling dari **17186** twit untuk periode 2. 
 
 ```{r, fig.cap="Topic modelling dari twit tentang Teluk Benoa periode 1"}
 # taking data for topic modelling
@@ -528,33 +575,38 @@ tm_tb_p2 <- bigram_tm(tm_tb_periode2$clean_text, number_of_topics = 4)
 tm_tb_p2
 ```
 
-**Batalkan perpres**
-```{r}
-tb_raw %>%
-  filter(is_duplicate == FALSE) %>%
-  filter(periode == "periode_2") %>%
-  filter(str_detect(clean_text, "batalkan perpres")) %>%
-  select(tweets) %>%
-  head(n = 5) %>% 
-  print(tweets)
-```
-
-**Dukung gerakan**
+Topik pertama dari periode dua adalah tentang perpres yang memungkinkan atau mendukung adanya reklamasi teluk benoa yaitu perpres 51 tahun 2014. Topik pertama di sini kurang lebih juga berisi tentang hal tersebut, di mana perpres nomor 51 dianggap oleh warga net pengguna Twitter sebagai sebuah kesalahan sehingga harus dibatalkan. Di sini warga net juga mengungkapkan alasan mereka mendukung gerakan pembatalan ini seperti dapat dilhat dalam twt berikut. 
 
 ```{r}
 tb_raw %>%
   filter(is_duplicate == FALSE) %>%
   filter(periode == "periode_2") %>%
-  filter(str_detect(clean_text, "dukung gerakan")) %>%
+  filter(str_detect(clean_text, "alasan mendukung")) %>%
   select(tweets) %>%
   head(n = 5) %>% 
-  print(tweets)
+  print()
 ```
+Adapun sepertinya pengungkapan alasan tersebut juga dipicu oleh "mungkin" siaran radio yang menanyakan tentang alasan mendukung gerakan BTR. Hal ini dapat dilihat pada twit terakhir di atas, yaitu twit yang diunggah oleh akun @menarafmbali dan di RT oleh warga net lainnya. 
 
-### Topic modelling periode 3
+Lebih jauh dari itu, sepertinya setiap orang (pengguna Twitter) memiliki alasannya masing-masing. Di sini kita melihat bahwa ada yang mendukung karena masyarakat lain juga mendukung. Namun ada juga yang mendukung karena menganggap reklamasi justru akan merusak alam. Walaupun sebenarnya reklamasi sendiri dilakukan untuk meng attract turis untuk datang ke Bali. Namun di sini warga net justru menganggap sebaliknya, turis yang datang ke Bali bukan untuk mendapatkan fasilitas berkelas internasional seperti rencana pembangunan di lahan hasil reklamasi. Tapi, turs datang ke Bali untuk menikmati keindahan alam Bali. Hal ini pula lah yang membuat mereka yakin Reklamasi merupakan hal yang tidak seharusnya di lakukan, khususnya teluk Benoa yang juga merupakan daerah konservasi menurut perpres tahun 2011. 
 
-- filter = wordcount >= 2
-- total twit = 22672
+Hal lain yang juga menjadi perhatian warga net pada periode ke dua adalah adanya kecurigaan pemnfaatan tokoh internasional (cristiano) oleh penguasa (pemerintah). Sehingga warga net kemudian juga memunculkan tagar #cr7fooled (lihat bagian tagar). Topik dua dari periode dua kurang lebih membicarakan hal tersebut. 
+
+
+```{r}
+tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(periode == "periode_2") %>%
+  filter(!str_detect(tweets, "RT")) %>%
+  filter(str_detect(tweets, "parade")) %>%
+  select(tweets) %>%
+  head(n = 5) %>% 
+  print()
+```
+Salah satu kegiatan Cristiano Ronaldo di Bali waktu itu adalah menanam mangrove. Di sana warga net menyuarakan bahwa melakukan reklamasi sama dengan merusak mangrove yang ditanam. Dalam periode ini pula, salah satu aksi yang kemudian diwujudkan di dunia nyata adalah dengan melakukan parade budaya. 
+
+## Topic modelling periode 3
+Periode terakhir atau periode tiga merupakan fase di mana gerakan sudah matang. Matang di sini diartikan tujuan gerakan sudah jelas, pihak yang dituntut juga jelas. Selain itu, pada fase ini berbagai aktivitas juga sudah berjalan. Dalam konteks ini, twit yang diunggah pada periode ini kemungkinan besar juga menggambarkan hal yang kurang lebih sama, yaitu ada topik tentang tujuan gerakan, pihak yang dituntut, serta kegiatan rutinnya, yaitu konser mini. Asumsi tersebut dapat dibuktikan dengan melihat hasil topic modelling dari **22672** twit pada periode 3 seperti dapat dilihat pada gambar di bawah ini. 
 
 ```{r, fig.cap="Topic modelling dari twit tentang Teluk Benoa periode 1"}
 # taking data for topic modelling
@@ -568,9 +620,71 @@ tm_tb_p3 <- bigram_tm(tm_tb_periode3$clean_text, number_of_topics = 4)
 tm_tb_p3
 ```
 
+Topik pertama dari periode tigas di sini berkaitan dengan beberapa aksi mendukung gerakan menolak reklamasi. Kegiatan tersebut berupa konser **svara bumi** dan festival layang-layang di padang galak. Selain itu, ketika pada periode 1 aksi demonstrasi dilakukan di kantor DPRD pada periode 3 ini aksi dilakukan di kantor Gubernur. Selain dilakukan di Bali, aski menolak reklamasi juga dilakukan di Jakarta. Aksi di Jakarta dilakukan dalam bentuk konser yang dilaksanakan di **Rolling Stonde Cafe**. Di mana majalah musik tersebut juga telah memberikan penghargaan pada gerakan bali tolak reklamasi seperti dapat dilihat pada beberapa twit berikut.
+
+```{r}
+tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(periode == "periode_3") %>%
+  filter(!str_detect(tweets, "RT")) %>%
+  filter(str_detect(tweets, "Rolling Stone")) %>%
+  select(tweets, date) %>%
+  head(n = 3) %>% 
+  print()
+```
+
+Topik ketiga pada peride terakhir juga menyinggung keberadaan desa adat yang juga dapat dikategorikan sebagai representasi budaya masyarakat bali. Dalam konteks ini, dukung desa adat terhadap BTR membuat gerakan bukan hanya menyentuh generasi milenial yang aktif di media sosial, tetapi juga masyarakat secara kesulurhan di Bali. 
+
+```{r}
+tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(periode == "periode_3") %>%
+  filter(!str_detect(tweets, "RT")) %>%
+  filter(str_detect(clean_text, "desa adat")) %>%
+  select(tweets, date) %>%
+  head(n = 10) %>% 
+  print()
+```
+
+Berdasarkan penuturan partisipan peneitian, revitalisasi merupakan salah satu propaganda pendukung reklamasi. Pada periode tiga ini kita juga dapat melihat bahwa revitalisasi dianggap sebagai kedok. Beberapa twit tentang hal tersebut adalah sebagai berikut. 
+
+```{r}
+tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(periode == "periode_3") %>%
+  filter(!str_detect(tweets, "RT")) %>%
+  filter(str_detect(tweets, "revitalisasi")) %>%
+  select(tweets, date) %>%
+  head(n = 10) %>% 
+  print()
+```
+
+Terakhir, di sini kita juga dapat mengetahui bahwa setiap artis atau band yang main di konser BTR tidak dibayar sebagaimana di nyatakan oleh salah satu penggeraknya (JRX_SID) atau jerink yang juga merupakan drumer band SID. 
+
+```{r}
+tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(periode == "periode_3") %>%
+  filter(!str_detect(tweets, "RT")) %>%
+  filter(str_detect(clean_text, "konser dibayar")) %>%
+  select(tweets, date) %>%
+  head(n = 10) %>% 
+  print()
+```
+
+Bagi mereka yang mau main di konser, resiko bukan hanya harus modal sendiri tapi juga dimusuhi, dan bahkan mungkin diputuskan kontraknya. Namun karena itu pula gerakan ini dapat dikatakan sebagai gerakan organik. Gerakan seperti ini "mungkin" hanya bisa muncul karena adanya kesadaran dengan tujuan gerakan. 
+
 # Penutup
+Sebagai penutup saya ingin kembali mereview temuan dari twit yang didapat dengan dua parameter pencarian, yaitu tagar balinotforsale dan balitolakreklamsi. Dua parameter tersebut menghasilkan **82.616** twit dan setelah dilakukan pengecekan duplikasi berdasarkan konten twitnya didapat **69.013** yang unik (bukan duplicate). Jumlah twit tersebut dikirim oleh **21.827** username dan melibatkan **31.796** username yang berbeda.
 
-## Simpulan
-periode 1 - konser untuk mempopulerkan keresahan tentang tolak reklamasi bali 
-periode 2 - 
+Akun twit yang paling banyak mengirim twit dengan tagar BTR adalah akun **ForBALI13**, dan akun yang paling sering terlibat (berada) dalam twit adalah akun **JRX_SID**. Dua akun tersebut dimiliki oleh kelompok dan individu yang juga menjadi penggerak gerakan. Akun ForBALI13 merupakan sebuah forum utama masyarakat penolak reklamasi. Sedangkan JRX_SID adalah satu pendukung gerakan yang juga cukup vokal menyuarakan kepentingan masyarakat penolak reklamasi baik di media sosial maupun arus utama. 
 
+Gerakan BTR di media sosial terbantu oleh keberadaan akun-akun yang sudah lebih dulu populer dan memiliki cukup banyak pengikut (celebrity). Namun berdasarkan twit salah satu dari selebritas tersebut, kemungkinan tidak semua mau ikut serta dalam mendukung gerakan BTR, karena ada resiko baik profesional seperti pembatalan kontrak maupun individual seperti dibenci publik. Walaupun demikian sampai saat ini gerakan tersebut telah bertahan selama hampir 5 tahun dan memiliki beberapa pola gerakan penolakan yang rutin dilakukan. 
+
+*Pertama*, aksi demonstrasi. Aksi demonstrasi telah dilakukan beberapa kali, di antara yang tertangkap di media sosial dan kemungkinan juga menjadi salah satu aksi yang terbesar adalah demo di kantor DPRD dan di Gubernur Bali. Selain melakukan aksi demonstrasi di dunia nyata, mereka juga membagikan pengalaman dan atau opininya tentang tuntutan dari aksi tersebut di dunia maya. Oleh karena itu pula studi terhadap media sosial juga dapat memberikan gambaran tentang "sebuah cara baru menjadi masyarakat." *Kedua*, Parade budaya, misalnya dengan melaksanakan dan atau mengikuti festival layang-layang dan juga kegiatan budaya lainnya. *Ketiga*, konser mini yang rutin dilaksanakan dengan melibatkan banyak musisi baik lokal maupun nasional.
+
+Melalui aksi-aksi di atas gerakan BTR yang saat ini juga didukung oleh "Desa Adat" menyuarakan beberapa hal. Pada periode pertama, yaitu periode sebelum perpres 51 di terbitkan mereka selain ada 3 aksi konser dan juga demonstrasi, di media sosial mereka cenderung mengajak dan mensosialisasikan gerakan. Oleh karena itu periode 1 ini dapat dianggap sebagai fase emergence. Fase ini ditandai dengan adanya pengungkapan keresahan masing-masing individu yang kemudian melembaga dan menjadi kesadaran bersama untuk menolak dan melakukan aksi penolakan. 
+
+Pada periode kedua, berdasarkan twit-twit yang diunggah oleh warga net dapat dipahami bahwa mereka sudah mulai mengarahkan tuntutan pada pihak-pihak tertentu. Dalam konteks ini, pihak yang mereka tuntut di antaranya adalaha pemerintah daerah dan juga pemerintah pusat dengan kementrian yang terkait. Selain itu, pada periode kedua mereka juga sudah memastikan bahwa mereka cukup matang sebagai sebuah gerakan. Oleh kerana itu, mereka juga sering merespons pihak-pihak yang diduga mendukung dan mendengungkan revitalisasi. Salah satunya adalah kedatangan Cristiano dan juga perang baliho. 
+
+Pada Periode ketiga, gerakan memastikan bahwa menolak reklamasi merupakan sebuah sikap dan akan terus berlanjut hingga tuntutan mereka dipenuhi. Oleh karena itu, selain topik-topik tentang kegiatan yang sudah rutin dilakukan pada periode tiga ini juga ditemui topik tentang konser yang dilakukan di daerah lain, prestasi gerakan, dan dukungan, dan pernyataan sikap. 

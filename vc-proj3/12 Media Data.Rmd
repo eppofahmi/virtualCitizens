@@ -1,0 +1,53 @@
+---
+title: "Laporan 3: BTR dalam Media"
+author: "Ujang fahmi"
+date: "5/20/2018"
+output:
+  html_notebook:
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+  rmarkdown::pdf_document:
+    fig_caption: yes
+    includes:
+      in_header: setup markdown.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.pos = "h")
+
+set.seed(2018)
+```
+
+# Pendahuluan
+
+
+```{r}
+library(googledrive)
+library(ggplot2)
+library(tidyverse)
+library(tidytext)
+```
+
+
+```{r}
+id_media <- "1MI7WGILkpdyLt8iU9-7NUwr7d5yv0UnJ" # cleaned username_all 
+media_data <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_media))
+```
+
+
+```{r}
+media_data %>%
+  select(tanggal, media) %>% 
+  separate(tanggal, into = c("tahun", "bulan", "tanggal"), sep = "-") %>%
+  group_by(tahun) %>%
+  count(media) %>%
+  ggplot(aes(tahun, n, fill = media)) +
+  geom_col() + 
+  labs(x = "Tahun", y = "Jumlah Berita")
+```
+
