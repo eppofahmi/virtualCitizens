@@ -37,7 +37,7 @@ tweet_cleaner2 <- function(input_text) # nama kolom yang akan dibersihkan
   stopwords <- c(stopwords, stopwords())
   corpusku <- tm_map(corpusku, removeWords, stopwords)
   #kata khusus yang dihapus
-  corpusku <- tm_map(corpusku, removeWords, c("baca", "simak", "or", "to", "teluk", "benoa", "zeroms", "opacity", "transition", "text", "bold", "font", "weight", "onepx", "decoration", "important", "none"))
+  corpusku <- tm_map(corpusku, removeWords, c("baca", "simak", "or", "to", "teluk", "benoa", "zeroms", "opacity", "transition", "text", "bold", "font", "weight", "onepx", "decoration", "important", "none", "balipost", "rls", "psk", "kompas", "com", "pbthreeas"))
   corpusku <- tm_map(corpusku, stripWhitespace)
   #removing white space in the begining
   rem_spc_front <- function(x) gsub("^[[:space:]]+", "", x)

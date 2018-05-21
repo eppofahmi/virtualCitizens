@@ -94,7 +94,7 @@ twit_media <- bind_cols(a, b) %>%
 rm(a, b)
 ```
 
-# Term Frekuensi Berita
+# Term Frekuensi dan TF-IDF
 
 ## Berita tempo.co
 Terdapat 73 berita dari tempo.co tentang reklamasi teluk benoa Bali dari tahun 2014 hingga 2018. Pada tahun 2014 terdapat 9, dan pada tahun-tahun berikutnya terdapat 3, 49, 8, 4 berita. Gambar di bawah ini menunjukkan bigram yang paling sering muncul dari berita di tempo.co, (kecuali term **teluk** dan **benoa**).
@@ -184,6 +184,39 @@ media_data %>%
   labs(x = NULL, y = "Jumlah kata")
 ```
 
+## TF-IDF 
+
+```{r}
+media_words <- media_data %>%
+  group_by(media) %>%
+  unnest_tokens(kata, clean_text, token = "ngrams", n = 3) %>%
+  count(kata, sort = TRUE)
+
+total_media <- media_words %>% 
+  group_by(media) %>% 
+  summarise(total = sum(n))
+
+media_words <- left_join(media_words, total_media)
+
+media_words <- media_words %>%
+  bind_tf_idf(kata, media, n) %>%
+  arrange(desc(tf_idf))
+
+# Visualisasi tf-idf
+media_words %>%
+  arrange(desc(tf_idf)) %>%
+  mutate(kata = factor(kata, levels = rev(unique(kata)))) %>% 
+  group_by(media) %>% 
+  top_n(7) %>% 
+  ungroup %>%
+  ggplot(aes(reorder(kata,tf_idf), tf_idf, fill = media)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~media, ncol = 2, scales = "free") + 
+  labs(x = "Bigram", y = "Value") +
+  coord_flip()
+```
+
+
 # Topic modelling
 
 ```{r}
@@ -224,13 +257,52 @@ bigram_tm <- function(input_text,
 ```
 
 
-## Topic modelling - tempo.co
+## TM - tempo.co
 
 ```{r}
 data_tempo <- media_data %>%
   filter(media == "tempo") %>%
   select(clean_text)
 
-bigram_tm(data_tempo$clean_text, plot = TRUE, number_of_topics = 4)
+bigram_tm(data_tempo$clean_text, plot = TRUE, number_of_topics = 2)
 ```
 
+## TM - kompas.com
+
+```{r}
+data_kompas <- media_data %>%
+  filter(media == "kompas") %>%
+  select(clean_text)
+
+bigram_tm(data_kompas$clean_text, plot = TRUE, number_of_topics = 2)
+```
+
+## TM - balipost.com
+
+```{r}
+data_balipost <- media_data %>%
+  filter(media == "balipost") %>%
+  select(clean_text)
+
+bigram_tm(data_balipost$clean_text, plot = TRUE, number_of_topics = 2)
+```
+
+## TM - beritabali.com
+
+```{r}
+data_beritabali <- media_data %>%
+  na.omit() %>%
+  filter(media == "beritabali") 
+
+bigram_tm(data_beritabali$clean_text, plot = TRUE, number_of_topics = 2)
+```
+
+# Penutup
+Dari media online dan beberapa analisis yang dilakukan dapat diketahui bahwa kontennya kemungkinan besar berisi tentang: 
+
+1. Aktor individu maupun kelompok yang menjadi motor gerakan. Aktor individu misalnya Wayan Gendo Suardana (@gendovara). Sementara aktor kelompok misalnya ForBALI. Selain itu, gerakan juga didukung oleh DESA ADAT. 
+2. Aktor individu dan kelompok yang menjadi sasaran. Aktor individu yang teridentifikasi adalah Presiden yang mengeluarkan Perpres 51 tahun 2014 (@SBYudhoyono), presiden yang sedang menjabat (@jokowi), serta menteri kelautan dan perikanan (Susi). Selain itu, juga ada nama Gubernur Bali, Mangku Pastika dan konglomerat Tomy Winata. Aktor kelompok misalnya PT Tirta Wahana Internasional. Selain itu beberapa lembaga lain yang juga disebut di antaranya adalah DPRD, DPD, Komnas Ham. 
+3. Isu yang menjadi perhatian diantaranya adalah: Perpres 51 tahun 2014, Ijin pelaksanaan proyek, amdal. 
+4. Simbol yang digunakan para pendukung gerakan di antaranya: Konser mini, Ogoh-ogoh, Baliho.
+
+**Catatan: Sepertinya konten berita masih ada yang tercampur dengan kasus reklamasi di Jakarta**.
