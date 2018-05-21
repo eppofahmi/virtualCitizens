@@ -24,21 +24,23 @@ set.seed(2018)
 ```
 
 # Pendahuluan
+Berdasarkan penuturan salah seorang partisipan penelitian, media sosial dipilih sebagai salah satu media untuk menyebarluaskan pesan penolakan reklamasi teluk benoa karena covering media arus utama kurang memadai. Oleh karena itu di sini saya akan mencoba mengonfirmasi pendapat tersebut. Selain itu, pemberitaan di media masa juga digunakan untuk mengetahui cerita tentang BTR dari sudut pandang lain. 
 
+Berita yang digunakan bersumber dari media lokal dan nasional. Media lokal terdiri dari balipost dan berita bali. Sedangkan berita nasional bersumber dari tempo dan kompas. Berita didapat dengan metode scrapping yang meliputi semua berita dengan kata kunci **reklamasi teluk benoa** yang pernah diterbitkan oleh media-media tersebut di atas. Namun untuk kompas dan tempo hanya bisa mendapatkan berita dalam 10 halaman terakhir saja karena adanya pembatasan pencarian berita. Berikut adalah perbandingan berita dari masing-masing sumber. 
 
 ```{r}
 library(googledrive)
 library(ggplot2)
 library(tidyverse)
 library(tidytext)
+library(Hmisc)
+library(corrgram)
 ```
-
 
 ```{r}
 id_media <- "1MI7WGILkpdyLt8iU9-7NUwr7d5yv0UnJ" # cleaned username_all 
 media_data <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_media))
 ```
-
 
 ```{r}
 media_data %>%
@@ -47,7 +49,116 @@ media_data %>%
   group_by(tahun) %>%
   count(media) %>%
   ggplot(aes(tahun, n, fill = media)) +
-  geom_col() + 
-  labs(x = "Tahun", y = "Jumlah Berita")
+  geom_col() + theme(legend.position="top") +
+  ggtitle("Jumlah pemeberitaan tentang reklamasi") +
+  labs(x = "Tahun", y = NULL)
+```
+Dari total 275 artikel berita, porsi pemberitaan paling banyak berada pada tahun 2016. Media nasional yang selalu membuat pemberitaan terkait denga BTR adalah tempo, sedangkan media lokalnya adalah beritabali. Hal ini sedikit berbeda jika dibandingkan dengan jumlah unggah media sosial yang mengalami puncaknya pada pertangahan tahun 2014 seperti dapat dilihat pada gambar di bawah ini. 
+
+```{r}
+tb_raw %>%
+  group_by(date) %>% count(date) %>% arrange(date) %>%
+  ggplot(aes(x = date, y = n)) + geom_line(show.legend = FALSE) + 
+  geom_smooth(method = "gam") +
+  labs(x = "Tahun", y = "Jumlah Twit")
+```
+Perbedaan tren tersebut secara tidak langsung dapat memunculkan asumi untuk membantah (menolak) adanya *echo chamber* antara media sosial dan media arus utama. Di mana media sosial cenderung mengikuti tren pemberitaan di media arus utama. 
+
+```{r}
+a <- media_data %>%
+  select(tanggal, media) %>% 
+  separate(tanggal, into = c("tahun", "bulan", "tanggal"), sep = "-") %>%
+  group_by(tahun) %>%
+  summarise(jumlah_berita = n())
+
+b <- tb_raw %>%
+  separate(date, into = c("tahun", "bulan", "tanggal"), sep = "-") %>%
+  group_by(tahun) %>% 
+  count(tahun) %>%
+  filter(!tahun == "2013") %>%
+  filter(!tahun == "2012")
+
+twit_media <- bind_cols(a, b) %>%
+  select(tahun, jumlah_berita, jumlah_twit = n)
+
+rm(a, b)
+```
+
+# Berita tempo.co
+Terdapat 73 berita dari tempo.co tentang reklamasi teluk benoa Bali dari tahun 2014 hingga 2018. Pada tahun 2014 terdapat 9, dan pada tahun-tahun berikutnya terdapat 3, 49, 8, 4 berita. Gambar di bawah ini menunjukkan bigram yang paling sering muncul dari berita di tempo.co, (kecuali term **teluk** dan **benoa**).
+
+```{r}
+media_data %>%
+  filter(media == "tempo") %>%
+  select(clean_text)%>%
+  unnest_tokens(kata, clean_text, token = "ngrams", n = 2, to_lower = TRUE, 
+                drop = TRUE, collapse = NULL) %>%
+  count(kata, sort = TRUE) %>% 
+  filter(!str_detect(kata, "teluk")) %>%
+  filter(!str_detect(kata, "benoa")) %>%
+  top_n(20) %>%
+  ggplot(aes(reorder(kata, n), n)) + geom_col() + coord_flip() + 
+  ggtitle("top 20 bigram dalam pemberitaan tempo.co") +
+  labs(x = NULL, y = "Jumlah kata")
+```
+
+# Berita kompas.com
+Data dari kompas yang ada disini mulai dari tahun 2015 dengan 3 berita, 2016 dengan 35, 2017 dengan 17, dan 2018 sebanyak 2 berita. 
+
+```{r}
+media_data %>%
+  filter(media == "kompas") %>%
+  select(clean_text)%>%
+  unnest_tokens(kata, clean_text, token = "ngrams", n = 2, to_lower = TRUE, 
+                drop = TRUE, collapse = NULL) %>%
+  count(kata, sort = TRUE) %>% 
+  filter(!str_detect(kata, "teluk")) %>%
+  filter(!str_detect(kata, "benoa")) %>%
+  filter(!str_detect(kata, "kompas")) %>%
+  filter(!str_detect(kata, "com")) %>%
+  top_n(20) %>%
+  ggplot(aes(reorder(kata, n), n)) + geom_col() + coord_flip() + 
+  ggtitle("top 20 bigram dalam pemberitaan kompas.com") +
+  labs(x = NULL, y = "Jumlah kata")
+```
+
+# Berita balipost.com
+Data dari balipost.com berasal dari dua tahun terakhir saja, yaitu tahun 2017 dan 2018. Pada tahun 2017 terdapat 46 berita, sedangkan pada tahun 2018 terdapat 25 berita. Gambar berikut akan menunjukkan 20 bigram paling sering muncul dalam pemberitaan tentang BTR dari balopost.com. 
+
+```{r}
+media_data %>%
+  filter(media == "balipost") %>%
+  select(clean_text)%>%
+  unnest_tokens(kata, clean_text, token = "ngrams", n = 2, to_lower = TRUE, 
+                drop = TRUE, collapse = NULL) %>%
+  count(kata, sort = TRUE) %>% 
+  filter(!str_detect(kata, "teluk")) %>%
+  filter(!str_detect(kata, "benoa")) %>%
+  filter(!str_detect(kata, "kompas")) %>%
+  filter(!str_detect(kata, "com")) %>%
+  top_n(20) %>%
+  ggplot(aes(reorder(kata, n), n)) + geom_col() + coord_flip() + 
+  ggtitle("top 20 bigram dalam pemberitaan balipost.com") +
+  labs(x = NULL, y = "Jumlah kata")
+```
+
+# Berita beritabali.com
+Pemberitaan tentang BTR dari beritabli dapat dikatakan rutin dilakukan dari tahun 2014 hingga 2018 awal ini. Secara urut (2014 - 2018) jumlah pemberitaan tentang BTR ada 5, 13, 44, 3, dan 9. 
+
+```{r}
+media_data %>%
+  filter(media=="beritabali") %>%
+  #select(clean_text) %>%
+  unnest_tokens(kata, clean_text, token = "ngrams", n = 2, to_lower = TRUE, 
+                drop = TRUE, collapse = NULL) %>%
+  count(kata, sort = TRUE) %>%
+  filter(!str_detect(kata, "teluk")) %>%
+  filter(!str_detect(kata, "benoa")) %>%
+  #filter(!str_detect(kata, "kompas")) %>%
+  #filter(!str_detect(kata, "com")) %>%
+  top_n(20) %>%
+  ggplot(aes(reorder(kata, n), n)) + geom_col() + coord_flip() + 
+  ggtitle("top 20 bigram dalam pemberitaan beritabali.com") +
+  labs(x = NULL, y = "Jumlah kata")
 ```
 
