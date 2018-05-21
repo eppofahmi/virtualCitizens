@@ -29,12 +29,22 @@ Berdasarkan penuturan salah seorang partisipan penelitian, media sosial dipilih 
 Berita yang digunakan bersumber dari media lokal dan nasional. Media lokal terdiri dari balipost dan berita bali. Sedangkan berita nasional bersumber dari tempo dan kompas. Berita didapat dengan metode scrapping yang meliputi semua berita dengan kata kunci **reklamasi teluk benoa** yang pernah diterbitkan oleh media-media tersebut di atas. Namun untuk kompas dan tempo hanya bisa mendapatkan berita dalam 10 halaman terakhir saja karena adanya pembatasan pencarian berita. Berikut adalah perbandingan berita dari masing-masing sumber. 
 
 ```{r}
+# Runing RJava
+if (Sys.info()['sysname'] == 'Darwin') {
+  libjvm <- paste0(system2('/usr/libexec/java_home',stdout = TRUE)[1],'/jre/lib/server/libjvm.dylib')
+  message (paste0('Load libjvm.dylib from: ',libjvm))
+  dyn.load(libjvm)
+}
+
 library(googledrive)
 library(ggplot2)
 library(tidyverse)
 library(tidytext)
 library(Hmisc)
 library(corrgram)
+library(tm)
+library(RWeka)
+library(topicmodels)
 ```
 
 ```{r}
@@ -84,32 +94,34 @@ twit_media <- bind_cols(a, b) %>%
 rm(a, b)
 ```
 
-# Berita tempo.co
+# Term Frekuensi Berita
+
+## Berita tempo.co
 Terdapat 73 berita dari tempo.co tentang reklamasi teluk benoa Bali dari tahun 2014 hingga 2018. Pada tahun 2014 terdapat 9, dan pada tahun-tahun berikutnya terdapat 3, 49, 8, 4 berita. Gambar di bawah ini menunjukkan bigram yang paling sering muncul dari berita di tempo.co, (kecuali term **teluk** dan **benoa**).
 
 ```{r}
 media_data %>%
   filter(media == "tempo") %>%
   select(clean_text)%>%
-  unnest_tokens(kata, clean_text, token = "ngrams", n = 2, to_lower = TRUE, 
+  unnest_tokens(kata, clean_text, token = "ngrams", n = 3, to_lower = TRUE, 
                 drop = TRUE, collapse = NULL) %>%
   count(kata, sort = TRUE) %>% 
   filter(!str_detect(kata, "teluk")) %>%
   filter(!str_detect(kata, "benoa")) %>%
   top_n(20) %>%
   ggplot(aes(reorder(kata, n), n)) + geom_col() + coord_flip() + 
-  ggtitle("top 20 bigram dalam pemberitaan tempo.co") +
+  ggtitle("top 20 trigram dari tempo.co") +
   labs(x = NULL, y = "Jumlah kata")
 ```
 
-# Berita kompas.com
+## Berita kompas.com
 Data dari kompas yang ada disini mulai dari tahun 2015 dengan 3 berita, 2016 dengan 35, 2017 dengan 17, dan 2018 sebanyak 2 berita. 
 
 ```{r}
 media_data %>%
   filter(media == "kompas") %>%
   select(clean_text)%>%
-  unnest_tokens(kata, clean_text, token = "ngrams", n = 2, to_lower = TRUE, 
+  unnest_tokens(kata, clean_text, token = "ngrams", n = 3, to_lower = TRUE, 
                 drop = TRUE, collapse = NULL) %>%
   count(kata, sort = TRUE) %>% 
   filter(!str_detect(kata, "teluk")) %>%
@@ -118,38 +130,48 @@ media_data %>%
   filter(!str_detect(kata, "com")) %>%
   top_n(20) %>%
   ggplot(aes(reorder(kata, n), n)) + geom_col() + coord_flip() + 
-  ggtitle("top 20 bigram dalam pemberitaan kompas.com") +
+  ggtitle("top 20 trigram dari kompas.com") +
   labs(x = NULL, y = "Jumlah kata")
 ```
 
-# Berita balipost.com
+## Berita balipost.com
 Data dari balipost.com berasal dari dua tahun terakhir saja, yaitu tahun 2017 dan 2018. Pada tahun 2017 terdapat 46 berita, sedangkan pada tahun 2018 terdapat 25 berita. Gambar berikut akan menunjukkan 20 bigram paling sering muncul dalam pemberitaan tentang BTR dari balopost.com. 
 
 ```{r}
 media_data %>%
   filter(media == "balipost") %>%
   select(clean_text)%>%
-  unnest_tokens(kata, clean_text, token = "ngrams", n = 2, to_lower = TRUE, 
+  unnest_tokens(kata, clean_text, token = "ngrams", n = 3, to_lower = TRUE, 
                 drop = TRUE, collapse = NULL) %>%
   count(kata, sort = TRUE) %>% 
   filter(!str_detect(kata, "teluk")) %>%
   filter(!str_detect(kata, "benoa")) %>%
-  filter(!str_detect(kata, "kompas")) %>%
-  filter(!str_detect(kata, "com")) %>%
+  filter(!str_detect(kata, "balipost")) %>%
+  filter(!str_detect(kata, "zeroms")) %>%
+  filter(!str_detect(kata, "opacity")) %>%
+  filter(!str_detect(kata, "transition")) %>%
+  filter(!str_detect(kata, "font")) %>%
+  filter(!str_detect(kata, "weight")) %>%
+  filter(!str_detect(kata, "bold")) %>%
+  filter(!str_detect(kata, "onepx")) %>%
+  filter(!str_detect(kata, "text")) %>%
+  filter(!str_detect(kata, "decoration")) %>%
+  filter(!str_detect(kata, "none")) %>%
+  filter(!str_detect(kata, "important")) %>%
   top_n(20) %>%
   ggplot(aes(reorder(kata, n), n)) + geom_col() + coord_flip() + 
-  ggtitle("top 20 bigram dalam pemberitaan balipost.com") +
+  ggtitle("top 20 trigram dari balipost.com") +
   labs(x = NULL, y = "Jumlah kata")
 ```
 
-# Berita beritabali.com
+## Berita beritabali.com
 Pemberitaan tentang BTR dari beritabli dapat dikatakan rutin dilakukan dari tahun 2014 hingga 2018 awal ini. Secara urut (2014 - 2018) jumlah pemberitaan tentang BTR ada 5, 13, 44, 3, dan 9. 
 
 ```{r}
 media_data %>%
   filter(media=="beritabali") %>%
   #select(clean_text) %>%
-  unnest_tokens(kata, clean_text, token = "ngrams", n = 2, to_lower = TRUE, 
+  unnest_tokens(kata, clean_text, token = "ngrams", n = 3, to_lower = TRUE, 
                 drop = TRUE, collapse = NULL) %>%
   count(kata, sort = TRUE) %>%
   filter(!str_detect(kata, "teluk")) %>%
@@ -158,7 +180,57 @@ media_data %>%
   #filter(!str_detect(kata, "com")) %>%
   top_n(20) %>%
   ggplot(aes(reorder(kata, n), n)) + geom_col() + coord_flip() + 
-  ggtitle("top 20 bigram dalam pemberitaan beritabali.com") +
+  ggtitle("top 20 trigram dari beritabali.com") +
   labs(x = NULL, y = "Jumlah kata")
+```
+
+# Topic modelling
+
+```{r}
+bigram_tm <- function(input_text, 
+                       plot = T, 
+                       number_of_topics = 4)
+{    
+  set.seed(2016)
+  Corpus <- VCorpus(VectorSource(input_text))
+  
+  BigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min=2, max=3))
+  DTM <- DocumentTermMatrix(Corpus, control=list(tokenize=BigramTokenizer))
+  unique_indexes <- unique(DTM$i)
+  DTM <- DTM[unique_indexes,]
+  lda <- LDA(DTM, k = number_of_topics, control = list(seed = 1234))
+  topics <- tidy(lda, matrix = "beta")
+  top_terms <- topics  %>% 
+    group_by(topic) %>% 
+    top_n(10, beta) %>%
+    ungroup() %>%
+    arrange(topic, -beta)
+  
+  # if the user asks for a plot (TRUE by default)
+  if(plot == T){
+    top_terms %>%
+      mutate(term = reorder(term, beta)) %>% 
+      ggplot(aes(term, beta, fill = factor(topic))) +
+      geom_col(show.legend = FALSE) + 
+      facet_wrap(~ topic, scales = "free") +
+      labs(x = NULL, y = "Beta") + 
+      coord_flip()
+  }else{ 
+    # if the user does not request a plot
+    # return a list of sorted terms instead
+    return(top_terms)
+  }
+}
+```
+
+
+## Topic modelling - tempo.co
+
+```{r}
+data_tempo <- media_data %>%
+  filter(media == "tempo") %>%
+  select(clean_text)
+
+bigram_tm(data_tempo$clean_text, plot = TRUE, number_of_topics = 4)
 ```
 
