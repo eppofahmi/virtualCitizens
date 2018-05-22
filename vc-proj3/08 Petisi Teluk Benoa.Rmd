@@ -1,0 +1,114 @@
+---
+title: 'Laporan 3: Petisi Teluk Benoa'
+author: "Ujang fahmi"
+date: "5/4/2018"
+output: 
+  html_notebook:
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  rmarkdown::pdf_document:
+    fig_caption: yes
+    includes:
+      in_header: setup markdown.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.pos = "h")
+```
+
+# Pendahualuan
+Data yang digunakan dalam lapporan ini berasal dari laman change.org. Data di dapat dengan melakukan scrapping dengan kata kunci teluk benoa. Komentar yang diambil dari petisi dengan jumlah pendukung terbanyak. 
+
+```{r}
+# Runing RJava
+if (Sys.info()['sysname'] == 'Darwin') {
+  libjvm <- paste0(system2('/usr/libexec/java_home',stdout = TRUE)[1],'/jre/lib/server/libjvm.dylib')
+  message (paste0('Load libjvm.dylib from: ',libjvm))
+  dyn.load(libjvm)
+}
+
+library(tidyverse)
+library(ggplot2)
+library(stringr)
+library(lubridate)
+library(topicmodels)
+library(tm)
+library(tidytext)
+library(RWeka)
+library(reshape2)
+library(wordcloud)
+library(igraph)
+library(ggraph)
+library(quanteda)
+```
+
+# data
+
+```{r}
+dirwd <- paste(getwd(),"/wrangled data proj-3/",sep='')
+
+# daftar petisi
+daftar_petisi <- read.csv(paste(dirwd,"daftar petisi benoa.csv", sep=''), header = TRUE, sep = ',', stringsAsFactors = FALSE)
+
+daftar_petisi$jml_pendukung <- as.integer(daftar_petisi$jml_pendukung)
+daftar_petisi$date <- as.Date(daftar_petisi$date, "%Y-%m-%d")
+
+# petisi 1
+petisi1 <- read.csv(paste(dirwd,"change-segera cabut.csv", sep=''), header = TRUE, sep = ';', stringsAsFactors = FALSE)
+# petisi 2
+petisi2 <- read.csv(paste(dirwd,"change-segera cabut.csv", sep=''), header = TRUE, sep = ';', stringsAsFactors = FALSE)
+# petisi 3
+petisi3 <- read.csv(paste(dirwd,"change-segera cabut.csv", sep=''), header = TRUE, sep = ';', stringsAsFactors = FALSE)
+
+petisi_tb <- bind_rows(petisi1 %>%
+            mutate(judul= "petisi_1"), 
+          petisi2 %>%
+            mutate(judul= "petisi_2"),
+          petisi3 %>%
+            mutate(judul= "petisi_3"))
+```
+
+## Daftar Petisi
+
+```{r}
+print(daftar_petisi$title)
+```
+
+```{r, fig.cap="jumlah pendukung tiap petisi"}
+daftar_petisi %>%
+  select(date,title, jml_pendukung) %>%
+  arrange(desc(jml_pendukung)) %>%
+  ggplot(aes(reorder(date, jml_pendukung), jml_pendukung)) + geom_col() +
+  coord_flip() + labs(x = NULL, y = "Jumlah Pendukung")
+```
+
+terdapat tiga petisi yang didukung oleh lebih dari 50 ribu penandatangan. Berikut adalah daftarnya. 
+
+```{r}
+daftar_petisi %>%
+  filter(jml_pendukung >= 50000) %>%
+  select(title, date) %>%
+  arrange(date)
+```
+
+Untuk mendalami di seputar teluk benua, selanjutnya akan digunakan data berupa komentar dari tiga petisi dengan judul di atas. 
+
+## Jumlah Komentar
+Gambar berikut menunjukkan jumlah komentar untuk tiga petisi yang memiliki kata teluk benoa dengan pendukung paling banyak. 
+
+```{r}
+petisi_tb %>%
+  select(judul) %>%
+  group_by(judul) %>%
+  count(judul) %>%
+  ggplot(aes(judul, n)) + geom_col() +
+  labs(x = "Judul Petisi", y ="Jumlah")
+```
+
+# Term
+
+
+
+# Topic

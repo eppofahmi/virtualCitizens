@@ -1,13 +1,11 @@
 ---
-title: "Laporan 3: BTR dalam Media"
+title: 'Laporan 3: BTR dalam Media'
 author: "Ujang fahmi"
 date: "5/20/2018"
 output:
-  html_notebook:
-    number_sections: yes
+  word_document:
     toc: yes
-    toc_depth: 3
-    toc_float: yes
+    toc_depth: '3'
   pdf_document:
     toc: yes
     toc_depth: '3'
@@ -15,6 +13,11 @@ output:
     fig_caption: yes
     includes:
       in_header: setup markdown.tex
+  html_notebook:
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
 ---
 
 ```{r setup, include=FALSE}
