@@ -316,8 +316,8 @@ twit_words <- tb_raw %>%
   count(kata, sort = TRUE)
 
 total_words <- twit_words %>% 
-  group_by(periode) %>% 
-  summarize(total = sum(n))
+  group_by(periode) %>%
+  summarise(total = sum(n))
 
 twit_words <- left_join(twit_words, total_words)
 
