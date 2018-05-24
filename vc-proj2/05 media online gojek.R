@@ -27,7 +27,7 @@ colnames(gojek_media) <- c("tanggal", "judul", "konten", "media")
 
 # remving duplicate conten
 gojek_media <- gojek_media %>%
-  mutate(duplicate = duplicated(konten)) %>%
+  mutate(duplicate = duplicated(judul, konten)) %>%
   filter(duplicate == FALSE)
 
 # cleaning 1 ---- 
@@ -132,17 +132,16 @@ to_txt <- media_data %>%
 to_txt$judul <- toupper(to_txt$judul)
 to_txt$media <- toupper(to_txt$media)
 
+to_txt$judul <- gsub("([-])|[[:punct:]]", "\\1", to_txt$judul)
+
 for(i in seq(nrow(to_txt))) {
   text <- as.character(to_txt$konten[i]) 
   judul <- as.character(to_txt$judul[i])
   tanggal <- as.character(to_txt$tanggal[i])
   media <- as.character(to_txt$media[i])
   # Create the file name
-  filename <- paste0("/Volumes/mydata/RStudio/virtualCitizens/vc-proj3/output file proj-2/", to_txt$judul[i], ".txt")
+  filename <- paste0("/Volumes/mydata/RStudio/virtualCitizens/vc-proj2/output file proj-2/", to_txt$judul[i], ".txt")
   sink(file = filename) %>% # open file to write 
     cat(media, tanggal, judul, text, sep = "|")  # write the file
   sink() # close the file
 }
-
-unique(to_txt$judul)
-
