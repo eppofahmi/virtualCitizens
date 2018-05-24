@@ -549,7 +549,7 @@ Periode pertama juga dapat disebut sebagai periode promosi gerakan. Hal ini ditu
 tb_raw %>%
   filter(is_duplicate == FALSE) %>%
   filter(periode == "periode_1") %>%
-  filter(str_detect(clean_text, "bantu promosikan")) %>%
+  filter(str_detect(clean_text, "hebat bener")) %>%
   select(tweets) %>%
   head(n = 5) %>% 
   print()
