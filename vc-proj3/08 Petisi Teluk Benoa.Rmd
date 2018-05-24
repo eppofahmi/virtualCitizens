@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.pos = 
 ```
 
 # Pendahualuan
-Data yang digunakan dalam lapporan ini berasal dari laman change.org. Data di dapat dengan melakukan scrapping dengan kata kunci teluk benoa. Komentar yang diambil dari petisi dengan jumlah pendukung terbanyak. 
+Data yang digunakan dalam lapporan ini berasal dari laman change.org. Data di dapat dengan melakukan scrapping dengan kata kunci teluk benoa. Komentar yang diambil berasal dari komentar pada petisi dengan jumlah pendukung terbanyak.
 
 ```{r}
 # Runing RJava
@@ -55,19 +55,7 @@ daftar_petisi <- read.csv(paste(dirwd,"daftar petisi benoa.csv", sep=''), header
 daftar_petisi$jml_pendukung <- as.integer(daftar_petisi$jml_pendukung)
 daftar_petisi$date <- as.Date(daftar_petisi$date, "%Y-%m-%d")
 
-# petisi 1
-petisi1 <- read.csv(paste(dirwd,"change-segera cabut.csv", sep=''), header = TRUE, sep = ';', stringsAsFactors = FALSE)
-# petisi 2
-petisi2 <- read.csv(paste(dirwd,"change-segera cabut.csv", sep=''), header = TRUE, sep = ';', stringsAsFactors = FALSE)
-# petisi 3
-petisi3 <- read.csv(paste(dirwd,"change-segera cabut.csv", sep=''), header = TRUE, sep = ';', stringsAsFactors = FALSE)
-
-petisi_tb <- bind_rows(petisi1 %>%
-            mutate(judul= "petisi_1"), 
-          petisi2 %>%
-            mutate(judul= "petisi_2"),
-          petisi3 %>%
-            mutate(judul= "petisi_3"))
+petisi_tb <- read.csv(paste(dirwd,"petisi_tb.csv", sep=''), header = TRUE, sep = ',', stringsAsFactors = FALSE)
 ```
 
 ## Daftar Petisi
@@ -81,7 +69,9 @@ daftar_petisi %>%
   select(date,title, jml_pendukung) %>%
   arrange(desc(jml_pendukung)) %>%
   ggplot(aes(reorder(date, jml_pendukung), jml_pendukung)) + geom_col() +
-  coord_flip() + labs(x = NULL, y = "Jumlah Pendukung")
+  coord_flip() + labs(x = NULL, y = "Jumlah Pendukung") + 
+  ggtitle("Petisi dengan pendukung terbanyak") +
+  labs(c = "Tanggal pembuatan Petisi", y = "Tanggal pembuatan Petisi")
 ```
 
 terdapat tiga petisi yang didukung oleh lebih dari 50 ribu penandatangan. Berikut adalah daftarnya. 
@@ -89,9 +79,11 @@ terdapat tiga petisi yang didukung oleh lebih dari 50 ribu penandatangan. Beriku
 ```{r}
 daftar_petisi %>%
   filter(jml_pendukung >= 50000) %>%
-  select(title, date) %>%
+  select(title, date, inisiator) %>%
   arrange(date)
 ```
+
+**Keterangan:** Untuk mengetahui inisiator petisi geser tanda plas disamping `date` pada tabel di atas. 
 
 Untuk mendalami di seputar teluk benua, selanjutnya akan digunakan data berupa komentar dari tiga petisi dengan judul di atas. 
 
@@ -104,11 +96,97 @@ petisi_tb %>%
   group_by(judul) %>%
   count(judul) %>%
   ggplot(aes(judul, n)) + geom_col() +
+  ggtitle("Jumlah komentar masing-masing petisi") +
   labs(x = "Judul Petisi", y ="Jumlah")
 ```
 
 # Term
 
+## Term Petisi 1
+```{r}
+petisi_tb %>%
+  filter(judul == "petisi_1") %>%
+  filter(word_count >= 2) %>%
+  select(alasan_clean, word_count) %>%
+  unnest_tokens(kata, alasan_clean, token = "ngrams", n = 2) %>%
+  count(kata, sort = TRUE) %>%
+  filter(!str_detect(kata, "teluk benoa")) %>%
+  filter(!str_detect(kata, "alam alam")) %>%
+  head(n = 20) %>%
+  ggplot(aes(reorder(kata, n), n)) + geom_col() + coord_flip() +
+  labs(x = "bigram", y = "jumlah bigram")
+```
+
+### tanah kelahiran
+
+```{r}
+petisi_tb %>%
+  filter(str_detect(alasan, "tanah kelahiran")) %>%
+  arrange(desc(likes)) %>%
+  select(alasan) %>%
+  print()
+```
+
+
+## Term Petisi 2
+
+```{r}
+petisi_tb %>%
+  filter(judul == "petisi_2") %>%
+  filter(word_count >= 2) %>%
+  select(alasan_clean, word_count) %>%
+  unnest_tokens(kata, alasan_clean, token = "ngrams", n = 2) %>%
+  count(kata, sort = TRUE) %>%
+  filter(!str_detect(kata, "teluk benoa")) %>%
+  head(n = 20) %>%
+  ggplot(aes(reorder(kata, n), n)) + geom_col() + coord_flip() +
+  labs(x = "bigram", y = "jumlah bigram")
+```
+
+### revitalisasi teluk 
+
+```{r}
+petisi_tb %>%
+  filter(str_detect(alasan, "revitalisasi teluk")) %>%
+  arrange(desc(likes)) %>%
+  select(alasan) %>%
+  print()
+```
+
+
+
+## Term Petisi 3
+
+```{r}
+petisi_tb %>%
+  filter(judul == "petisi_3") %>%
+  filter(word_count >= 2) %>%
+  select(alasan_clean, word_count) %>%
+  unnest_tokens(kata, alasan_clean, token = "ngrams", n = 2) %>%
+  count(kata, sort = TRUE) %>%
+  filter(!str_detect(kata, "teluk benoa")) %>%
+  head(n = 20) %>%
+  ggplot(aes(reorder(kata, n), n)) + geom_col() + coord_flip() +
+  labs(x = "bigram", y = "jumlah bigram")
+```
+
+
+### Tri hita karana
+```{r}
+petisi_tb %>%
+  filter(str_detect(alasan, "tri hita")) %>%
+  arrange(desc(likes)) %>%
+  select(alasan) %>%
+  print()
+```
 
 
 # Topic
+
+## Topik Petisi 1
+
+
+## Topik Petisi 2
+
+
+## Topik Petisi 3

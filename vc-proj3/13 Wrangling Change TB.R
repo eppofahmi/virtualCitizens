@@ -103,7 +103,7 @@ colnames(petisi_tb) <- c("nama", "waktu", "alasan", "likes", "links", "judul", "
 
 petisi_tb$word_count <- sapply(petisi_tb$alasan_clean, function(x) length(unlist(strsplit(as.character(x), "\\W+"))))
 
-write_csv(media_data, path = 'wrangled data proj-3/petisi_tb.csv')
+write_csv(petisi_tb, path = 'wrangled data proj-3/petisi_tb.csv')
 
 
 # ekplorasi term ----
@@ -112,4 +112,9 @@ petisi_term <- petisi_tb %>%
   unnest_tokens(kata, alasan_clean, token = "ngrams", n = 2, to_lower = TRUE, drop = TRUE) %>%
   count(kata, sort = TRUE)
 
-
+petisi_term %>%
+  head(n = 20) %>%
+  ggplot(aes(reorder(kata, n), n)) + geom_col() +
+  ggtitle("Reklamasi Teluk Benoa dalam Media") +
+  labs(x = "Media", y = "Jumlah Berita") + 
+  coord_flip()
