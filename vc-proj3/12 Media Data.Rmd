@@ -309,3 +309,17 @@ Dari media online dan beberapa analisis yang dilakukan dapat diketahui bahwa kon
 4. Simbol yang digunakan para pendukung gerakan di antaranya: Konser mini, Ogoh-ogoh, Baliho.
 
 **Catatan: Sepertinya konten berita masih ada yang tercampur dengan kasus reklamasi di Jakarta**.
+
+
+```{r}
+names(media_data)
+
+media_data %>%
+  filter(str_detect(clean_text, "gendo")) %>%
+  select(konten_asli) %>%
+  head(n = 1) %>%
+  as.character()
+  
+#print(as.character(a))
+```
+
