@@ -64,6 +64,18 @@ a %>%
   
 head(n=2, media_data$konten)
 
+
+rm(a, clean_text)
+
+media_data <- bind_cols(media_data, konten_asli)
+
+media_data <- media_data %>%
+  select(-konten)
+
+names(media_data)
+
+colnames(media_data) <- c("tanggal", "judul", "media", "media", "clean_text", "konten_asli")
+
 write_csv(media_data, path = 'wrangled data proj-3/media data.csv')
 
 # ekspor ke txt per row ----

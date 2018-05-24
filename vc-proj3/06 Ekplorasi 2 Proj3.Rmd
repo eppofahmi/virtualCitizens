@@ -3,18 +3,14 @@ title: 'Laporan 2: Twit tentang Teluk Benua'
 author: "Ujang fahmi"
 date: "4/30/2018"
 output:
+  word_document:
+    toc: yes
+    toc_depth: '3'
   html_notebook:
     number_sections: yes
     toc: yes
     toc_depth: 3
     toc_float: yes
-  pdf_document:
-    toc: yes
-    toc_depth: '3'
-  rmarkdown::pdf_document:
-    fig_caption: yes
-    includes:
-      in_header: setup markdown.tex
 ---
 
 ```{r setup, include=FALSE}
@@ -629,7 +625,7 @@ tb_raw %>%
   filter(!str_detect(tweets, "RT")) %>%
   filter(str_detect(tweets, "Rolling Stone")) %>%
   select(tweets, date) %>%
-  head(n = 3) %>% 
+  head(n = 10) %>% 
   print()
 ```
 
@@ -646,7 +642,7 @@ tb_raw %>%
   print()
 ```
 
-Berdasarkan penuturan partisipan peneitian, revitalisasi merupakan salah satu propaganda pendukung reklamasi. Pada periode tiga ini kita juga dapat melihat bahwa revitalisasi dianggap sebagai kedok. Beberapa twit tentang hal tersebut adalah sebagai berikut. 
+Berdasarkan penuturan partisipan penelitian, revitalisasi merupakan salah satu propaganda pendukung reklamasi. Pada periode tiga ini kita juga dapat melihat bahwa revitalisasi dianggap sebagai kedok. Beberapa twit tentang hal tersebut adalah sebagai berikut. 
 
 ```{r}
 tb_raw %>%

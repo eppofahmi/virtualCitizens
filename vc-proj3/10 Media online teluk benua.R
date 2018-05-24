@@ -32,11 +32,14 @@ rm(tb_balipost, tb_beritabali, tb_kompas, tb_tempo)
 
 colnames(tb_media) <- c("tanggal", "judul", "konten", "media")
 
+
+konten_asli <- as.data.frame(tb_media$konten)
+
 # check duplicates
 tb_media <- tb_media %>%
   mutate(duplicate = duplicated(konten))
 
-tb_media <- tb_media %>%
+#tb_media <- tb_media %>%
   filter(duplicate == FALSE)
 
 # Eksplorasi 1 ----
@@ -83,7 +86,7 @@ tb_media$konten <- replace_white(tb_media$konten) # replacing white space
 tb_media$konten <- add_comma_space(tb_media$konten)
 tb_media$konten <- replace_symbol(tb_media$konten)
 tb_media$konten <- replace_non_ascii(tb_media$konten, remove.nonconverted = TRUE)
-tb_media$konten <- gsub("((?:\b| )?([.,:;!?()]+)(?: |\b)?)", " \\1 ", tb_media$konten, perl=T)
+#tb_media$konten <- gsub("((?:\b| )?([.,:;!?()]+)(?: |\b)?)", " \\1 ", tb_media$konten, perl=T)
 tb_media$konten <- replace_white(tb_media$konten) # replacing white space
 
 # mengganti - menjadi to untuk tangal
@@ -103,9 +106,4 @@ tb_media$judul <- replace_white(tb_media$judul) # replacing white space
 tb_media$judul <- strip(tb_media$judul, char.keep = c("-", "/"), digit.remove = FALSE, apostrophe.remove = TRUE, lower.case = FALSE)
 
 head(n = 2, tb_media$konten)
-
-# Eksplorasi 2 ----
-
-
-
 
