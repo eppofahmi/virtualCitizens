@@ -30,7 +30,6 @@ gojek_media <- gojek_media %>%
   mutate(duplicate = duplicated(konten)) %>%
   filter(duplicate == FALSE)
 
-
 # cleaning 1 ---- 
 # 1. removing non ascii chr from `judul` and `konten`
 gojek_media$judul <- replace_non_ascii(gojek_media$judul, remove.nonconverted = TRUE)
@@ -90,7 +89,7 @@ media_cleaner <- function(input_text) # nama kolom yang akan dibersihkan
   stopwords <- c(stopwords, stopwords())
   corpusku <- tm_map(corpusku, removeWords, stopwords)
   #kata khusus yang dihapus
-  corpusku <- tm_map(corpusku, removeWords, c("baca", "simak", "or", "to", "teluk", "benoa", "zeroms", "opacity", "transition", "text", "bold", "font", "weight", "onepx", "decoration", "important", "none", "balipost", "rls", "psk", "kompas", "com", "pbthreeas"))
+  corpusku <- tm_map(corpusku, removeWords, c("baca", "simak", "or", "to", "transportasi", "online", "cmd", "googletag", "displaydiv", "pushfunction", "aa"))
   corpusku <- tm_map(corpusku, stripWhitespace)
   #removing white space in the begining
   rem_spc_front <- function(x) gsub("^[[:space:]]+", "", x)
@@ -108,8 +107,42 @@ media_data <- bind_cols(gojek_media, clean_konten)
 media_data <- media_data %>%
   select(-konten_clean)
 
-names(media_data)
-
-colnames(media_data) <- c("tanggal", "judul", "konetn", "media", "is_duplicate", "clean_konten")
+colnames(media_data) <- c("tanggal", "judul", "konten", "media", "is_duplicate", "clean_konten")
 
 write_csv(media_data, path = 'wrangled data proj-2/media data proj-2.csv')
+
+# eksplrasi ----
+library(tidytext)
+
+media_term <- media_data %>%
+  unnest_tokens(term, clean_konten,  token = "ngrams", n = 2,  drop = TRUE) %>%
+  count(term, sort = TRUE)
+
+media_term %>%
+  top_n(20) %>%
+  ggplot(aes(reorder(term, n), n)) + geom_col() + coord_flip()
+
+rm(clean_konten, gojek_media)
+
+
+# put on txt per row ----
+to_txt <- media_data %>%
+  select(judul, tanggal, media, konten)
+
+to_txt$judul <- toupper(to_txt$judul)
+to_txt$media <- toupper(to_txt$media)
+
+for(i in seq(nrow(to_txt))) {
+  text <- as.character(to_txt$konten[i]) 
+  judul <- as.character(to_txt$judul[i])
+  tanggal <- as.character(to_txt$tanggal[i])
+  media <- as.character(to_txt$media[i])
+  # Create the file name
+  filename <- paste0("/Volumes/mydata/RStudio/virtualCitizens/vc-proj3/output file proj-2/", to_txt$judul[i], ".txt")
+  sink(file = filename) %>% # open file to write 
+    cat(media, tanggal, judul, text, sep = "|")  # write the file
+  sink() # close the file
+}
+
+unique(to_txt$judul)
+
