@@ -17,7 +17,7 @@ glimpse(btr_raw)
 
 to_change <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id0))
 
-my_grdrive <- drive_find(n_max = 50)
+my_grdrive <- drive_find(n_max = 50, type = "csv")
 
 id_graph <- "1mEOcrRI0UaQyIE_ktFV-nf1_Vm-kL8hr"
 
