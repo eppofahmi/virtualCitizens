@@ -1,0 +1,33 @@
+---
+title: "ambil twit jadi tabel"
+author: "Ujang fahmi"
+date: "5/29/2018"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+install.packages("kableExtra")
+library(kableExtra)
+```
+
+1. Pada bagian library tambahkan satu baris ini `library(kableExtra)`
+
+
+2. pada bagian di dalam skrip tambahkan skrip dibawah ini. 
+```{r}
+tb_raw %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(str_detect(tweets, "reklamasi")) %>%
+  arrange(desc(ret_count)) %>% # mengurutkan berdasrkan twit dengan retweet terbanyak
+  select(date, tweets) %>% # untuk memilih lebih dua kolom tambahkan nama kolom dan pisahkan dengan koma 
+  head(n = 5) %>% # mengambil 5 tertinggi, bisa ditambahkan
+  kable() %>%
+  kable_styling()
+```
+
+Skrip ini bisa ditambahkan pada skrip awal:
