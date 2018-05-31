@@ -1,0 +1,452 @@
+---
+title: "Laporan 3 Petisi Teluk Benoa"
+author: "Ujang fahmi"
+date: "5/4/2018"
+output:
+  html_notebook:
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.pos = "h")
+set.seed(2018)
+```
+
+**Skrip dibawah ini untuk menginstall library baru yang akan digunakan. hanya perlu di run sekali saat terkoneksi dengan internet.**
+
+```{r}
+install.packages("kableExtra")
+install.packages("textclean")
+```
+
+
+# Pendahualuan
+Skrip ini dibuat untuk mengeksplorasi komentar yang dibuat oleh warga net di laman www.change.org. Terdapat dua jenis data yang digunakan di sini. Pertama, data yang memuat seluruh petisi yang memiliki kata kunci "teluk benoa". Kedua, komentar petisi yang memperoleh dukungan paling banyak. 
+
+
+```{r}
+# Runing RJava
+if (Sys.info()['sysname'] == 'Darwin') {
+  libjvm <- paste0(system2('/usr/libexec/java_home',stdout = TRUE)[1],'/jre/lib/server/libjvm.dylib')
+  message (paste0('Load libjvm.dylib from: ',libjvm))
+  dyn.load(libjvm)
+}
+
+library(tidyverse)
+library(ggplot2)
+library(stringr)
+library(lubridate)
+library(topicmodels)
+library(tm)
+library(tidytext)
+library(RWeka)
+library(reshape2)
+library(wordcloud)
+library(igraph)
+library(ggraph)
+library(quanteda)
+library(googledrive)
+library(skimr)
+library(textclean)
+library(kableExtra)
+```
+
+# Data
+Skrip di bawah ini mengunduh data yang ada dalam googledrive saya. Data yang diunduh telah diolah sehingga bisa dilakukan eksplorasi secara langsung. Namun sebelum lebih lanjut saya ingin mengenalkan terlebih dahulu salah satu tanda utama yang sering digunakan dalam skrip yaitu tanda pagar `#`. Tanda pagar digunakan untuk memberikan komentar, dan komentar tidak dieksekusi sebagai sebuah perintah. Di sini komentar berfungsi untuk memberikan keterangan dari skrip yang dibuat. Misalnya:
+
+skrip pertama: `id_petisi <- "1GAmUZ2TrPTdCJrnu9pxyFnNExabn8i39"`
+
+skrip kedua: `id_petisi <- "1GAmUZ2TrPTdCJrnu9pxyFnNExabn8i39"` # id data komentar petisi
+
+kalimat setelah tanda pagar `#` pada skrip kedua dibaca sebagai komentar
+
+```{r}
+id_petisi <- "1GAmUZ2TrPTdCJrnu9pxyFnNExabn8i39"
+id_list_petisi <- "1VwCnz04fkwplVKiQ-7TSinIvZgu6pjMD"
+petisi_tb <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_petisi))
+daftar_petisi <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_list_petisi))
+
+daftar_petisi$jml_pendukung <- as.integer(daftar_petisi$jml_pendukung)
+daftar_petisi$date <- as.Date(daftar_petisi$date, "%Y-%m-%d")
+petisi_tb$alasan_clean <- gsub("\\bthree\\b", '',petisi_tb$alasan_clean)
+petisi_tb$alasan_clean <- gsub("\\bfour\\b", '',petisi_tb$alasan_clean)
+petisi_tb$alasan <- replace_non_ascii(petisi_tb$alasan, remove.nonconverted = TRUE)
+```
+
+Di bagian sebeleh kanan atas (`Environment`) seharusnya ada dua data yang masuk, yaitu `daftar_petisi`, dan `petisi_tb`. Data pada bagian tersebut akan bertambah setiap kali kita membuat variabel baru yang ditanding dengan `nama_variabel` = atau <- `sumber_data`. Sumber data bisa berasal dari luar lingkungan (di luar R) atau dengan cara mengimpor. Disini dua data diaatas diimpor dengan fungsi `read_csv` dari google drive. Sumber data juga bisa berasal dari data yang sudah lebih dulu ada di lingkungan R, atau sudah diimpor. Untuk membuatnya kita harus terelbih dahulu memahmi data kita. 
+
+Untuk memahami data, hal utama dan pertama yang bisa dilakukan adalah dengan menggunakan fungsi `names(...)` (titik-titik diisi dengan `sumber data`).
+
+Misalnya adalah skrip berikut. **Silahkan di run dengan memencet tombol hijau pada blok script**. 
+
+```{r}
+names(daftar_petisi)
+
+#names(...) # isilah titik-titiknya dengan data kedua
+```
+*hilangkan tanda commentnya terlebih dahulu*
+
+Script di atas menunjukkan kita nama masing-masing kolom. Hal ini merupakan informasi berharga agar kita memiliki pengetahuan dasar dalam upaya eksplorasi yang dilakukan. Namun, hal tersebut tidak cukup, karena dalam komputer jenis isi dari tiap kolom berbeda, ada integer, string atau character, numeric, list, dll. Untuk mengetahui perbedaan masing-masing jenis data tersebut silahkan googling saja :).  
+
+Ada fungsi lain yang dapat digunakan untuk mendapatkan rangkuman dari data yang kita miliki. Misalnya `skim` dari library(skimr), `glimpse` dari library(tidyverse), dan `summary` yang meupakan fungsi base dari R. 
+
+Cara menggunakannya adalah sebagai berikut: fungsi(sumber_data). 
+
+Penasaran apa yang dihasilkan dengan fungsi2 di atas? 
+
+**Challange:** Silahkan buat blok skrip baru dan gunakan fungsi tersebut untuk melihat rangkuman dua data yang sudah ada (daftar_petisi, dan petisi_tb). 
+
+**Pengingat:** Blok skrip dalam `.rmd` ditandai dengan tanda ```{r} ```, cara membuatnya adalah dengan melihat tombol insert pada bagian atas (hint: warnanya hijau) dan pilih R. Tulisalah fungsi diantara di dalam blok tersebut. 
+
+**BUATLAH BLOK SKRIP DI BAWAH TULISAN INI....**
+
+
+
+Jika fungsi tersebut berhasil ditulis dengan benar, seharusnya saat ini kita sedang melihat ouput informasi yang dihasilkan. dengan informasi tersebut kita bisa membuat deskripsi terkait data yang digunakan. 
+
+**BUATLAH DESKRIPSI DI BAWAH TULISAN INI....**
+
+
+
+## Daftar Petisi
+Beberapa latihan di atas, merupakan dasar yang harus dikuasai dalam eksplorasi yang lebih lanjut. Mungkin saat ini kita juga ingin mengetahui judul masing-masing petisi yang ada kata **teluk benua**nya. Untuk itu, di sini saya juga ingin mengenalkan salah satu fungsi dasar dari R, yaitu `print()`. Misalnya kita ingin mengetahui judul petisi yang ada di data frame `daftar_petisi`. Informasi tentang hal tersebut terdapat dalam kolom `title`. Maka, skripnya adalah sebagai berikut:
+```{r}
+print(daftar_petisi$title)
+```
+Dengan menjalankan skrip di atas, saat ini kita bisa membaca judul-judul petisi. Hal ini cukup nyaman jika datanya tidak banyak, dalam kasus data yang diprint di atas, data hanya memiliki 12 row. Hal ini tidak berlaku dan membuat pusing jika diterapkan pada data 2 (petisi_tb), yang memiliki 6061 rows. Untuk membatasi informasi yang di print kita bisa menggunakan fungsi head(n = ....), titik2 harus diisi dengan jumlah baris yang ingin di print. Misalnya kita hanya ingin memprint 5, maka skripnya adalah: `head(n=5)`. 
+
+```{r}
+daftar_petisi %>% # nama data
+  select(title) %>% # memilih kolom berdasarkan namanya
+  head(n = 3) %>% # menentukan jumlah baris yang di print
+  kable() %>% # membuat ouput menjadi tabel 
+  kable_styling(c("striped", "bordered")) # jenis tabel
+```
+
+**Challange:** Cobalah kopi paste skrip di atas dan aplikasikan untuk data `petisi_tb`. 
+Skrip di atas menggabungkan dua fungsi, yaitu `select()` dan `head()`, coba definisikan sendiri guna dari dua fungsi di atas. Selain itu, di sini kita juga akan sering melihat tanda `%>%` yang dapat dibaca terus atau selanjutnya (jowo: njut). Jadi skrip di atas dapat dibaca sebagai berikut. 
+
+**Dari data dengan nama `daftar_petisi`, selanjutnya saya hanya memilih kolom dengan nama `title`, selanjutnya dari kolom tersebut saya hanya ingin mem print 3 yang pertama**
+
+Hehe.... jika sudah agak capek, rehat dulu dan kembalilah untuk mengulangi dan memahami fungsi2 yang baru saja kita tulis di atas. Selow dibutuhkan karena kita sedang memasuki dunia `tidyverse` dalam bahasa pemrograman R.
+
+Selaing dengan fungsi-fungsi di atas, eksplorasi juga sangat nyaman digunakan secara visual. Untuk itu, sebagian besar hasil dari pengolahan data merupakan plot. Di R, plot dapat dibuat dengan librar(ggolot2). Skrip berikut adalah contoh visualisasi untuk mengetahui jawaban dari pertanyaan:
+
+**Kapan petisi dengan penudukung terbanyak dibuat di laman change.org?**
+
+```{r, fig.cap="jumlah pendukung tiap petisi"}
+daftar_petisi %>%
+  select(date,title, jml_pendukung) %>%
+  arrange(desc(jml_pendukung)) %>%
+  ggplot(aes(reorder(date, jml_pendukung), jml_pendukung)) + geom_col() +
+  coord_flip() + labs(x = NULL, y = "Jumlah Pendukung") + 
+  ggtitle("Petisi dengan pendukung terbanyak") +
+  labs(c = "Tanggal pembuatan Petisi", y = "Tanggal pembuatan Petisi")
+```
+
+**INTERPRETASI**
+
+Tiga petisi dengan jumlah pendukung terbanyak dibuat pada tahun 2013 dan 2014. Dua diantaranya dibuat pada tahun 2013 dan hanya selisih empat hari. Lalu kita mungkin juga ingin mengetahui petisi apa yang memiliki jumlah pendukung di atas 50rb. Oleh karena itu, pada skrip berikut ini kita menggunakan filter jumlah pendukung >= (lebih dari/sama dengan) 50000. 
+
+```{r}
+daftar_petisi %>%
+  filter(jml_pendukung >= 50000) %>%
+  select(title, date, inisiator, jml_pendukung) %>%
+  arrange(date) %>%
+  kable() %>%
+  kable_styling(c("striped", "bordered"))
+```
+
+**Keterangan:** Untuk mengetahui inisiator petisi geser tanda play disamping `date` pada tabel di atas. 
+
+Untuk mendalami di seputar teluk benua, selanjutnya akan digunakan data berupa komentar dari tiga petisi dengan judul di atas.
+
+## Jumlah Komentar
+Gambar berikut menunjukkan jumlah komentar untuk tiga petisi yang memiliki kata teluk benoa dengan pendukung paling banyak. 
+
+```{r}
+petisi_tb %>%
+  select(judul) %>%
+  group_by(judul) %>%
+  count(judul) %>%
+  ggplot(aes(judul, n)) + geom_col() +
+  ggtitle("Jumlah komentar masing-masing petisi") +
+  labs(x = "Judul Petisi", y ="Jumlah")
+```
+
+# Term
+
+## Term Petisi 1
+```{r}
+petisi_tb %>%
+  filter(judul == "petisi_1") %>%
+  filter(word_count >= 2) %>%
+  select(alasan_clean, word_count) %>%
+  unnest_tokens(kata, alasan_clean, token = "ngrams", n = 2) %>%
+  count(kata, sort = TRUE) %>%
+  filter(!str_detect(kata, "teluk benoa")) %>%
+  filter(!str_detect(kata, "alam alam")) %>%
+  head(n = 20) %>%
+  ggplot(aes(reorder(kata, n), n)) + geom_col() + coord_flip() +
+  labs(x = "bigram", y = "jumlah bigram")
+```
+
+**Interpretasi:**
+
+
+## Term Petisi 2
+
+```{r}
+petisi_tb %>%
+  filter(judul == "petisi_2") %>%
+  filter(word_count >= 2) %>%
+  select(alasan_clean, word_count) %>%
+  unnest_tokens(kata, alasan_clean, token = "ngrams", n = 2) %>%
+  count(kata, sort = TRUE) %>%
+  filter(!str_detect(kata, "teluk benoa")) %>%
+  head(n = 20) %>%
+  ggplot(aes(reorder(kata, n), n)) + geom_col() + coord_flip() +
+  labs(x = "bigram", y = "jumlah bigram")
+```
+
+**Interpretasi:**
+
+
+## Term Petisi 3
+
+```{r}
+petisi_tb %>%
+  filter(judul == "petisi_3") %>%
+  filter(word_count >= 2) %>%
+  select(alasan_clean, word_count) %>%
+  unnest_tokens(kata, alasan_clean, token = "ngrams", n = 2) %>%
+  count(kata, sort = TRUE) %>%
+  filter(!str_detect(kata, "teluk benoa")) %>%
+  head(n = 20) %>%
+  ggplot(aes(reorder(kata, n), n)) + geom_col() + coord_flip() +
+  labs(x = "bigram", y = "jumlah bigram")
+```
+
+**Interpretasi:**
+
+# TF-IDF
+
+```{r}
+tfidf_petisi <- petisi_tb %>%
+  na.omit(alasan_clean) #menyeleksi row yang berisi pada kolom alasan_clean
+
+# Fungsi untuk membuat tf idf dari data frame
+tfidf_generator <- function(data1, plot = T) {
+  twit_words <- data1 %>%
+    filter(word_count >= 2) %>%
+    select(alasan_clean, judul) %>%
+    group_by(judul) %>%
+    unnest_tokens(kata, alasan_clean, token = "ngrams", n = 2) %>%
+    count(kata, sort = TRUE)
+  # calculate all words per periode
+  total_words <- twit_words %>% 
+    group_by(judul) %>% 
+    summarize(total = sum(n))
+  # combining 
+  twit_words <- left_join(twit_words, total_words)
+  #tf-idf calculation
+  twit_words <- twit_words %>%
+    bind_tf_idf(kata, judul, n) %>%
+    arrange(desc(tf_idf))
+  # get top tf-idf 
+  top_terms <- twit_words  %>%
+    group_by(judul) %>%
+    top_n(10, tf_idf) %>%
+    ungroup() %>% 
+    arrange(kata, -tf_idf)
+  
+  if(plot == T){
+    # plot the top ten terms for each topic in order
+    top_terms %>% # take the top terms
+      mutate(term = reorder(kata, tf_idf)) %>% # sort terms by beta value 
+      ggplot(aes(term, tf_idf, fill = factor(term))) + # plot beta by theme
+      geom_col(show.legend = FALSE) + # as a bar plot
+      facet_wrap(~ judul, scales = "free") + # which each topic in a seperate plot
+      labs(x = NULL, y = "tf-idf") + # no x label, change y label 
+      coord_flip() # turn bars sideways
+  }else{ 
+    # if the user does not request a plot
+    # return a list of sorted terms instead
+    return(top_terms)
+  }
+  
+}
+
+tfidf_generator(tfidf_petisi, plot = T)
+```
+
+**Interpretasi:**
+
+## Kata Penting Petisi 1
+
+```{r}
+petisi_tb %>%
+  filter(judul == "petisi_1") %>%
+  filter(str_detect(alasan_clean, "anak cucu")) %>%
+  arrange(desc(likes)) %>%
+  select(nama, alasan) %>%
+  head(n = 3) %>%
+  kable() %>%
+  kable_styling(c("striped", "bordered"))
+```
+
+jika ingiin membuatnya menjadi data frame sehingga bisa dilihat di environment, maka dapat menggunakan skrip berikut:
+
+```{r}
+anak_cucu <- petisi_tb %>%
+  filter(judul == "petisi_1") %>%
+  filter(str_detect(alasan_clean, "anak cucu")) %>%
+  arrange(desc(likes)) %>%
+  select(alasan) %>%
+  head(n = 3) %>%
+  kable() %>%
+  kable_styling(c("striped", "bordered"))
+```
+
+Di environment saat ini sudah ada data baru bernama anak cucu, dan dapat disimpan ke drive (hardisk) dengan skrip berikut:
+
+```{r}
+#write_csv(anak_cucu, path = "anak_cucu.csv")
+```
+
+Saat ini kita sudah memiliki data di drive kita dengan nama anak_cucu yang berisi 10 komentar yang mengandung kata anak cucu. 
+
+## Kata Penting Petisi 2
+
+```{r}
+petisi_tb %>%
+  filter(judul == "petisi_2") %>%
+  filter(str_detect(alasan_clean, "anak cucu")) %>%
+  arrange(desc(likes)) %>%
+  select(nama, alasan) %>%
+  head(n = 3) %>%
+  kable() %>%
+  kable_styling(c("striped", "bordered"))
+```
+
+## Kata Penting Petisi 3
+
+```{r}
+petisi_tb %>%
+  filter(judul == "petisi_3") %>%
+  filter(str_detect(alasan_clean, "beautiful place")) %>%
+  arrange(desc(likes)) %>%
+  select(nama, alasan) %>%
+  head(n = 3) %>%
+  kable() %>%
+  kable_styling(c("striped", "bordered"))
+```
+
+# Topic
+Berikut ini adalah fungsi untuk mengambil topik dari data. Dalam hal ini data dibagi 3 berdasarkan judulnya. 
+```{r}
+bigram_tm <- function(input_text, 
+                       plot = T, 
+                       number_of_topics = 4)
+{    
+  set.seed(2016)
+  Corpus <- VCorpus(VectorSource(input_text))
+  
+  BigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min=2, max=3))
+  DTM <- DocumentTermMatrix(Corpus, control=list(tokenize=BigramTokenizer))
+  unique_indexes <- unique(DTM$i)
+  DTM <- DTM[unique_indexes,]
+  lda <- LDA(DTM, k = number_of_topics, control = list(seed = 1234))
+  topics <- tidy(lda, matrix = "beta")
+  top_terms <- topics  %>% 
+    group_by(topic) %>% 
+    top_n(10, beta) %>%
+    ungroup() %>%
+    arrange(topic, -beta)
+  
+  # if the user asks for a plot (TRUE by default)
+  if(plot == T){
+    top_terms %>%
+      mutate(term = reorder(term, beta)) %>% 
+      ggplot(aes(term, beta, fill = factor(topic))) +
+      geom_col(show.legend = FALSE) + 
+      facet_wrap(~ topic, scales = "free") +
+      labs(x = NULL, y = "Beta") + 
+      coord_flip()
+  }else{ 
+    # if the user does not request a plot
+    # return a list of sorted terms instead
+    return(top_terms)
+  }
+}
+```
+
+## Topik Petisi 1
+
+```{r}
+petisi1 <- petisi_tb %>%
+  filter(judul == "petisi_1") %>%
+  select(alasan_clean) %>%
+  na.omit()
+
+bigram_tm(petisi1$alasan_clean, plot = TRUE, number_of_topics = 2)
+```
+
+**Interpretasi:**
+
+## Topik Petisi 2
+
+```{r}
+petisi2 <- petisi_tb %>%
+  filter(judul == "petisi_2") %>%
+  select(alasan_clean) %>%
+  na.omit()
+
+bigram_tm(petisi2$alasan_clean, plot = TRUE, number_of_topics = 2)
+```
+
+**Interpretasi:**
+
+
+## Topik Petisi 3
+
+```{r}
+petisi3 <- petisi_tb %>%
+  filter(judul == "petisi_3") %>%
+  select(alasan_clean) %>%
+  na.omit()
+
+bigram_tm(petisi3$alasan_clean, plot = TRUE, number_of_topics = 2)
+```
+
+**Interpretasi:**
+
+Petisi tiga ini sepertinya digunakan untuk mendapat dukungan publik internasional. Oleh karena itu petisi dilayangkan dan dijelaskan dalam bahasa inggris. 
+
+Apa yang mereka tulis tentang "dont want"?
+
+```{r}
+petisi_tb %>%
+  filter(judul == "petisi_3") %>%
+  arrange(desc(likes)) %>%
+  filter(str_detect(alasan, "\\bdont want\\b")) %>%
+  select(nama, alasan) %>%
+  head(n=3) %>%
+  kable() %>%
+  kable_styling(c("striped", "bordered"))
+```
+
+Apa yang mereka tulis tentang "balinese"?
+```{r}
+petisi_tb %>%
+  filter(judul == "petisi_3") %>%
+  arrange(desc(likes)) %>%
+  filter(str_detect(alasan, "\\bbalinese\\b")) %>%
+  select(nama, alasan) %>%
+  head(n=3) %>%
+  kable() %>%
+  kable_styling(c("striped", "bordered"))
+```

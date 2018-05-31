@@ -1,0 +1,325 @@
+---
+title: 'Laporan 3: BTR dalam Media'
+author: "Ujang fahmi"
+date: "5/20/2018"
+output:
+  html_notebook:
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+  rmarkdown::pdf_document:
+    fig_caption: yes
+    includes:
+      in_header: setup markdown.tex
+  word_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.pos = "h")
+
+set.seed(2018)
+```
+
+# Pendahuluan
+Berdasarkan penuturan salah seorang partisipan penelitian, media sosial dipilih sebagai salah satu media untuk menyebarluaskan pesan penolakan reklamasi teluk benoa karena covering media arus utama kurang memadai. Oleh karena itu di sini saya akan mencoba mengonfirmasi pendapat tersebut. Selain itu, pemberitaan di media masa juga digunakan untuk mengetahui cerita tentang BTR dari sudut pandang lain. 
+
+Berita yang digunakan bersumber dari media lokal dan nasional. Media lokal terdiri dari balipost dan berita bali. Sedangkan berita nasional bersumber dari tempo dan kompas. Berita didapat dengan metode scrapping yang meliputi semua berita dengan kata kunci **reklamasi teluk benoa** yang pernah diterbitkan oleh media-media tersebut di atas. Namun untuk kompas dan tempo hanya bisa mendapatkan berita dalam 10 halaman terakhir saja karena adanya pembatasan pencarian berita. Berikut adalah perbandingan berita dari masing-masing sumber. 
+
+```{r}
+# Runing RJava
+if (Sys.info()['sysname'] == 'Darwin') {
+  libjvm <- paste0(system2('/usr/libexec/java_home',stdout = TRUE)[1],'/jre/lib/server/libjvm.dylib')
+  message (paste0('Load libjvm.dylib from: ',libjvm))
+  dyn.load(libjvm)
+}
+
+library(googledrive)
+library(ggplot2)
+library(tidyverse)
+library(tidytext)
+library(Hmisc)
+library(corrgram)
+library(tm)
+library(RWeka)
+library(topicmodels)
+```
+
+```{r}
+id_media <- "1MI7WGILkpdyLt8iU9-7NUwr7d5yv0UnJ" # cleaned username_all 
+media_data <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_media))
+```
+
+```{r}
+media_data %>%
+  select(tanggal, media) %>% 
+  separate(tanggal, into = c("tahun", "bulan", "tanggal"), sep = "-") %>%
+  group_by(tahun) %>%
+  count(media) %>%
+  ggplot(aes(tahun, n, fill = media)) +
+  geom_col() + theme(legend.position="top") +
+  ggtitle("Jumlah pemeberitaan tentang reklamasi") +
+  labs(x = "Tahun", y = NULL)
+```
+Dari total 275 artikel berita, porsi pemberitaan paling banyak berada pada tahun 2016. Media nasional yang selalu membuat pemberitaan terkait denga BTR adalah tempo, sedangkan media lokalnya adalah beritabali. Hal ini sedikit berbeda jika dibandingkan dengan jumlah unggah media sosial yang mengalami puncaknya pada pertangahan tahun 2014 seperti dapat dilihat pada gambar di bawah ini. 
+
+```{r}
+tb_raw %>%
+  group_by(date) %>% count(date) %>% arrange(date) %>%
+  ggplot(aes(x = date, y = n)) + geom_line(show.legend = FALSE) + 
+  geom_smooth(method = "gam") +
+  labs(x = "Tahun", y = "Jumlah Twit")
+```
+Perbedaan tren tersebut secara tidak langsung dapat memunculkan asumi untuk membantah (menolak) adanya *echo chamber* antara media sosial dan media arus utama. Di mana media sosial cenderung mengikuti tren pemberitaan di media arus utama. 
+
+```{r}
+a <- media_data %>%
+  select(tanggal, media) %>% 
+  separate(tanggal, into = c("tahun", "bulan", "tanggal"), sep = "-") %>%
+  group_by(tahun) %>%
+  summarise(jumlah_berita = n())
+
+b <- tb_raw %>%
+  separate(date, into = c("tahun", "bulan", "tanggal"), sep = "-") %>%
+  group_by(tahun) %>% 
+  count(tahun) %>%
+  filter(!tahun == "2013") %>%
+  filter(!tahun == "2012")
+
+twit_media <- bind_cols(a, b) %>%
+  select(tahun, jumlah_berita, jumlah_twit = n)
+
+rm(a, b)
+```
+
+# Term Frekuensi dan TF-IDF
+
+## Berita tempo.co
+Terdapat 73 berita dari tempo.co tentang reklamasi teluk benoa Bali dari tahun 2014 hingga 2018. Pada tahun 2014 terdapat 9, dan pada tahun-tahun berikutnya terdapat 3, 49, 8, 4 berita. Gambar di bawah ini menunjukkan bigram yang paling sering muncul dari berita di tempo.co, (kecuali term **teluk** dan **benoa**).
+
+```{r}
+media_data %>%
+  filter(media == "tempo") %>%
+  select(clean_text)%>%
+  unnest_tokens(kata, clean_text, token = "ngrams", n = 3, to_lower = TRUE, 
+                drop = TRUE, collapse = NULL) %>%
+  count(kata, sort = TRUE) %>% 
+  filter(!str_detect(kata, "teluk")) %>%
+  filter(!str_detect(kata, "benoa")) %>%
+  top_n(20) %>%
+  ggplot(aes(reorder(kata, n), n)) + geom_col() + coord_flip() + 
+  ggtitle("top 20 trigram dari tempo.co") +
+  labs(x = NULL, y = "Jumlah kata")
+```
+
+## Berita kompas.com
+Data dari kompas yang ada disini mulai dari tahun 2015 dengan 3 berita, 2016 dengan 35, 2017 dengan 17, dan 2018 sebanyak 2 berita. 
+
+```{r}
+media_data %>%
+  filter(media == "kompas") %>%
+  select(clean_text)%>%
+  unnest_tokens(kata, clean_text, token = "ngrams", n = 3, to_lower = TRUE, 
+                drop = TRUE, collapse = NULL) %>%
+  count(kata, sort = TRUE) %>% 
+  filter(!str_detect(kata, "teluk")) %>%
+  filter(!str_detect(kata, "benoa")) %>%
+  filter(!str_detect(kata, "kompas")) %>%
+  filter(!str_detect(kata, "com")) %>%
+  top_n(20) %>%
+  ggplot(aes(reorder(kata, n), n)) + geom_col() + coord_flip() + 
+  ggtitle("top 20 trigram dari kompas.com") +
+  labs(x = NULL, y = "Jumlah kata")
+```
+
+## Berita balipost.com
+Data dari balipost.com berasal dari dua tahun terakhir saja, yaitu tahun 2017 dan 2018. Pada tahun 2017 terdapat 46 berita, sedangkan pada tahun 2018 terdapat 25 berita. Gambar berikut akan menunjukkan 20 bigram paling sering muncul dalam pemberitaan tentang BTR dari balopost.com. 
+
+```{r}
+media_data %>%
+  filter(media == "balipost") %>%
+  select(clean_text)%>%
+  unnest_tokens(kata, clean_text, token = "ngrams", n = 3, to_lower = TRUE, 
+                drop = TRUE, collapse = NULL) %>%
+  count(kata, sort = TRUE) %>% 
+  filter(!str_detect(kata, "teluk")) %>%
+  filter(!str_detect(kata, "benoa")) %>%
+  filter(!str_detect(kata, "balipost")) %>%
+  filter(!str_detect(kata, "zeroms")) %>%
+  filter(!str_detect(kata, "opacity")) %>%
+  filter(!str_detect(kata, "transition")) %>%
+  filter(!str_detect(kata, "font")) %>%
+  filter(!str_detect(kata, "weight")) %>%
+  filter(!str_detect(kata, "bold")) %>%
+  filter(!str_detect(kata, "onepx")) %>%
+  filter(!str_detect(kata, "text")) %>%
+  filter(!str_detect(kata, "decoration")) %>%
+  filter(!str_detect(kata, "none")) %>%
+  filter(!str_detect(kata, "important")) %>%
+  top_n(20) %>%
+  ggplot(aes(reorder(kata, n), n)) + geom_col() + coord_flip() + 
+  ggtitle("top 20 trigram dari balipost.com") +
+  labs(x = NULL, y = "Jumlah kata")
+```
+
+## Berita beritabali.com
+Pemberitaan tentang BTR dari beritabli dapat dikatakan rutin dilakukan dari tahun 2014 hingga 2018 awal ini. Secara urut (2014 - 2018) jumlah pemberitaan tentang BTR ada 5, 13, 44, 3, dan 9. 
+
+```{r}
+media_data %>%
+  filter(media=="beritabali") %>%
+  #select(clean_text) %>%
+  unnest_tokens(kata, clean_text, token = "ngrams", n = 3, to_lower = TRUE, 
+                drop = TRUE, collapse = NULL) %>%
+  count(kata, sort = TRUE) %>%
+  filter(!str_detect(kata, "teluk")) %>%
+  filter(!str_detect(kata, "benoa")) %>%
+  #filter(!str_detect(kata, "kompas")) %>%
+  #filter(!str_detect(kata, "com")) %>%
+  top_n(20) %>%
+  ggplot(aes(reorder(kata, n), n)) + geom_col() + coord_flip() + 
+  ggtitle("top 20 trigram dari beritabali.com") +
+  labs(x = NULL, y = "Jumlah kata")
+```
+
+## TF-IDF 
+
+```{r}
+media_words <- media_data %>%
+  group_by(media) %>%
+  unnest_tokens(kata, clean_text, token = "ngrams", n = 3) %>%
+  count(kata, sort = TRUE)
+
+total_media <- media_words %>% 
+  group_by(media) %>% 
+  summarise(total = sum(n))
+
+media_words <- left_join(media_words, total_media)
+
+media_words <- media_words %>%
+  bind_tf_idf(kata, media, n) %>%
+  arrange(desc(tf_idf))
+
+# Visualisasi tf-idf
+media_words %>%
+  arrange(desc(tf_idf)) %>%
+  mutate(kata = factor(kata, levels = rev(unique(kata)))) %>% 
+  group_by(media) %>% 
+  top_n(7) %>% 
+  ungroup %>%
+  ggplot(aes(reorder(kata,tf_idf), tf_idf, fill = media)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~media, ncol = 2, scales = "free") + 
+  labs(x = "Bigram", y = "Value") +
+  coord_flip()
+```
+
+
+# Topic modelling
+
+```{r}
+bigram_tm <- function(input_text, 
+                       plot = T, 
+                       number_of_topics = 4)
+{    
+  set.seed(2016)
+  Corpus <- VCorpus(VectorSource(input_text))
+  
+  BigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min=2, max=3))
+  DTM <- DocumentTermMatrix(Corpus, control=list(tokenize=BigramTokenizer))
+  unique_indexes <- unique(DTM$i)
+  DTM <- DTM[unique_indexes,]
+  lda <- LDA(DTM, k = number_of_topics, control = list(seed = 1234))
+  topics <- tidy(lda, matrix = "beta")
+  top_terms <- topics  %>% 
+    group_by(topic) %>% 
+    top_n(10, beta) %>%
+    ungroup() %>%
+    arrange(topic, -beta)
+  
+  # if the user asks for a plot (TRUE by default)
+  if(plot == T){
+    top_terms %>%
+      mutate(term = reorder(term, beta)) %>% 
+      ggplot(aes(term, beta, fill = factor(topic))) +
+      geom_col(show.legend = FALSE) + 
+      facet_wrap(~ topic, scales = "free") +
+      labs(x = NULL, y = "Beta") + 
+      coord_flip()
+  }else{ 
+    # if the user does not request a plot
+    # return a list of sorted terms instead
+    return(top_terms)
+  }
+}
+```
+
+
+## TM - tempo.co
+
+```{r}
+data_tempo <- media_data %>%
+  filter(media == "tempo") %>%
+  select(clean_text)
+
+bigram_tm(data_tempo$clean_text, plot = TRUE, number_of_topics = 2)
+```
+
+## TM - kompas.com
+
+```{r}
+data_kompas <- media_data %>%
+  filter(media == "kompas") %>%
+  select(clean_text)
+
+bigram_tm(data_kompas$clean_text, plot = TRUE, number_of_topics = 2)
+```
+
+## TM - balipost.com
+
+```{r}
+data_balipost <- media_data %>%
+  filter(media == "balipost") %>%
+  select(clean_text)
+
+bigram_tm(data_balipost$clean_text, plot = TRUE, number_of_topics = 2)
+```
+
+## TM - beritabali.com
+
+```{r}
+data_beritabali <- media_data %>%
+  na.omit() %>%
+  filter(media == "beritabali") 
+
+bigram_tm(data_beritabali$clean_text, plot = TRUE, number_of_topics = 2)
+```
+
+# Penutup
+Dari media online dan beberapa analisis yang dilakukan dapat diketahui bahwa kontennya kemungkinan besar berisi tentang: 
+
+1. Aktor individu maupun kelompok yang menjadi motor gerakan. Aktor individu misalnya Wayan Gendo Suardana (@gendovara). Sementara aktor kelompok misalnya ForBALI. Selain itu, gerakan juga didukung oleh DESA ADAT. 
+2. Aktor individu dan kelompok yang menjadi sasaran. Aktor individu yang teridentifikasi adalah Presiden yang mengeluarkan Perpres 51 tahun 2014 (@SBYudhoyono), presiden yang sedang menjabat (@jokowi), serta menteri kelautan dan perikanan (Susi). Selain itu, juga ada nama Gubernur Bali, Mangku Pastika dan konglomerat Tomy Winata. Aktor kelompok misalnya PT Tirta Wahana Internasional. Selain itu beberapa lembaga lain yang juga disebut di antaranya adalah DPRD, DPD, Komnas Ham. 
+3. Isu yang menjadi perhatian diantaranya adalah: Perpres 51 tahun 2014, Ijin pelaksanaan proyek, amdal. 
+4. Simbol yang digunakan para pendukung gerakan di antaranya: Konser mini, Ogoh-ogoh, Baliho.
+
+**Catatan: Sepertinya konten berita masih ada yang tercampur dengan kasus reklamasi di Jakarta**.
+
+
+```{r}
+names(media_data)
+
+media_data %>%
+  filter(str_detect(clean_text, "gendo")) %>%
+  select(konten_asli) %>%
+  head(n = 1) %>%
+  as.character()
+  
+#print(as.character(a))
+```
+

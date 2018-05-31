@@ -14,6 +14,7 @@
 # 10. Parameter = menunjukkan parameter yang digunakan untuk mendapatkan data
 
 # Library ----
+library(textclean)
 library(lubridate)
 library(tidyverse)
 library(tidytext)
@@ -37,13 +38,19 @@ glimpse(change_raw)
 change_raw <- change_raw %>%
   dplyr::mutate(is_duplicate = duplicated(tweets))
 
+head(change_raw$tweets, n = 10)
+
 # 2. user_all ===================================== 
 change_raw$user <- (gsub('[@]', ' ', change_raw$user))
 change_raw$tweets <- gsub("pic[^[:space:]]*", "", change_raw$tweets)
 change_raw$tweets <- gsub("http[^[:space:]]*", "", change_raw$tweets)
 change_raw$tweets <- gsub("https[^[:space:]]*", "", change_raw$tweets)
 
+head(change_raw$tweets, n = 10)
+
 change_raw$tweets <- gsub("([[:alnum:]])([^[:alnum:][:space:]_])", "\\1 \\2", change_raw$tweets)
+
+head(change_raw$tweets, n = 10)
 
 change_raw$user_all <- sapply(str_extract_all(change_raw$tweets, "(?<=@)[^\\s:]+", simplify = FALSE), paste, collapse=", ")
 
