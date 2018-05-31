@@ -1,21 +1,25 @@
 ---
-title: 'Laporan 1: Tweets' 'Mentioning @ChangeOrg_ID'
+title: 'Laporan 1: Tweets Mentioning @ChangeOrg_ID'
 author: "Ujang fahmi"
 date: "4/26/2018"
 output:
-  rmarkdown::pdf_document:
-    fig_caption: yes
-    includes:
-      in_header: setup markdown.tex
   html_notebook:
     number_sections: yes
     toc: yes
     toc_depth: 3
     toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+  word_document:
+    toc: yes
+    toc_depth: '3'
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.pos = "h")
+
+set.seed(2018)
 ```
 
 # Pendahuluan
@@ -24,7 +28,6 @@ Eksplorasi 1 dilakukan sebagai studi pendahuluan tentang wacana yang berkembang 
 Twit yang memention akun resmi milik **Change.org** dipilih sebagai langkah pertama untuk mengidentifikasi wacana yang berkembang. Berdasarkan wacana yang teridentifikasi dari data ini kemudian akan dipilih studi kasus untuk mendalami pengembangan sebuah nilai yang dilakukan oleh warga net secara virtual (di dunia maya).
 
 ```{r}
-# Runing RJava
 if (Sys.info()['sysname'] == 'Darwin') {
   libjvm <- paste0(system2('/usr/libexec/java_home',stdout = TRUE)[1],'/jre/lib/server/libjvm.dylib')
   message (paste0('Load libjvm.dylib from: ',libjvm))
@@ -44,6 +47,7 @@ library(wordcloud)
 library(igraph)
 library(ggraph)
 library(quanteda)
+library(kableExtra)
 ```
 
 ```{r}
@@ -108,8 +112,10 @@ Selain akun @ChangeOrg_ID, username Twitter yang menjadi pengirim twit terbanyak
 ```{r}
 twit_to_change %>%
   filter(str_detect(user, "ChangeOrg_ID")) %>%
+  arrange(desc(ret_count)) %>%
   select(tweets) %>%
-  head(n = 2) %>% print(tweets)
+  head(n = 5) %>% 
+  print(tweets)
 ```
 
 Sementara twit yang dikirim oleh akun lain, contohnya dapat dilihat di bawah ini. Misalnya di sini kita ingin melihat oleh pengirim terbanyak kedua, yaitu akun **@wijayalabs**. 
@@ -154,53 +160,16 @@ Tagar diekstrak dari kolom `tweets` yang selanjutnya diletakan dalam kolom `hash
 Tagar dibagi menjadi empat periode karena pada tahun 2018 tagarnya terlalu sedikit. 
 
 ```{r, fig.cap="Tagar yang digunakan"}
-tagar_periode1 <- twit_to_change %>%
-  filter(periode == "periode_1") %>%
-  select(hashtag, tag_count) %>%
+hashtag <- twit_to_change %>%
   filter(tag_count >= 1) %>%
-  unnest_tokens(tagar, hashtag) %>%
+  select(hashtag, tag_count, periode) %>%
+  unnest_tokens(tagar, hashtag, token = "words") %>%
+  group_by(periode) %>%
   count(tagar, sort = TRUE)
 
-tagar_periode2 <- twit_to_change %>%
-  filter(periode == "periode_2") %>%
-  select(hashtag, tag_count) %>%
-  filter(tag_count >= 1) %>%
-  unnest_tokens(tagar, hashtag) %>%
-  count(tagar, sort = TRUE)
+hashtag$periode <- gsub("\\bperiode_5\\b", "periode_4", hashtag$periode)
 
-tagar_periode3 <- twit_to_change %>%
-  filter(periode == "periode_3") %>%
-  select(hashtag, tag_count) %>%
-  filter(tag_count >= 1) %>%
-  unnest_tokens(tagar, hashtag) %>%
-  count(tagar, sort = TRUE)
-
-tagar_periode4 <- twit_to_change %>%
-  filter(periode == "periode_4") %>%
-  select(hashtag, tag_count) %>%
-  filter(tag_count >= 1) %>%
-  unnest_tokens(tagar, hashtag) %>%
-  count(tagar, sort = TRUE)
-
-tagar_periode5 <- twit_to_change %>%
-  filter(periode == "periode_5") %>%
-  select(hashtag, tag_count) %>%
-  filter(tag_count >= 1) %>%
-  unnest_tokens(tagar, hashtag) %>%
-  count(tagar, sort = TRUE)
-
-tagar_periode <- bind_rows(tagar_periode1 %>%
-                             mutate(periode = "periode_1"), 
-                           tagar_periode2 %>%
-                             mutate(periode = "periode_2"), 
-                           tagar_periode3 %>%
-                             mutate(periode = "periode_3"),
-                           tagar_periode4 %>%
-                             mutate(periode = "periode_4"),
-                           tagar_periode5 %>%
-                             mutate(periode = "periode_4"))
-
-tagar_periode %>%
+hashtag %>%
   group_by(periode) %>%
   top_n(10, n) %>%
   ggplot(aes(reorder(tagar, n), n, fill = periode)) +
@@ -234,36 +203,51 @@ Pasangan kata yang paling banyak muncul dalam twit adalah **teluk benua**. Kemun
 ## TF-IDF
 
 ```{r, fig.cap="TF-IDF bigram per periode"}
-twit_words <- twit_to_change %>%
-  filter(is_duplicate == FALSE) %>%
-  filter(word_count >= 2) %>%
-  select(clean_text, periode) %>%
-  group_by(periode) %>%
-  unnest_tokens(kata, clean_text, token = "ngrams", n = 2) %>%
-  count(kata, sort = TRUE)
 
-total_words <- twit_words %>% 
-  group_by(periode) %>% 
-  summarize(total = sum(n))
+# Fungsi untuk membuat tf idf dari data frame
+tfidf_generator <- function(data1, plot = T) {
+  twit_words <- data1 %>%
+    filter(is_duplicate == FALSE) %>%
+    filter(word_count >= 2) %>%
+    select(clean_text, periode) %>%
+    group_by(periode) %>%
+    unnest_tokens(kata, clean_text, token = "ngrams", n = 2) %>%
+    count(kata, sort = TRUE)
+  # calculate all words per periode
+  total_words <- twit_words %>% 
+    group_by(periode) %>% 
+    summarize(total = sum(n))
+  # combining 
+  twit_words <- left_join(twit_words, total_words)
+  #tf-idf calculation
+  twit_words <- twit_words %>%
+    bind_tf_idf(kata, periode, n) %>%
+    arrange(desc(tf_idf))
+  # get top tf-idf 
+  top_terms <- twit_words  %>%
+    group_by(periode) %>%
+    top_n(10, tf_idf) %>%
+    ungroup() %>% 
+    arrange(kata, -tf_idf)
+  
+  if(plot == T){
+    # plot the top ten terms for each topic in order
+    top_terms %>% # take the top terms
+      mutate(term = reorder(kata, tf_idf)) %>% # sort terms by beta value 
+      ggplot(aes(term, tf_idf, fill = factor(term))) + # plot beta by theme
+      geom_col(show.legend = FALSE) + # as a bar plot
+      facet_wrap(~ periode, scales = "free") + # which each topic in a seperate plot
+      labs(x = NULL, y = "tf-idf") + # no x label, change y label 
+      coord_flip() # turn bars sideways
+  }else{ 
+    # if the user does not request a plot
+    # return a list of sorted terms instead
+    return(top_terms)
+  }
+  
+}
 
-twit_words <- left_join(twit_words, total_words)
-
-twit_words <- twit_words %>%
-  bind_tf_idf(kata, periode, n) %>%
-  arrange(desc(tf_idf))
-
-# Visualisasi tf-idf
-twit_words %>%
-  arrange(desc(tf_idf)) %>%
-  mutate(kata = factor(kata, levels = rev(unique(kata)))) %>% 
-  group_by(periode) %>% 
-  top_n(7) %>% 
-  ungroup %>%
-  ggplot(aes(reorder(kata,tf_idf), tf_idf, fill = periode)) +
-  geom_col(show.legend = FALSE) +
-  facet_wrap(~periode, ncol = 2, scales = "free") + 
-  labs(x = "Bigram", y = "Value") +
-  coord_flip()
+tfidf_generator(twit_to_change, plot = T)
 ```
 
 Di periode 1 bigram yang dianggap paling penting salah satunya adalah benua ubah dan ubah perpres. Hal ini berkaitan dengan adanya perpres yang juga terkait dengan teluk benua seperti dapat dilihat pada twit berikut.
@@ -291,26 +275,20 @@ bigram_tm <- function(input_text, # should be a columm from a dataframe
   
   # function for creating bigram in the DTM
   BigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min=2, max=2))
-  # you can explore which term combination gave the most interpretable topic for you
-  # by changing numbers inside Weka_control
-  
   DTM <- DocumentTermMatrix(Corpus, control=list(tokenize=BigramTokenizer))
-  
-  # remove any empty rows in our document term matrix (if there are any 
-  # we'll get an error when we try to run our LDA)
-  unique_indexes <- unique(DTM$i) # get the index of each unique value
-  DTM <- DTM[unique_indexes,] # get a subset of only those indexes
+  unique_indexes <- unique(DTM$i)
+  DTM <- DTM[unique_indexes,]
   
   # preform LDA & get the words/topic in a tidy text format
   lda <- LDA(DTM, k = number_of_topics, control = list(seed = 1234))
   topics <- tidy(lda, matrix = "beta")
   
   # get the top ten terms for each topic
-  top_terms <- topics  %>% # take the topics data frame and..
-    group_by(topic) %>% # treat each topic as a different group
-    top_n(10, beta) %>% # get the top 10 most informative words
-    ungroup() %>% # ungroup
-    arrange(topic, -beta) # arrange words in descending informativeness
+  top_terms <- topics  %>%
+    group_by(topic) %>%
+    top_n(10, beta) %>%
+    ungroup() %>% 
+    arrange(topic, -beta)
   
   # if the user asks for a plot (TRUE by default)
   if(plot == T){

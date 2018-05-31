@@ -1,11 +1,8 @@
 ---
-title: 'Laporan 2: Twit tentang Teluk Benua'
+title: 'Laporan 2 Twit tentang Teluk Benua'
 author: "Ujang fahmi"
 date: "4/30/2018"
 output:
-  word_document:
-    toc: yes
-    toc_depth: '3'
   html_notebook:
     number_sections: yes
     toc: yes
@@ -450,7 +447,9 @@ tb_raw %>%
   arrange(desc(ret_count)) %>%
   select(tweets) %>%
   head(n = 5) %>% 
-  print()
+  print() %>%
+  kable() %>%
+  kable_styling()
 ```
 Selain dengan melakukan aksi demonstrasi, penolakan reklamasi juga dilakukan melalui aksi konser. Dalam hal ini, konser disebut sebagai konser bali not for sale yang juga menjadi salah satu tagar. Namun jika dilihat berdasarkan waktu keberadaannya, tagar ini digunakan lebih dulu dibanding tagar balitolakreklamasi. Dengan demikian, dapat diketahui bahwa gerakan sosial ini berusaha menggunakan kegiatan-kegiatan seni sebagai salah satu aksinya. 
 

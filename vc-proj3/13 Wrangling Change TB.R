@@ -10,11 +10,12 @@ library(tidyverse)
 
 # Data ----
 # petisi 1
+dirwd <- paste(getwd(),"/wrangled data proj-3/",sep='')
 petisi1 <- read.csv(paste(dirwd,"change-segera cabut.csv", sep=''), header = TRUE, sep = ';', stringsAsFactors = FALSE)
 # petisi 2
 petisi2 <- read.csv(paste(dirwd,"change-pak jokowi.csv", sep=''), header = TRUE, sep = ';', stringsAsFactors = FALSE)
 # petisi 3
-petisi3 <- read.csv(paste(dirwd,"change-segera cabut.csv", sep=''), header = TRUE, sep = ';', stringsAsFactors = FALSE)
+petisi3 <- read.csv(paste(dirwd,"change-revoke.csv", sep=''), header = TRUE, sep = ';', stringsAsFactors = FALSE)
 
 petisi_tb <- bind_rows(petisi1 %>%
                          mutate(judul= "petisi_1"),
@@ -78,7 +79,7 @@ tweet_cleaner2 <- function(input_text) # nama kolom yang akan dibersihkan
   stopwords <- c(stopwords, stopwords())
   corpusku <- tm_map(corpusku, removeWords, stopwords)
   #kata khusus yang dihapus
-  corpusku <- tm_map(corpusku, removeWords, c("yg", "yg", "n", "hemmmmmm", "adala", "adalah", "aj", "aje", "aka", "menandatangani", "ku", "sdh", "dr", "udah", "gw", "tsb", "dll", "sya", "say", "bli", "dlm", "orng", "ok", "deh", "man", "msh", "thn", "nggak", "skrg", "yth", "balii", "dpt"))
+  corpusku <- tm_map(corpusku, removeWords, c("yg", "yg", "n", "hemmmmmm", "adala", "adalah", "aj", "aje", "aka", "menandatangani", "ku", "sdh", "dr", "udah", "gw", "tsb", "dll", "sya", "say", "bli", "dlm", "orng", "ok", "deh", "man", "msh", "thn", "nggak", "skrg", "yth", "balii", "dpt", "teluk", "benoa"))
   corpusku <- tm_map(corpusku, stripWhitespace)
   #removing white space in the begining
   rem_spc_front <- function(x) gsub("^[[:space:]]+", "", x)

@@ -86,6 +86,7 @@ tb_media$konten <- replace_white(tb_media$konten) # replacing white space
 tb_media$konten <- add_comma_space(tb_media$konten)
 tb_media$konten <- replace_symbol(tb_media$konten)
 tb_media$konten <- replace_non_ascii(tb_media$konten, remove.nonconverted = TRUE)
+
 #tb_media$konten <- gsub("((?:\b| )?([.,:;!?()]+)(?: |\b)?)", " \\1 ", tb_media$konten, perl=T)
 tb_media$konten <- replace_white(tb_media$konten) # replacing white space
 
