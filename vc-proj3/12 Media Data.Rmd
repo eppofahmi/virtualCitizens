@@ -33,7 +33,6 @@ if (Sys.info()['sysname'] == 'Darwin') {
   dyn.load(libjvm)
 }
 
-library(googledrive)
 library(ggplot2)
 library(tidyverse)
 library(tidytext)
@@ -42,6 +41,8 @@ library(corrgram)
 library(tm)
 library(RWeka)
 library(topicmodels)
+library(googledrive)
+library(SnowballC)
 ```
 
 ```{r}
@@ -50,6 +51,7 @@ media_data <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download
 ```
 
 ```{r}
+
 media_data %>%
   select(tanggal, media) %>% 
   separate(tanggal, into = c("tahun", "bulan", "tanggal"), sep = "-") %>%
@@ -59,6 +61,7 @@ media_data %>%
   geom_col() + theme(legend.position="top") +
   ggtitle("Jumlah pemeberitaan tentang reklamasi") +
   labs(x = "Tahun", y = NULL)
+
 ```
 Dari total 275 artikel berita, porsi pemberitaan paling banyak berada pada tahun 2016. Media nasional yang selalu membuat pemberitaan terkait denga BTR adalah tempo, sedangkan media lokalnya adalah beritabali. Hal ini sedikit berbeda jika dibandingkan dengan jumlah unggah media sosial yang mengalami puncaknya pada pertangahan tahun 2014 seperti dapat dilihat pada gambar di bawah ini. 
 
@@ -318,6 +321,8 @@ media_data %>%
 ```
 
 
+# Eksplorasi per tahun 
+
 **Skrip untuk membuat data perperiode berdasar tahun:**
 
 ```{r}
@@ -339,11 +344,169 @@ media2018 <- media_data %>%
   filter(tahun == 2018)
 ```
 
-Pada prinsipinya, aku membagi kolom tanggal yang berisi informasi tentang kapan berita tersebut diterbitkan menjadi tingga kolom, yaitu tahun, bulan, dan tanggal (baris kedua). Lalu setelah itu, aku memfilter data berdasarkan kolom tahun. Udah itu aja. Sementara skrip di bawah ini digunakan untuk memfilter antar tahun misalnya 2014 - 2015
+Pada prinsipinya, aku membagi kolom tanggal yang berisi informasi tentang kapan berita tersebut diterbitkan menjadi tingga kolom, yaitu tahun, bulan, dan tanggal (baris kedua). Lalu setelah itu, aku memfilter data berdasarkan kolom tahun. Udah itu aja. Sementara skrip di bawah ini digunakan untuk memfilter antar tahun misalnya 2014 - 2015.
+
+# tf-idf periode 1 
 
 ```{r}
-mediaAntara <- media_data %>%
-  separate(tanggal, into = c("tahun", "bulan", "tanggal")) %>%
-  filter(tahun == 2014 | tahun == 2015)
+media2014_words <- media2014 %>%
+  group_by(media) %>%
+  unnest_tokens(kata, clean_text, token = "ngrams", n = 3) %>%
+  count(kata, sort = TRUE)
+
+total2014_media <- media2014_words %>% 
+  group_by(media) %>% 
+  summarise(total = sum(n))
+
+media2014_words <- left_join(media2014_words, total2014_media)
+rm(total2014_media)
+
+media2014_words <- media2014_words %>%
+  bind_tf_idf(kata, media, n) %>%
+  arrange(desc(tf_idf))
+
+# Visualisasi tf-idf
+media2014_words %>%
+  arrange(desc(tf_idf)) %>%
+  mutate(kata = factor(kata, levels = rev(unique(kata)))) %>% 
+  group_by(media) %>% 
+  top_n(7) %>% 
+  ungroup %>%
+  ggplot(aes(reorder(kata,tf_idf), tf_idf, fill = media)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~media, ncol = 2, scales = "free") + 
+  labs(x = "Bigram", y = "Value") +
+  coord_flip()
+```
+
+# tf-idf periode 2
+
+```{r}
+media2015_words <- media2015 %>%
+  group_by(media) %>%
+  unnest_tokens(kata, clean_text, token = "ngrams", n = 2) %>%
+  count(kata, sort = TRUE)
+
+total2015_media <- media2015_words %>% 
+  group_by(media) %>% 
+  summarise(total = sum(n))
+
+media2014_words <- left_join(media2015_words, total2015_media)
+rm(total2015_media)
+
+media2015_words <- media2015_words %>%
+  bind_tf_idf(kata, media, n) %>%
+  arrange(desc(tf_idf))
+
+# Visualisasi tf-idf
+media2015_words %>%
+  arrange(desc(tf_idf)) %>%
+  mutate(kata = factor(kata, levels = rev(unique(kata)))) %>% 
+  group_by(media) %>% 
+  top_n(5) %>% 
+  ggplot(aes(reorder(kata,tf_idf), tf_idf, fill = media)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~media, ncol = 2, scales = "free") + 
+  labs(x = "Bigram", y = "Value") +
+  coord_flip()
+```
+
+# tf-idf periode 3
+
+```{r}
+media2016_words <- media2016 %>%
+  group_by(media) %>%
+  unnest_tokens(kata, clean_text, token = "ngrams", n = 2) %>%
+  count(kata, sort = TRUE)
+
+total2016_media <- media2016_words %>% 
+  group_by(media) %>% 
+  summarise(total = sum(n))
+
+media2016_words <- left_join(media2016_words, total2016_media)
+rm(total2016_media)
+
+media2016_words <- media2016_words %>%
+  bind_tf_idf(kata, media, n) %>%
+  arrange(desc(tf_idf))
+
+# Visualisasi tf-idf
+media2016_words %>%
+  arrange(desc(tf_idf)) %>%
+  mutate(kata = factor(kata, levels = rev(unique(kata)))) %>% 
+  group_by(media) %>% 
+  top_n(7) %>% 
+  ungroup %>%
+  ggplot(aes(reorder(kata,tf_idf), tf_idf, fill = media)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~media, ncol = 2, scales = "free") + 
+  labs(x = "Bigram", y = "Value") +
+  coord_flip()
+```
+
+# tf-idf periode 4
+
+```{r}
+media2017_words <- media2017 %>%
+  group_by(media) %>%
+  unnest_tokens(kata, clean_text, token = "ngrams", n = 2) %>%
+  count(kata, sort = TRUE)
+
+total2017_media <- media2017_words %>% 
+  group_by(media) %>%
+  summarise(total = sum(n))
+
+media2017_words <- left_join(media2017_words, total2017_media)
+rm(total2017_media)
+
+media2017_words <- media2017_words %>%
+  bind_tf_idf(kata, media, n) %>%
+  arrange(desc(tf_idf))
+
+# Visualisasi tf-idf
+media2017_words %>%
+  arrange(desc(tf_idf)) %>%
+  mutate(kata = factor(kata, levels = rev(unique(kata)))) %>% 
+  group_by(media) %>% 
+  top_n(7) %>% 
+  ungroup %>%
+  ggplot(aes(reorder(kata,tf_idf), tf_idf, fill = media)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~media, ncol = 2, scales = "free") + 
+  labs(x = "Bigram", y = "Value") +
+  coord_flip()
+```
+
+# tf-idf periode 5
+
+```{r}
+media2018_words <- media2018 %>%
+  group_by(media) %>%
+  unnest_tokens(kata, clean_text, token = "ngrams", n = 2) %>%
+  count(kata, sort = TRUE)
+
+total2018_media <- media2018_words %>% 
+  group_by(media) %>% 
+  summarise(total = sum(n))
+
+media2018_words <- left_join(media2018_words, total2018_media)
+rm(total2018_media)
+
+media2018_words <- media2018_words %>%
+  bind_tf_idf(kata, media, n) %>%
+  arrange(desc(tf_idf))
+
+# Visualisasi tf-idf
+media2018_words %>%
+  arrange(desc(tf_idf)) %>%
+  mutate(kata = factor(kata, levels = rev(unique(kata)))) %>%
+  group_by(media) %>%
+  top_n(7) %>%
+  ungroup %>%
+  ggplot(aes(reorder(kata,tf_idf), tf_idf, fill = media)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~media, ncol = 2, scales = "free") + 
+  labs(x = "Bigram", y = "Value") +
+  coord_flip()
 ```
 
