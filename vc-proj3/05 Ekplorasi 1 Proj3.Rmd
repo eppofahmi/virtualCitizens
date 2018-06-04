@@ -1,5 +1,5 @@
 ---
-title: 'Laporan 1: Tweets Mentioning @ChangeOrg_ID'
+title: 'Laporan 1 - Tweets Mentioning @ChangeOrg_ID'
 author: "Ujang fahmi"
 date: "4/26/2018"
 output:
@@ -113,9 +113,10 @@ Selain akun @ChangeOrg_ID, username Twitter yang menjadi pengirim twit terbanyak
 twit_to_change %>%
   filter(str_detect(user, "ChangeOrg_ID")) %>%
   arrange(desc(ret_count)) %>%
-  select(tweets) %>%
+  select(user, date, tweets) %>%
   head(n = 5) %>% 
-  print(tweets)
+  kable() %>%
+  kable_styling()
 ```
 
 Sementara twit yang dikirim oleh akun lain, contohnya dapat dilihat di bawah ini. Misalnya di sini kita ingin melihat oleh pengirim terbanyak kedua, yaitu akun **@wijayalabs**. 
@@ -123,8 +124,9 @@ Sementara twit yang dikirim oleh akun lain, contohnya dapat dilihat di bawah ini
 ```{r}
 twit_to_change %>%
   filter(str_detect(user, "wijayalabs")) %>%
-  select(tweets) %>%
-  head(n = 2) %>% print(tweets)
+  select(user, date, tweets) %>%
+  head(n = 2) %>% kable() %>%
+  kable_styling()
 ```
 
 Dari gambar dan contoh twit di atas, dapat dilihat bahwa twit yang memention akun @ChangeOrg_ID digunakan untuk mengampanyekan petisi yang ada di laman change.org. Sementara jika dilihat dari keselurahan akun Twitter yang ada dalam twit komposisinya dapat dilihat pada gambar di bawah ini. Di mana sekamin tinggi berarti semakin sering username tersebut disebut oleh pengguna twitter dalam twit yang memention akun parameter. 
@@ -145,9 +147,11 @@ Sementara jika dilihat dari username yang terlibat seperti pada gambar di atas, 
 
 ```{r}
 twit_to_change %>%
-  select(tweets) %>%
   dplyr::filter(grepl('@SBYudhoyono', tweets)) %>%
-  head(n = 2)
+  select(user, date, tweets) %>%
+  head(n = 5)%>%
+  kable() %>%
+  kable_styling()
 ```
 
 # Tagar, Term, TF-IDF
@@ -236,7 +240,7 @@ tfidf_generator <- function(data1, plot = T) {
       mutate(term = reorder(kata, tf_idf)) %>% # sort terms by beta value 
       ggplot(aes(term, tf_idf, fill = factor(term))) + # plot beta by theme
       geom_col(show.legend = FALSE) + # as a bar plot
-      facet_wrap(~ periode, scales = "free") + # which each topic in a seperate plot
+      facet_wrap(~ periode, scales = "free", ncol = 2) + # which each topic in a seperate plot
       labs(x = NULL, y = "tf-idf") + # no x label, change y label 
       coord_flip() # turn bars sideways
   }else{ 
@@ -256,8 +260,9 @@ Di periode 1 bigram yang dianggap paling penting salah satunya adalah benua ubah
 twit_to_change %>%
   filter(is_duplicate == FALSE) %>%
   filter(str_detect(clean_text, "benoa ubah")) %>%
-  select(tweets) %>%
-  head(n = 1) %>% print(tweets)
+  select(user, date, tweets) %>%
+  head(n = 3) %>% 
+  kable() %>% kable_styling()
 ```
 
 # Topic modelling

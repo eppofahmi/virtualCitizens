@@ -1,8 +1,11 @@
 ---
-title: 'Laporan 2 Twit tentang Teluk Benua'
+title: "Laporan 2 - Twit tentang Teluk Benua"
 author: "Ujang fahmi"
 date: "4/30/2018"
 output:
+  word_document:
+    toc: yes
+    toc_depth: '3'
   html_notebook:
     number_sections: yes
     toc: yes
@@ -42,6 +45,7 @@ library(ggraph)
 library(quanteda)
 library(googledrive)
 library(textclean)
+library(kableExtra)
 ```
 
 
@@ -70,8 +74,9 @@ tb_raw$tweets <- replace_non_ascii(tb_raw$tweets, remove.nonconverted = TRUE)
 tb_raw %>%
   group_by(is_duplicate) %>%
   count(is_duplicate) %>%
-  summarise(n) %>%
-  print()
+  summarise(jumlah = n) %>%
+  kable() %>%
+  kable_styling()
 ```
 
 Dari total **82.616** twit terdapat **13.603** twit yang merupakan twit duplikat atau memiliki konten yang sama. Oleh karena itu, dalam eksplorasi selanjutnya hanya akan menggunakan **69.013** twit. Distribusi twit tersebut dapat dilihat pada gambar di bawah ini.
@@ -93,7 +98,9 @@ Twit dibagi menjadi tiga periode waktu sesuai dengan alur kejadian di darat. Per
 ```{r}
 tb_raw %>%
   group_by(parameter) %>%
-  count(periode)
+  count(periode) %>%
+  kable() %>%
+  kable_styling()
 ```
 
 # Analisis Aktor
@@ -224,9 +231,10 @@ tb_raw %>%
   filter(is_duplicate == FALSE) %>%
   filter(str_detect(tweets, "#KecewaAmaSusi")) %>%
   arrange(desc(ret_count)) %>%
-  select(tweets) %>%
+  select(user, date, tweets) %>%
   head(n = 5) %>% 
-  print()
+  kable() %>%
+  kable_styling()
 ```
 
 Twit di atas menunjukkan twit-twit yang memiliki tagar #KecewaAmaSusi dan diurutkan berdasarkan jumlah retweet terbanyak. Isi dari twit secara seklias dapat menggambarkan bahwa twit diunggah sebagai respons terhadap sikap menteri Susi terkait dengan reklamasi yang mereka hadapi. Selain itu, di sana juga mereka menyatakan bahwa pilihannya hanya menolak reklamasi. 
@@ -285,9 +293,10 @@ tb_raw %>%
   filter(is_duplicate == FALSE) %>%
   filter(str_detect(tweets, "Tv")) %>%
   arrange(desc(ret_count)) %>%
-  select(tweets) %>%
+  select(user, date, tweets) %>%
   head(n = 5) %>% 
-  print()
+  kable() %>%
+  kable_styling()
 ```
 **Twit dengan kata kunci kompas tv**
 ```{r}
@@ -295,9 +304,10 @@ tb_raw %>%
   filter(is_duplicate == FALSE) %>%
   filter(str_detect(tweets, "Kompas TV")) %>%
   arrange(desc(ret_count)) %>%
-  select(tweets) %>%
+  select(user, date, tweets) %>%
   head(n = 5) %>% 
-  print()
+  kable() %>%
+  kable_styling()
 ```
 
 ## Tf-idf
@@ -344,9 +354,10 @@ tb_raw %>%
   filter(periode == "periode_1") %>%
   filter(!str_detect(tweets, "RT")) %>%
   filter(str_detect(clean_text, "dprd berperang")) %>%
-  select(tweets) %>%
+  select(user, date, tweets) %>%
   head(n = 5) %>% 
-  print()
+  kable() %>%
+  kable_styling()
 ```
 Sementara dalam periode dua, kita menemukan term yang cukup unik yaity **ve fooled**. Tanpa membaca lebih jauh term tersebut susah untuk diinterpretasikan. Untuk itu, beberapa twit di bawah ini mungkin dapat memberikan gambaran tentang isi twit dengan kata tersebut. 
 
@@ -357,9 +368,10 @@ tb_raw %>%
   filter(!str_detect(tweets, "RT")) %>%
   arrange(desc(ret_count)) %>%
   filter(str_detect(clean_text, "ve fooled")) %>%
-  select(tweets) %>%
+  select(user, date, tweets) %>%
   head(n = 5) %>% 
-  print()
+  kable() %>%
+  kable_styling()
 ```
 Dari twit di atas, ternyata term **ve fooled** berkaitan dengan keberadaan Cristiano Ronaldo ke Bali. Term ve sendiri ternyata berasal dari 've fooled atau u've been fooled. Dengan kata lain, melalui term tersebut kita dapat mengetahui bahwa warga net menganggap Cristiano telah dibohongi oleh akun yang juga ditunjukkan dalam twit tersebut.
 
@@ -372,11 +384,11 @@ tb_raw %>%
   filter(!str_detect(tweets, "RT")) %>%
   arrange(desc(ret_count)) %>%
   filter(str_detect(clean_text, "art event")) %>%
-  select(tweets) %>%
+  select(user, date, tweets) %>%
   head(n = 5) %>% 
-  print()
+  kable() %>%
+  kable_styling()
 ```
-
 
 ## Topic Modelling
 Topic modelling di sini dibagi menjadi tiga bagian berdasarkan periode waktu twit diunggah. Namun sebelumnya terlebih dahulu akan dilihat topic secara umum dari data. Topik-topik yang muncul per periode selanjutnya dapat dilihat pada gambar-gambara di bawah ini. Untuk keterangan lebih lanjut dengan topic modelling dengan algoritme LDA dapat dilihat [di sini](http://www.jmlr.org/papers/volume3/blei03a/blei03a.pdf). 
@@ -445,9 +457,8 @@ tb_raw %>%
   filter(is_duplicate == FALSE) %>%
   filter(!str_detect(tweets, "RT")) %>%
   arrange(desc(ret_count)) %>%
-  select(tweets) %>%
+  select(user, date, tweets) %>%
   head(n = 5) %>% 
-  print() %>%
   kable() %>%
   kable_styling()
 ```
@@ -463,9 +474,10 @@ tb_raw %>%
   filter(!str_detect(tweets, "RT")) %>%
   filter(str_detect(clean_text, "ribuan")) %>%
   arrange(desc(ret_count)) %>%
-  select(tweets) %>%
+  select(user, date, tweets) %>%
   head(n = 2) %>% 
-  print()
+  kable() %>%
+  kable_styling()
 ```
 
 ```{r}
@@ -474,9 +486,10 @@ tb_raw %>%
   filter(!str_detect(tweets, "RT")) %>%
   filter(str_detect(clean_text, "svara bumi")) %>%
   arrange(desc(ret_count)) %>%
-  select(tweets) %>%
-  head(n = 2) %>% 
-  print()
+  select(user, date, tweets) %>%
+  head(n = 5) %>% 
+  kable() %>%
+  kable_styling()
 ```
 
 ### Topik 3 - objek yang ditolak
@@ -489,9 +502,10 @@ tb_raw %>%
   filter(!str_detect(tweets, "RT")) %>%
   filter(str_detect(clean_text, "perpres")) %>%
   arrange(desc(ret_count)) %>%
-  select(tweets) %>%
+  select(user, date, tweets) %>%
   head(n = 5) %>% 
-  print()
+  kable() %>%
+  kable_styling()
 ```
 
 ### Topik 4 - pernyataan sikap melalui aksi
@@ -501,11 +515,12 @@ Sebelum lebih jauh, pada topik ke empat ada satu term yang mungkin cukup unik ya
 tb_raw %>%
   filter(is_duplicate == FALSE) %>%
   filter(!str_detect(tweets, "RT")) %>%
-  filter(str_detect(clean_text, "\\bpart don\\b")) %>%
+  filter(str_detect(clean_text, "part don")) %>%
   arrange(desc(ret_count)) %>%
-  select(tweets) %>%
+  select(user, date, tweets) %>%
   head(n = 5) %>% 
-  print()
+  kable() %>%
+  kable_styling()
 ```
 ```{r}
 tb_raw %>%
@@ -513,9 +528,10 @@ tb_raw %>%
   filter(!str_detect(tweets, "RT")) %>%
   filter(str_detect(clean_text, "\\bdon\\b")) %>%
   arrange(desc(ret_count)) %>%
-  select(tweets) %>%
+  select(user, date, tweets) %>%
   head(n = 3) %>% 
-  print()
+  kable() %>%
+  kable_styling()
 ```
 Topik keempat disini kurang lebih menyatakan kembali tujuan gerakan. Selain itu, topik 4 juga berkaitan dengan perjuangan yang yang dilakukan oleh warga net yang menjadi tuntutan yang harus dipenuhi. Dalam konteks ini, warga net pendukung gerakan menganggap bahwa pembatalan perperes 51 tahun 2014 dan reklamasi teluk benoa harus tercapai. Namun hingga saat ini (2018) tuntutan tersebut belum dapat dipenuhi oleh pemerintah. Mungkin karena itu pula, beragam aksi baik di dunia nyata maupun aksi di dunia maya melalui twit dengan tagar, atau penggunaan media sosial lain terus dilakukan. 
 
@@ -545,9 +561,10 @@ tb_raw %>%
   filter(is_duplicate == FALSE) %>%
   filter(periode == "periode_1") %>%
   filter(str_detect(clean_text, "hebat bener")) %>%
-  select(tweets) %>%
+  select(user, date, tweets) %>%
   head(n = 5) %>% 
-  print()
+  kable() %>%
+  kable_styling()
 ```
 Dari twit di atas dapat dilihat dengan jelas bahwa ajakan yang dilakukan terutama ditujukan pada wisatwan yang datang ke Bali, khususnya selebritis. Di masa awal sebuah gerakan hal ini cukup masuk akal untuk dilakukan, karena selebitis pada umumnya sudah memiliki *follower* yang banyak. Sehingga dengan terlibatnya selebritis dalam gerakan yang dalam konteks ini dapat dilakukan dengan hanya membuat twit dengan tagar BTR, tuntutan atau gaung gerakan tersebar lebih luas. 
 
@@ -577,9 +594,10 @@ tb_raw %>%
   filter(is_duplicate == FALSE) %>%
   filter(periode == "periode_2") %>%
   filter(str_detect(clean_text, "alasan mendukung")) %>%
-  select(tweets) %>%
+  select(user, date, tweets) %>%
   head(n = 5) %>% 
-  print()
+  kable() %>%
+  kable_styling()
 ```
 Adapun sepertinya pengungkapan alasan tersebut juga dipicu oleh "mungkin" siaran radio yang menanyakan tentang alasan mendukung gerakan BTR. Hal ini dapat dilihat pada twit terakhir di atas, yaitu twit yang diunggah oleh akun @menarafmbali dan di RT oleh warga net lainnya. 
 
@@ -594,9 +612,10 @@ tb_raw %>%
   filter(periode == "periode_2") %>%
   filter(!str_detect(tweets, "RT")) %>%
   filter(str_detect(tweets, "parade")) %>%
-  select(tweets) %>%
+  select(user, date, tweets) %>%
   head(n = 5) %>% 
-  print()
+  kable() %>%
+  kable_styling()
 ```
 Salah satu kegiatan Cristiano Ronaldo di Bali waktu itu adalah menanam mangrove. Di sana warga net menyuarakan bahwa melakukan reklamasi sama dengan merusak mangrove yang ditanam. Dalam periode ini pula, salah satu aksi yang kemudian diwujudkan di dunia nyata adalah dengan melakukan parade budaya. 
 
@@ -623,9 +642,10 @@ tb_raw %>%
   filter(periode == "periode_3") %>%
   filter(!str_detect(tweets, "RT")) %>%
   filter(str_detect(tweets, "Rolling Stone")) %>%
-  select(tweets, date) %>%
-  head(n = 10) %>% 
-  print()
+  select(user, date, tweets) %>%
+  head(n = 5) %>% 
+  kable() %>%
+  kable_styling()
 ```
 
 Topik ketiga pada peride terakhir juga menyinggung keberadaan desa adat yang juga dapat dikategorikan sebagai representasi budaya masyarakat bali. Dalam konteks ini, dukung desa adat terhadap BTR membuat gerakan bukan hanya menyentuh generasi milenial yang aktif di media sosial, tetapi juga masyarakat secara kesulurhan di Bali. 
@@ -636,9 +656,10 @@ tb_raw %>%
   filter(periode == "periode_3") %>%
   filter(!str_detect(tweets, "RT")) %>%
   filter(str_detect(clean_text, "desa adat")) %>%
-  select(tweets, date) %>%
-  head(n = 10) %>% 
-  print()
+  select(user, date, tweets) %>%
+  head(n = 5) %>% 
+  kable() %>%
+  kable_styling()
 ```
 
 Berdasarkan penuturan partisipan penelitian, revitalisasi merupakan salah satu propaganda pendukung reklamasi. Pada periode tiga ini kita juga dapat melihat bahwa revitalisasi dianggap sebagai kedok. Beberapa twit tentang hal tersebut adalah sebagai berikut. 
@@ -649,9 +670,10 @@ tb_raw %>%
   filter(periode == "periode_3") %>%
   filter(!str_detect(tweets, "RT")) %>%
   filter(str_detect(tweets, "revitalisasi")) %>%
-  select(tweets, date) %>%
+  select(user, date, tweets) %>%
   head(n = 10) %>% 
-  print()
+  kable() %>%
+  kable_styling()
 ```
 
 Terakhir, di sini kita juga dapat mengetahui bahwa setiap artis atau band yang main di konser BTR tidak dibayar sebagaimana di nyatakan oleh salah satu penggeraknya (JRX_SID) atau jerink yang juga merupakan drumer band SID. 
@@ -662,9 +684,11 @@ tb_raw %>%
   filter(periode == "periode_3") %>%
   filter(!str_detect(tweets, "RT")) %>%
   filter(str_detect(clean_text, "konser dibayar")) %>%
-  select(tweets, date) %>%
+  select(date, tweets) %>%
+  print() %>%
   head(n = 10) %>% 
-  print()
+  kable() %>%
+  kable_styling()
 ```
 
 Bagi mereka yang mau main di konser, resiko bukan hanya harus modal sendiri tapi juga dimusuhi, dan bahkan mungkin diputuskan kontraknya. Namun karena itu pula gerakan ini dapat dikatakan sebagai gerakan organik. Gerakan seperti ini "mungkin" hanya bisa muncul karena adanya kesadaran dengan tujuan gerakan. 

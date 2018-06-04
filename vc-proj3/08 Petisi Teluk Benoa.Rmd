@@ -3,6 +3,9 @@ title: "Laporan 3 Petisi Teluk Benoa"
 author: "Ujang fahmi"
 date: "5/4/2018"
 output:
+  word_document:
+    toc: yes
+    toc_depth: '3'
   html_notebook:
     number_sections: yes
     toc: yes
@@ -16,12 +19,6 @@ set.seed(2018)
 ```
 
 **Skrip dibawah ini untuk menginstall library baru yang akan digunakan. hanya perlu di run sekali saat terkoneksi dengan internet.**
-
-```{r}
-install.packages("kableExtra")
-install.packages("textclean")
-```
-
 
 # Pendahualuan
 Skrip ini dibuat untuk mengeksplorasi komentar yang dibuat oleh warga net di laman www.change.org. Terdapat dua jenis data yang digunakan di sini. Pertama, data yang memuat seluruh petisi yang memiliki kata kunci "teluk benoa". Kedua, komentar petisi yang memperoleh dukungan paling banyak. 

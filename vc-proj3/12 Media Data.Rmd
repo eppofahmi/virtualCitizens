@@ -1,5 +1,5 @@
 ---
-title: 'Laporan 3: BTR dalam Media'
+title: 'Laporan 3 BTR dalam Media'
 author: "Ujang fahmi"
 date: "5/20/2018"
 output:
@@ -8,20 +8,14 @@ output:
     toc: yes
     toc_depth: 3
     toc_float: yes
-  pdf_document:
-    toc: yes
-    toc_depth: '3'
   rmarkdown::pdf_document:
     fig_caption: yes
     includes:
       in_header: setup markdown.tex
-  word_document:
-    toc: yes
-    toc_depth: '3'
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.pos = "h")
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.pos = "h")
 
 set.seed(2018)
 ```
@@ -321,5 +315,35 @@ media_data %>%
   as.character()
   
 #print(as.character(a))
+```
+
+
+**Skrip untuk membuat data perperiode berdasar tahun:**
+
+```{r}
+# memfilter berita berdasar tahun
+media2014 <- media_data %>%
+  separate(tanggal, into = c("tahun", "bulan", "tanggal")) %>%
+  filter(tahun == 2014)
+media2015 <- media_data %>%
+  separate(tanggal, into = c("tahun", "bulan", "tanggal")) %>%
+  filter(tahun == 2015)
+media2016 <- media_data %>%
+  separate(tanggal, into = c("tahun", "bulan", "tanggal")) %>%
+  filter(tahun == 2016)
+media2017 <- media_data %>%
+  separate(tanggal, into = c("tahun", "bulan", "tanggal")) %>%
+  filter(tahun == 2017)
+media2018 <- media_data %>%
+  separate(tanggal, into = c("tahun", "bulan", "tanggal")) %>%
+  filter(tahun == 2018)
+```
+
+Pada prinsipinya, aku membagi kolom tanggal yang berisi informasi tentang kapan berita tersebut diterbitkan menjadi tingga kolom, yaitu tahun, bulan, dan tanggal (baris kedua). Lalu setelah itu, aku memfilter data berdasarkan kolom tahun. Udah itu aja. Sementara skrip di bawah ini digunakan untuk memfilter antar tahun misalnya 2014 - 2015
+
+```{r}
+mediaAntara <- media_data %>%
+  separate(tanggal, into = c("tahun", "bulan", "tanggal")) %>%
+  filter(tahun == 2014 | tahun == 2015)
 ```
 
