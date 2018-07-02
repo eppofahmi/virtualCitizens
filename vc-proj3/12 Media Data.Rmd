@@ -43,6 +43,7 @@ library(RWeka)
 library(topicmodels)
 library(googledrive)
 library(SnowballC)
+library(kableExtra)
 ```
 
 ```{r}
@@ -51,7 +52,6 @@ media_data <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download
 ```
 
 ```{r}
-
 media_data %>%
   select(tanggal, media) %>% 
   separate(tanggal, into = c("tahun", "bulan", "tanggal"), sep = "-") %>%
@@ -297,6 +297,7 @@ data_beritabali <- media_data %>%
 bigram_tm(data_beritabali$clean_text, plot = TRUE, number_of_topics = 2)
 ```
 
+
 # Penutup
 Dari media online dan beberapa analisis yang dilakukan dapat diketahui bahwa kontennya kemungkinan besar berisi tentang: 
 
@@ -378,6 +379,18 @@ media2014_words %>%
   labs(x = "Bigram", y = "Value") +
   coord_flip()
 ```
+
+```{r}
+# masyarakat memilih revitalisasi
+media2014 %>%
+  filter(str_detect(clean_text, "masyarakat memilih revitalisasi")) %>%
+  select(tanggal, media, konten_asli) %>%
+  kable() %>%
+  kable_styling()
+
+```
+
+
 
 # tf-idf periode 2
 
@@ -509,4 +522,100 @@ media2018_words %>%
   labs(x = "Bigram", y = "Value") +
   coord_flip()
 ```
+
+# tes fungsi tf-idf
+
+```{r}
+top_terms_by_topic_tfidf <- function(text_df, text_column, group_column, plot = T){
+  
+  group_column <- enquo(group_column)
+  text_column <- enquo(text_column)
+  # get the count of each word in each review
+  words <- text_df %>%
+    unnest_tokens(word, !!text_column) %>%
+    count(!!group_column, word) %>% 
+    ungroup()
+  
+  # get the number of words per text
+  total_words <- words %>% 
+    group_by(!!group_column) %>% 
+    summarize(total = sum(n))
+  
+  # combine the two dataframes we just made
+  words <- left_join(words, total_words)
+  
+  # get the tf_idf & order the words by degree of relevence
+  tf_idf <- words %>%
+    bind_tf_idf(word, !!group_column, n) %>%
+    select(-total) %>%
+    arrange(desc(tf_idf)) %>%
+    mutate(word = factor(word, levels = rev(unique(word))))
+  
+  if(plot == T){
+    group_name <- quo_name(group_column)
+    tf_idf %>% 
+      group_by(!!group_column) %>% 
+      top_n(10) %>% 
+      ungroup %>%
+      ggplot(aes(word, tf_idf, fill = as.factor(group_name))) +
+      geom_col(show.legend = FALSE) +
+      labs(x = NULL, y = "tf-idf") +
+      facet_wrap(reformulate(group_name), scales = "free") +
+      coord_flip()
+  }else{
+    # return the entire tf_idf dataframe
+    return(tf_idf)
+  }
+}
+
+top_terms_by_topic_tfidf(text_df = media_data, # dataframe
+                         text_column = clean_text, # column with text
+                         group_column = media, # column with topic label
+                         plot = T) # return a plot
+```
+
+```{r}
+# mengambil berita per sumber media
+
+library(kableExtra)
+
+media_data %>% # nama data 
+  filter(media == "kompas") %>% # memilih media dari kolom media
+  filter(media_1 == "FALSE") %>%
+  filter(str_detect(clean_text, "tanjung")) %>% # yang memiliki teks 'tanjung'
+  select(media, tanggal, konten_asli) %>% # menampilkan 'isi' dari kolom2 itu
+  head(n = 2) %>% # menampilkan 2 row
+  kable() %>% 
+  kable_styling() # 2 baris terakhir untuk membuat table
+```
+
+```{r}
+# mengambil berita per sumber media hanya dari tahun 2014
+
+library(kableExtra)
+
+media2014 %>% # nama data untuk data media yang sudah dibagi per tahun
+  filter(media == "tempo") %>% # memilih media dari kolom media
+  filter(media_1 == "FALSE") %>%
+  filter(str_detect(clean_text, "menolak")) %>% # yang memiliki teks 'tanjung'
+  select(media, tahun, bulan, tanggal, konten_asli) %>% # menampilkan 'isi' dari kolom2 itu
+  head(n = 2) %>% # menampilkan 2 row
+  kable() %>% 
+  kable_styling() # 2 baris terakhir untuk membuat table
+```
+
+```{r}
+tri_hita <- media_data %>%
+  filter(str_detect(clean_text, "tri hita karana")) %>%
+  select(tanggal, media, konten_asli, clean_text) %>%
+  unnest_tokens(kata, clean_text, token = "ngrams", n = 3, to_lower = FALSE) %>%
+  count(kata, sort = TRUE)
+
+media_data %>%
+  filter(str_detect(clean_text, "tri hita karana")) %>%
+  select(tanggal, media, konten_asli, clean_text) %>%
+  unnest_tokens(kata, clean_text, token = "ngrams", n = 3, to_lower = FALSE) %>%
+  count(kata, sort = TRUE)
+```
+
 

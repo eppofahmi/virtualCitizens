@@ -1,0 +1,230 @@
+---
+title: "Eksplorasi Media tentang Transportasi Online"
+author: "Ujang fahmi"
+date: "7/2/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.pos = "h")
+
+set.seed(2018)
+```
+
+# Library
+
+```{r}
+# Runing RJava
+if (Sys.info()['sysname'] == 'Darwin') {
+  libjvm <- paste0(system2('/usr/libexec/java_home',stdout = TRUE)[1],'/jre/lib/server/libjvm.dylib')
+  message (paste0('Load libjvm.dylib from: ',libjvm))
+  dyn.load(libjvm)
+}
+
+library(ggplot2)
+library(tidyverse)
+library(tidytext)
+library(Hmisc)
+library(tm)
+library(RWeka)
+library(topicmodels)
+library(googledrive)
+library(SnowballC)
+library(kableExtra)
+```
+
+# Data
+
+```{r}
+id_media <- "1hNGgygHzjGmKJDD3dbfJpQ833YoSVj_3" # cleaned username_all 
+media_data <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_media))
+```
+
+# Perbandingan jumlah berita
+Data diambil dari media daring dengan kata kunci "transportasi online." Sumber media yang digunakan adalah:
+
+1. tempo.co
+2. kompas.com
+3. detik.com
+
+```{r}
+# unrelated conten
+media_data <- media_data %>%
+  filter(!str_detect(judul, "\\bKe Bandara Naik Subway, Dandanan G-Dragon Mirip Teroris?\\b"))
+media_data <- media_data %>%
+  filter(!str_detect(judul, "\\bSelera Bule, Nikita Mirzani Tak Tertarik Pilot Tampan Mantan Pacar Kahiyang\\b"))
+media_data <- media_data %>%
+  filter(!str_detect(judul, "\\bNikita Mirzani Merasa Terbantu dengan Transportasi Online\\b"))
+
+media_data %>%
+  select(tanggal, media) %>% 
+  separate(tanggal, into = c("tahun", "bulan", "tanggal"), sep = "-") %>%
+  group_by(tahun) %>%
+  count(media) %>%
+  ggplot(aes(tahun, n, fill = media)) +
+  geom_col() + theme(legend.position="top") +
+  ggtitle("Jumlah pemeberitaan tentang transportasi online") +
+  labs(x = "Tahun", y = NULL)
+```
+
+# Perbandingan Frekuensi Term
+```{r}
+media_data %>%
+  select(clean_konten, media)%>%
+  unnest_tokens(kata, clean_konten, token = "ngrams", n = 2, to_lower = TRUE, 
+                drop = TRUE, collapse = NULL) %>%
+  group_by(media) %>%
+  count(kata, sort = TRUE) %>%
+  top_n(20) %>%
+  ggplot(aes(reorder(kata, n), n, fill = "media")) + geom_col(show.legend = FALSE) + 
+  coord_flip() + 
+  facet_wrap(~ media, scales = "free_y") +
+  ggtitle("Perbandingan term yang digunakan dalam berita") +
+  labs(x = "Bigram", y = "Jumlah kata")
+```
+Wacana yang berkembang dan dibahas media:
+
+1. Tempat/area/daerah (DKI JAKARTA)
+2. Undang-undang/UU No.108 tahun 2017/ peraturan menteri
+3. Kementrian dan Menteri perhubungan
+4. Blue Bird/taksi konvensional
+5. Kendaraan bermotor
+6. Tarif
+7. Aplikasi/Basis Aplikasi
+8. Pengemudi
+
+# Perbandingan TF-IDF
+Untuk mengetahui term yang "mungkin" jadi bingkau utama media tersebut dalam memberitakan transportasi online. Konfirmasi wacana di atas. 
+
+```{r}
+# unclear cleaning .... gossssssshhhh
+media_data$clean_konten <- gsub("\\bonetrillionfivehundredandtwentyfivebillionsevenhundredandsixtyeightmillionninehundredandninetysixthousandfivehundredandninetyeight\\b", "", media_data$clean_konten)
+media_data$clean_konten <- gsub("\\gpt\\b", "", media_data$clean_konten)
+
+media_words <- media_data %>%
+  group_by(media) %>%
+  unnest_tokens(kata, clean_konten, token = "ngrams", n = 3) %>%
+  count(kata, sort = TRUE)
+
+total_media <- media_words %>% 
+  group_by(media) %>% 
+  summarise(total = sum(n))
+
+media_words <- left_join(media_words, total_media)
+
+media_words <- media_words %>%
+  bind_tf_idf(kata, media, n) %>%
+  arrange(desc(tf_idf))
+
+# Visualisasi tf-idf
+media_words %>%
+  arrange(desc(tf_idf)) %>%
+  mutate(kata = factor(kata, levels = rev(unique(kata)))) %>% 
+  group_by(media) %>% 
+  top_n(10) %>% 
+  ungroup %>%
+  ggplot(aes(reorder(kata,tf_idf), tf_idf, fill = media)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~media, ncol = 2, scales = "free_y") + 
+  labs(x = "Bigram", y = "TF-IDF") +
+  coord_flip()
+```
+
+- aktor pemerinta (Gub. dan Wagub DKI)
+- jalan merdeka? tempat/kantor apa?
+- undang-undang 22 tahun 2009
+- aturan angkutan online
+- tarif angkutan online
+- Igun Wicaksono adalah ketua PPT JDI (Perkumpulan Pengemudi Transposrtasi dan Jasa Daring Indonesia)
+- peran pemerintah
+
+
+# Kajian mendalam (Close Reading)
+
+```{r}
+media_data %>%
+  filter(str_detect(konten, "JDI")) %>% #masukkan kata kunci yang ingin di cari
+  select(konten, media, judul) %>%
+  filter(str_detect(media, "detik")) %>% # sumber berita dari kompas, bisa diganti "tempo" atau "detik"
+  head(n=10) %>% # jumlah berita yang dinginkan    
+  kable() %>%
+  kable_styling()
+```
+
+
+# Pemodelan Topik
+```{r}
+bigram_tm <- function(input_text, 
+                       plot = T, 
+                       number_of_topics = 4)
+{    
+  set.seed(2016)
+  Corpus <- VCorpus(VectorSource(input_text))
+  
+  BigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min=2, max=3))
+  DTM <- DocumentTermMatrix(Corpus, control=list(tokenize=BigramTokenizer))
+  unique_indexes <- unique(DTM$i)
+  DTM <- DTM[unique_indexes,]
+  lda <- LDA(DTM, k = number_of_topics, control = list(seed = 1234))
+  topics <- tidy(lda, matrix = "beta")
+  top_terms <- topics  %>% 
+    group_by(topic) %>% 
+    top_n(10, beta) %>%
+    ungroup() %>%
+    arrange(topic, -beta)
+  
+  # if the user asks for a plot (TRUE by default)
+  if(plot == T){
+    top_terms %>%
+      mutate(term = reorder(term, beta)) %>% 
+      ggplot(aes(term, beta, fill = factor(topic))) +
+      geom_col(show.legend = FALSE) + 
+      facet_wrap(~ topic, scales = "free") +
+      labs(x = NULL, y = "Beta") + 
+      coord_flip()
+  }else{ 
+    # if the user does not request a plot
+    # return a list of sorted terms instead
+    return(top_terms)
+  }
+}
+```
+
+## Topik dari tempo.co
+```{r}
+data_tempo <- media_data %>%
+  filter(media == "tempo") %>%
+  select(clean_konten)
+
+bigram_tm(data_tempo$clean_konten, plot = TRUE, number_of_topics = 2)
+```
+
+## Topik dari kompas.com
+```{r}
+data_kompas <- media_data %>%
+  filter(media == "kompas") %>%
+  select(clean_konten)
+
+bigram_tm(data_kompas$clean_konten, plot = TRUE, number_of_topics = 2)
+```
+
+## Topik dari Detik.com
+```{r}
+data_detik <- media_data %>%
+  filter(media == "detik") %>%
+  select(clean_konten)
+
+bigram_tm(data_detik$clean_konten, plot = TRUE, number_of_topics = 4)
+```
+
+# Kajian mendalam (Close Reading)
+
+```{r}
+media_data %>%
+  filter(str_detect(konten, "tarif taksi")) %>% #masukkan kata kunci yang ingin di cari
+  select(konten, media, judul) %>%
+  filter(str_detect(media, "tempo")) %>% # sumber berita dari kompas, bisa diganti "tempo" atau "detik"
+  head(n=10) %>% # jumlah berita yang dinginkan    
+  kable() %>%
+  kable_styling()
+```
