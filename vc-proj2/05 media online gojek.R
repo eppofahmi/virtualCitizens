@@ -124,7 +124,6 @@ media_term %>%
 
 rm(clean_konten, gojek_media)
 
-
 # put on txt per row ----
 to_txt <- media_data %>%
   select(judul, tanggal, media, konten)

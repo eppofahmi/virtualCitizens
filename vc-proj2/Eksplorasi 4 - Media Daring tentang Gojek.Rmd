@@ -2,12 +2,16 @@
 title: "Eksplorasi Media tentang Transportasi Online"
 author: "Ujang fahmi"
 date: "7/2/2018"
-output: html_document
+output: 
+  html_notebook:
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.pos = "h")
-
 set.seed(2018)
 ```
 
@@ -144,9 +148,9 @@ media_words %>%
 ```{r}
 media_data %>%
   filter(str_detect(konten, "JDI")) %>% #masukkan kata kunci yang ingin di cari
-  select(konten, media, judul) %>%
+  select(konten, media, judul, tanggal) %>%
   filter(str_detect(media, "detik")) %>% # sumber berita dari kompas, bisa diganti "tempo" atau "detik"
-  head(n=10) %>% # jumlah berita yang dinginkan    
+  head(n=2) %>% # jumlah berita yang dinginkan    
   kable() %>%
   kable_styling()
 ```
@@ -221,10 +225,10 @@ bigram_tm(data_detik$clean_konten, plot = TRUE, number_of_topics = 4)
 
 ```{r}
 media_data %>%
-  filter(str_detect(konten, "tarif taksi")) %>% #masukkan kata kunci yang ingin di cari
-  select(konten, media, judul) %>%
+  filter(str_detect(konten, "mitra")) %>% #masukkan kata kunci yang ingin di cari
+  select(konten, media, judul, tanggal) %>%
   filter(str_detect(media, "tempo")) %>% # sumber berita dari kompas, bisa diganti "tempo" atau "detik"
-  head(n=10) %>% # jumlah berita yang dinginkan    
+  head(n=2) %>% # jumlah berita yang dinginkan    
   kable() %>%
   kable_styling()
 ```
