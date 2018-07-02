@@ -181,6 +181,10 @@ names(twit_gojek)
 twit_gojek <- twit_gojek %>%
   select(sumber_data, parameter, date, time, periode, user, user_all, user_count, tweets,clean_text, word_count, hashtag, tag_count, is_duplicate, replying, fav_count, rep_count, ret_count, link)
 
+twit_gojek <- twit_gojek %>%
+  filter(is_duplicate == FALSE) %>%
+  filter(!user == "@poocongs")
+  
 write_csv(twit_gojek, path = "wrangled data proj-2/twit-gojek.csv")
 
 #11. net data ----

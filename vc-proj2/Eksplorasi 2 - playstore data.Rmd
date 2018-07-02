@@ -22,7 +22,6 @@ if (Sys.info()['sysname'] == 'Darwin') {
   dyn.load(libjvm)
 }
 
-
 library(lubridate)
 library(tidyverse)
 library(tidytext)
@@ -68,9 +67,10 @@ ps_gojek %>%
   group_by(aplikasi) %>%
   unnest_tokens(bigram, clean_text, token = "ngrams", n=2) %>%
   count(bigram, sort = TRUE) %>%
+  filter(!str_detect(bigram, "good good")) %>%
   top_n(10) %>%
   ggplot(aes(x = reorder(bigram, n), y = n, collour = "aplikasi")) + 
-  geom_col() + facet_wrap(~aplikasi) + coord_flip() + 
+  geom_col() + facet_wrap(~aplikasi, scales = "free_y") + coord_flip() + 
   labs( x = "Bigram", y = "Jumlah Bigram")
 ```
 
@@ -215,15 +215,26 @@ bigram_tm <- function(input_text, # should be a columm from a dataframe
 
 Berikut ini adalah term dengan probabilitas tertinggi sebagai topik yang dibahas dalam twit tentang gojek.   
 
+# Pemodelan Topik Komentar 
+## Pelanggan
+
 ```{r, fig.cap="Hasil topic modelling"}
 # execution
-tm_ps <- ps_gojek %>%
+tm_ps_costum <- ps_gojek %>%
+  filter(str_detect(aplikasi, "gojek_customer")) %>%
   select(date, clean_text, aplikasi)
 
-tm_ps_gojek <- bigram_tm(tm_ps$clean_text, number_of_topics = 2)
+tm_ps_gojek1 <- bigram_tm(tm_ps_costum$clean_text, number_of_topics = 2)
 tm_ps_gojek
 ```
 
-Secara umum, topik yang dibahas dalam komentar adalah tentang aplikasi dan permohonan untuk memperbaikinya. Permohonan tersebut disampaikan baik oleh kustomer maupun driver sebagai mitranya. 
+## Mitra
 
-Hal tersebut menunjukkan adanya interaksi dalam hubungan antara produsen (penyedia jasa) dalam hal ini PT GI, dengan kustomer dan mitra kerjanya. Di mana mereka bisa mendapatkan tilikan tentang apa yang diinginkan atau dibutuhkan oleh mitra dan kustomernya melalui komentar terhadap aplikasi di playstore. 
+```{r}
+tm_ps_mitra <- ps_gojek %>%
+  filter(str_detect(aplikasi, "gojek_driver")) %>%
+  select(date, clean_text, aplikasi)
+
+tm_ps_gojek <- bigram_tm(tm_ps_mitra$clean_text, number_of_topics = 2)
+tm_ps_gojek
+```
