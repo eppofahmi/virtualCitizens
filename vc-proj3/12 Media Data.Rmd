@@ -44,6 +44,7 @@ library(topicmodels)
 library(googledrive)
 library(SnowballC)
 library(kableExtra)
+library(plotly)
 ```
 
 ```{r}
@@ -70,7 +71,7 @@ tb_raw %>%
   group_by(date) %>% count(date) %>% arrange(date) %>%
   ggplot(aes(x = date, y = n)) + geom_line(show.legend = FALSE) + 
   geom_smooth(method = "gam") +
-  labs(x = "Tahun", y = "Jumlah Twit")
+  labs(x = "Tahun", y = "Media")
 ```
 Perbedaan tren tersebut secara tidak langsung dapat memunculkan asumi untuk membantah (menolak) adanya *echo chamber* antara media sosial dan media arus utama. Di mana media sosial cenderung mengikuti tren pemberitaan di media arus utama. 
 
