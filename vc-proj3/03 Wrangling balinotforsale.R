@@ -133,12 +133,15 @@ rm(clean_text)
 
 # 8. Periode =====================================
 # Periode dibagi berdasarkan tahun
-bns_raw <- bns_raw %>%
+bns_raw <- btr_raw %>%
   mutate(periode = case_when(
-    date >= "2012-01-01" & date <= "2014-03-31" ~ "periode_1",
-    date >= "2014-04-01" & date <= "2014-08-31" ~ "periode_2",
-    TRUE ~ "periode_3")) %>%
-  mutate(periode = factor(periode, levels = c("periode_1", "periode_2", "periode_3")))
+    date >= "2013-07-01" & date <= "2013-12-31" ~ "periode_1",
+    date >= "2014-01-01" & date <= "2014-12-31" ~ "periode_2",
+    date >= "2015-07-01" & date <= "2015-12-31" ~ "periode_3",
+    date >= "2016-04-01" & date <= "2016-12-31" ~ "periode_4",
+    date >= "2017-07-01" & date <= "2017-12-31" ~ "periode_5",
+    TRUE ~ "periode_6")) %>%
+  mutate(periode = factor(periode, levels = c("periode_1", "periode_2", "periode_3","periode_4","periode_5", "periode_6")))
 
 #9. Parameter pencarian======================
 bns_raw <- bns_raw %>%

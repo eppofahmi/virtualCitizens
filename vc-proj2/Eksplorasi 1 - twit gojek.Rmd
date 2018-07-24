@@ -9,24 +9,19 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+set.seed(2018)
 ```
 
-# Pendahuluan
-Data yang digunakan di sini diambil dengan menggunakan beberapa parameter, yaitu: 
+# Tentang Data
+Berdasarkan observasi awal, pembicara terkait dengan "gojek" dilakukan oleh warganet dalam beberapa kasus yang ditandai dengan tagar. Di sini tagar yang digunakan sebagai parameter pencarian adalah tagar-tagar berikut:
 
 1. tagar #savegojek
 2. tagar #savedrivergojek
 3. tagar #saveojekonline
 4. ceritan transportasi online timeline
 
-Tujuan ekplorasi adalah: 
-
-1. Memisahkan data yang dapat dianalisis dan yang tidak (duplicate dan atau kontennya tidak relevan)
-2. Mengetahui utama (jika ada)
-3. Mengetahui isi yang dibahas
-
-# Library
+Setelah melalui pra-promosesan, didapat **3040** twit yang dinilai bisa dianalisis lebih lanjut. Twit tersebut bukan merupakan twit duplikat, dan mengandung minimal 2 kata dalam satu twit setelah stopword dan beberapa elemen lainnya dihilangkan. Distribusi twit berdasarkan tagar dapat dilihat pada gambar berikut. 
 
 ```{r}
 # Runing RJava
@@ -36,15 +31,14 @@ if (Sys.info()['sysname'] == 'Darwin') {
   dyn.load(libjvm)
 }
 
-
-library(lubridate)
 library(tidyverse)
 library(tidytext)
+library(googledrive)
+library(lubridate)
 library(stringr)
 library(tm)
 library(reshape2)
 library(scales)
-library(AnomalyDetection)
 library(igraph)
 library(ggraph)
 library(topicmodels)
@@ -52,187 +46,172 @@ library(SnowballC)
 library(RWeka) 
 library(quanteda)
 library(ggplot2)
+library(knitr)
 ```
-
-# Import Data
 
 ```{r}
-dirwd <- paste(getwd(),"/wrangled data proj-2/",sep='')
-twit_gojek <- read.csv(paste(dirwd,"twit-gojek.csv",sep=''), 
-                     header = TRUE, sep = ",", stringsAsFactors = FALSE)
-```
+id_tw_gojek <- "1ALZxvnmISCHuRzawaP5K6FjUTN3Wy700"
+twit_gojek <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_tw_gojek))
 
-# Eksplorasi 1 - Perbandingan
-Data yang digunakan di sini bersumber dari beberapa parameter yang digunakan untuk scrapping. Gambar di bawah ini, menunjukkan perbandingan jumlah twit yang dihasilkan oleh masing-masing parameter. 
+twit_gojek <- twit_gojek %>%
+  filter(word_count >= 2)
+```
 
 ```{r, fig.cap="Perbandingan twit antar parameter"}
 twit_gojek %>%
   group_by(parameter) %>%
   count(parameter) %>%
   ggplot(aes(parameter, n)) + geom_col() +
+  ggtitle("Jumlah Twit Berdasarkan Tagar") +
   labs( x = "Parameter Pencarian", y = "Jumlah Twit")
 ```
+Berdasarkan gambar di atas diketahui bahwa tagar yang paling banyak digunakan untuk membahas tentang gojek adalah tagar #savegojek disusul #savedrivergojek dan twit yang ditujukan ke akun Twitter @CeritaTranspOL. Tagar #saveojekonline merupakan tagar yang sedikit digunakan. Selain tagar-tagar di atas, di dalam twit juga ada tagar lain yang digunakan. Berikut adalah 10 tagar yang paling sering digunakan dalam twit. 
 
-  >Sebagian besar (mayoritas data) berasal dari twit yang didapat dengan menggunakan parameter #savegojek
-
-Namun, data di atas masih kotor (ada yang duplicate dan tidak relevan). Salah satunya adalah twit yang diposting oleh akun @poocongs, di mana akun tersebut menggunakan tagar #savegojek dalam twitnya, namun isinya tidak membahas tentang gojek. Untuk itu, dalam gambar data akan dibersihkan terlebih dahulu dari: 
-
-1. twit duplicate
-2. twit dari akun @poocongs
-
-```{r, fig.cap="Perbandingan twit antar parameter setelah cleaning"}
+```{r}
 twit_gojek %>%
-  filter(is_duplicate == FALSE) %>%
-  filter(!user == "@poocongs") %>%
+  filter(tag_count >= 1) %>%
+  select(parameter, hashtag) %>%
+  unnest_tokens(tagar, hashtag, token = "words", to_lower = TRUE) %>%
   group_by(parameter) %>%
-  count(parameter) %>%
-  ggplot(aes(parameter, n)) + geom_col() +
-  labs( x = "Parameter Pencarian", y = "Jumlah Twit")
+  count(tagar, sort = TRUE) %>%
+  filter(!str_detect(tagar, "savedrivergojek")) %>%
+  filter(!str_detect(tagar, "saveojekonline")) %>%
+  filter(!str_detect(tagar, "savegojek")) %>%
+  filter(!str_detect(tagar, "eaa")) %>%
+  filter(!str_detect(tagar, "dwp2017")) %>%
+  filter(!str_detect(tagar, "ynwa")) %>%
+  filter(!str_detect(tagar, "transportasionline")) %>%
+  filter(!str_detect(tagar, "kumparannews")) %>%
+  filter(!str_detect(tagar, "akurapopo")) %>%
+  filter(!str_detect(tagar, "rameditwitter")) %>%
+  filter(!str_detect(tagar, "banjirjatihandap")) %>%
+  filter(!str_detect(tagar, "tiada2")) %>%
+  top_n(5) %>% ungroup %>%
+  ggplot(aes(reorder(tagar, n), n, fill = parameter)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~parameter, ncol = 2, scales = "free") + 
+  labs(x = "Tagar", y = "Jumlah Penggunaan") +
+  coord_flip()
 ```
+Gambar di atas menunjukkan bahwa tagar tidak selalu digunakan dalam twit. Di sini, twit yang didapat dengan parameter #saveojekonline dan yang memention @CeritatranspOL jarang menggunakan tagar. Sebaliknya, twit dengan tagar #svaedrivergojek dan #savegojek cenderung menggunakan tagar lain. Uniknya dalam tagar #savegojek yang seharunya merujuk pada "GOJEK", sebuah aplikasi dari PT GOJEK INDONESIA juga ada #savegrab dan #saveuber yang masing-masing digunakan kurang lebih sebanyak 58 dan 75 kali.
 
-Gambar di atas menunjukkan bahwa distribusi twit masih didominasi oleh tagar #savegojek. Namun dilihat dari segi jumlahnya, twit dengan tagar tersebut sudah menunurun dibanding sebelumnya.
+Kemungkinan melaui twit dengan tagar #savegojek warga net juga melihat uber dan grab juga perlu diselamatkan. Dengan kata lain, transportasi online perlu diselamatkan.
 
-# Eksplorasi 2 - Username
-Gambar di bawah ini digunakan untuk melihat username yang paling sering muncul dalam data. 
+# Nama akun dalam Twit
 
-```{r, fig.cap="Username pengirim twit terbanyak"}
+## Pengirim
+
+```{r}
+#glimpse(twit_gojek)
+
 twit_gojek %>%
-  filter(is_duplicate == FALSE) %>%
-  filter(!user == "@poocongs") %>%
-  group_by(user) %>%
+  group_by(parameter) %>%
   count(user, sort = TRUE) %>%
-  head(n = 20) %>%
-  ggplot(aes(x = reorder(user, n), y = n)) + geom_col() + coord_flip() +
+  top_n(n = 10) %>%
+  ggplot(aes(reorder(user, n), n, fill = parameter)) +
+  geom_col(show.legend = FALSE) + 
+  coord_flip() +
+  facet_wrap(~parameter, scales = "free_y") +
   labs( x = "Username", y = "Jumlah Twit")
 ```
 
-Setelah dibersihkan total masih tersisi **4995** twit dengan daftar username yang paling banyak mengirim twit di atas. Selanjutnya, ekploasi dilakukan terhadap asal twit berdasarkan waktu
+## Terlibat
 
-# Eksplorasi 3 - Distribusi twit
-
-```{r, fig.cap="Perbandingan distribusi twit antar parameter"}
-twit_gojek$date <- as.Date(twit_gojek$date)
-
+```{r}
 twit_gojek %>%
-  filter(is_duplicate == FALSE) %>%
-  filter(!user == "@poocongs") %>%
+  filter(user_count >= 1) %>%
+  select(parameter, user_all) %>%
+  unnest_tokens(ngram, user_all, token = "words", to_lower = FALSE) %>%
   group_by(parameter) %>%
-  count(date, sort = TRUE) %>% 
-  ggplot(aes(x=date, y=n, colour=parameter)) +
-  geom_line(show.legend = FALSE) +
-  scale_x_date(labels = date_format("%Y-%m"), 
-               breaks = date_breaks("3 months")) +
-  facet_grid(parameter~., scales="free") +
-  theme(legend.position="top")
+  count(ngram, sort = TRUE) %>%
+  top_n(n = 10) %>%
+  ggplot(aes(reorder(ngram, n), n, fill = parameter)) +
+  geom_col(show.legend = FALSE) + coord_flip() +
+  facet_wrap(~parameter, scales = "free_y")
 ```
 
-Gambar di atas menunjukkan asal waktu untuk masing-masing paramter pencarian twit. Twit dengan tagar #savedrivergojek berasal dari akhir tahun 2016 hingga akhir 2017, dengan puncaknya sekitar bulan 11 tahun 2017. Di sini parameter yang lain juga dapat dilihat tren penggunaan dan postingan twitnya. 
+# Konten
 
-# Eksplorasi 4 - Tagar
+## Frekuensi
 
-```{r, fig.cap="Tagar paling sering digunakan dalam keseluruhan twit"}
+```{r}
 twit_gojek %>%
-  filter(is_duplicate == FALSE) %>%
-  filter(!user == "@poocongs") %>%
-  select(hashtag) %>%
-  unnest_tokens(tagar, hashtag) %>%
-  count(tagar, sort = TRUE) %>%
-  filter(!tagar == "savegojek") %>%
-  filter(!tagar == "savedrivergojek") %>%
-  filter(!tagar == "saveojekonline") %>%
-  filter(!tagar == "gojek") %>%
-  filter(!tagar == "akukaukita") %>%
-  head(n = 20) %>%
-  ggplot(aes(reorder(tagar, n), n)) + geom_col() + coord_flip() +
-  labs(x = "tagar", y = "jumlah tagar")
-```
-
-Gambar di atas menunjukkan tagar yang paling sering digunakan setelah dilakukan filter terlebih dahulu. Tagar yang tidak diikutsertakan di antaranya adalah, tagar yang menjadi parameter pencarian, tagar gojek, dan akukaukita.
-
-# Eksplorasi 5 - Term
-Term yang digunakan dalam twit setelah di cleaning dapat dilihat pada gambar di bawah ini. Gambar menunjukkan 20 pasangan kata (bigram) yang paling sering muncul dalam data. 
-
-```{r, fig.cap="Bigram dengan frekuensi tertinggi"}
-twit_gojek %>%
-  filter(is_duplicate == FALSE) %>%
-  filter(!user == "@poocongs") %>%
-  select(clean_text) %>%
-  unnest_tokens(kata, clean_text, token = "ngrams", n = 2) %>%
-  count(kata, sort = TRUE) %>%
-  head(n = 20) %>%
-  ggplot(aes(reorder(kata, n), n)) + geom_col() + coord_flip() +
-  labs(x = "bigram", y = "jumlah bigram")
-```
-
-Bigram yang paling sering muncul, yaitu "ojek online" menunjukkan bahwa dokumen teks sebagian besar membahas tentang ojek online atau transportasi online. Hal tersebut ditunjukkan dengan tingginya coocurrance kata ojek dengan online. 
-
-# Eksplorasi 6 - TF-IDF
-
-```{r, echo=FALSE, fig.cap="TF-IDF untuk masing parameter"}
-twit_words <- twit_gojek %>%
-  filter(is_duplicate == FALSE) %>%
-  filter(!user == "@poocongs") %>%
   select(parameter, clean_text) %>%
+  unnest_tokens(ngram, clean_text, token = "ngrams", n = 2, to_lower = FALSE) %>%
   group_by(parameter) %>%
-  unnest_tokens(kata, clean_text, token = "ngrams", n = 2) %>%
-  count(kata, sort = TRUE)
-
-total_words <- twit_words %>% 
-  group_by(parameter) %>% 
-  summarize(total = sum(n))
-twit_words <- left_join(twit_words, total_words)
-twit_words <- twit_words %>%
-  bind_tf_idf(kata, parameter, n) %>%
-  arrange(desc(tf_idf))
-
-# Visualisasi tf-idf
-twit_words %>%
-  arrange(desc(tf_idf)) %>%
-  mutate(kata = factor(kata, levels = rev(unique(kata)))) %>% 
-  group_by(parameter) %>% 
-  top_n(5) %>% 
-  ungroup %>%
-  ggplot(aes(reorder(kata,tf_idf), tf_idf, fill = parameter)) +
-  geom_col(show.legend = FALSE) +
-  labs(x = NULL, y = "tf-idf") +
-  facet_wrap(~parameter, ncol = 2, scales = "free") + 
-  labs(x = NULL, y = "tf-idf bigram to parameters") +
-  coord_flip()
+  count(ngram, sort = TRUE) %>%
+  top_n(n = 10) %>%
+  ggplot(aes(reorder(ngram, n), n, fill = parameter)) +
+  geom_col(show.legend = FALSE) + coord_flip() +
+  facet_wrap(~parameter, scales = "free_y") +
+  labs(x = "bigram", y = "Jumlah")
 ```
 
-Dari twit dengan tagar savedrivergojek, diketahui bahwa kata yang memiliki nilai tf-idf tertinggi adalah tarif driver. Hal tersebut merujuk pada tagar itu sendiri yang digunakan untuk menyarakan pendapat tentang kasus menyelamatkan dirver gojek. Diselamatkan dari apa? dan apa yang terjadi?
 
-Dengan menggunakan data di atas, juga dapat diketahui bahwa salah satu isu yang dibahas adalah tentang tarif driver. Hal ini kemungkinan berkaitan dengan kebijakan tarif yang diterapkan oleh PT GI dan berdampak pada driver sebagai mitra, serta mendapatkan respons. Tagar lain juga dapat diinterpretasikan seperti itu, dengan jumlah kata dengan nilai tf-idf tertinggi yang diubah-ubah.  
+## TF-IDF
 
-# Eksplorasi 7 - Semantic Network
+```{r}
+tf_idf <- function(kolom1, # column to be toknesed
+                   kolom2, # categorical column
+                   plot = T) {
+  # data
+  kolom1 <- tibble(kolom1)
+  kolom2 <- tibble(kolom2)
+  
+  # tokenising
+  mydata <- bind_cols(kolom1, kolom2)
+  my_words <- mydata %>%
+    unnest_tokens(kata, kolom1, token = "ngrams", n = 2, to_lower = FALSE) %>%
+    group_by(kolom2) %>%
+    count(kata, sort = TRUE)
+  
+  # total words
+  total_words <- my_words %>%
+    group_by(kolom2) %>%
+    add_tally(n)
+  
+  my_words <- left_join(my_words, total_words)
+  
+  # # tf-idf
+  my_words <- my_words %>%
+    bind_tf_idf(kata, kolom2, n) %>%
+    arrange(desc(tf_idf))
 
-Semantic network di sini dibuat berdasarkan posisi sebuah term dalam bigram. 
-
-```{r, echo=FALSE, fig.cap="Semantic Network"}
-bigram_counts <- twit_gojek %>%
-  filter(is_duplicate == FALSE) %>%
-  filter(!user == "@poocongs") %>%
-  select(clean_text) %>%
-  unnest_tokens(bigram, clean_text, token = "ngrams", n = 2) %>%
-  count(bigram, sort = TRUE) %>%
-  separate(bigram, into = c("word1", "word2"))
-
-bigram_graph <- bigram_counts %>%
-  filter(n > 10) %>%
-  graph_from_data_frame()
-
-ggraph(bigram_graph, layout = "fr") +
-  geom_edge_link() +
-  geom_node_point() +
-  geom_node_text(aes(label = name), vjust = 1, hjust = 1)
+  # # top ten terms for each category
+  top_terms <- my_words  %>%
+    group_by(kolom2) %>% # treat each topic as a different group
+    top_n(5, tf_idf) %>% # get the top 10 most informative words
+    ungroup() %>% # ungroup
+    arrange(kolom2, -tf_idf) # arrange words in descending informativeness
+  # 
+  # # if the user asks for a plot (TRUE by default)
+  if(plot == T){
+    # plot the top ten terms for each topic in order
+    top_terms %>% # take the top terms
+      mutate(kata = reorder(kata, tf_idf)) %>% # sort terms by beta value
+      ggplot(aes(kata, tf_idf, fill = factor(kolom2))) + # plot beta by theme
+      geom_col(show.legend = FALSE) + # as a bar plot
+      facet_wrap(~ kolom2, scales = "free_y") + # which each topic in a seperate plot
+      labs(x = NULL, y = "tf_idf") + # no x label, change y label
+      coord_flip() # turn bars sideways
+  }else{
+  #   # if the user does not request a plot
+  #   # return a list of sorted terms instead
+    return(top_terms)
+  }
+  
+}
 
 ```
 
-Hasil di atas menunjukkan bahwa sebuah kata, cenderung berdampingan dengan kata lain. Misalnya, di sini dapat dilihat bahwa kata online berdekatan atau cenderung berasosiasi dengan kata taksi, angkutan, dan transportasi. Sementara kata karya, berdampingan dengan kata anak dan bangsa. 
 
-# Eksplorasi 8 - Topic Modelling
+```{r}
+tf_idf(twit_gojek$clean_text, twit_gojek$parameter, plot = T)
+```
 
-```{r, echo=FALSE}
+# Topik
+
+```{r}
 # the LDA function using topicmodels package
 bigram_tm <- function(input_text, # should be a columm from a dataframe
                        plot = T, # return a plot? TRUE by defult
@@ -283,45 +262,7 @@ bigram_tm <- function(input_text, # should be a columm from a dataframe
 }
 ```
 
-Berikut ini adalah term dengan probabilitas tertinggi sebagai topik yang dibahas dalam twit tentang gojek.   
-
-```{r, fig.cap="Hasil topic modelling"}
-# execution
-tm_gojek <- twit_gojek %>%
-  filter(is_duplicate == FALSE) %>%
-  filter(!user == "@poocongs") %>%
-  select(date, user,clean_text, word_count, parameter) %>%
-  filter(word_count >= 2)
-
-tm_twit_gojek <- bigram_tm(tm_gojek$clean_text, number_of_topics = 3)
-tm_twit_gojek
-```
-
-Topik pertama cenderung membahas tentang apa gojek dalam persepsi username. Dalam hal ini gojek sebagai karya anak bangsa. Selain itu, dalam topik 1 gojek juga didefinisikan sebagai transportasi onlin. Namun, di sini juga ada topik tentang demo yang dilakukan oleh driver. Hal ini berkaitan dengan tagar savedriver gojek yang untuk mendiskusikan kebijakan tarif yang diterapkan oleh PT GI.
-
-# Eksplorasi 9 - Username' Network
-
 ```{r}
-net_twit_gojek <- twit_gojek %>%
-  filter(!user == "@poocongs") %>%
-  filter(is_duplicate == FALSE) %>%
-  filter(user_count >= 2) %>%
-  select(user_all, user_count)
-
-dfm_gojek <- dfm(net_twit_gojek$user_all)
-
-nfeat(dfm_gojek)
-
-# construct a feature-ouccerances matrix (FCM
-gojek_fcm <- fcm(dfm_gojek)
-dim(gojek_fcm)
-
-feat <- names(topfeatures(gojek_fcm, 75))
-gojek_fcm <- fcm_select(gojek_fcm, feat)
-dim(gojek_fcm)
-
-size <- log(colSums(dfm_select(dfm_gojek, feat)))
-textplot_network(gojek_fcm, min_freq = 0.8, vertex_size = size / max(size) * 3)
+bigram_tm(twit_gojek$clean_text, plot = T, number_of_topics = 4)
 ```
 
-Gambar di atas menunjukkan username Twitter yang sering berada bersamaan. Dalam konteks ini, hal tersebut dapat diasumsikan sebagai username paling sering disebut (dimention) oleh pengguna twitter dalam twit yang didapat dengan parameter yang digunakan di sini.

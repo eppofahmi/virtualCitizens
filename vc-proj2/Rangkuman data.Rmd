@@ -1,0 +1,378 @@
+---
+title: "rangkuman data gojek"
+author: "Ujang fahmi"
+date: "7/24/2018"
+output:
+  html_notebook:
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  word_document:
+    toc: yes
+    toc_depth: '3'
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_depth: '3'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+# Intro
+Rangkuman data yang sudah didapat tentang Gojek
+
+```{r}
+if (Sys.info()['sysname'] == 'Darwin') {
+  libjvm <- paste0(system2('/usr/libexec/java_home',stdout = TRUE)[1],'/jre/lib/server/libjvm.dylib')
+  message (paste0('Load libjvm.dylib from: ',libjvm))
+  dyn.load(libjvm)
+}
+
+library(googledrive)
+library(topicmodels)
+library(tidyverse)
+library(tidytext)
+library(textclean)
+library(ggplot2)
+library(knitr)
+library(RWeka)
+library(tm)
+library(reshape2)
+library(lubridate)
+library(scales)
+```
+
+
+# Twit tentang gojek
+## Data
+```{r}
+id_tw_gojek <- "1ALZxvnmISCHuRzawaP5K6FjUTN3Wy700"
+data_twit <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_tw_gojek))
+```
+
+```{r}
+data_twit %>%
+  select(date, parameter) %>%
+  separate(date, into = c("tahun", "bulan", "tanggal")) %>%
+  group_by(tahun) %>%
+  count(parameter) %>%
+  ggplot(aes(tahun, n, fill = parameter)) + 
+  geom_col() + theme(legend.position="top") + 
+  ggtitle("Jumlah Twit berdasarkan parameter mendapatkannya") + 
+  labs(x = "Tahun", y = "Jumlah")
+```
+
+## Jumlah akun pengirim
+
+```{r}
+data_twit %>%
+  group_by(parameter) %>%
+  count(user) %>%
+  ggplot(aes(parameter, n)) + 
+  geom_col() + 
+  ggtitle("Jumlah pengirim twit berdasarkan parameter") +
+  labs(x = "Parameter", y = "Jumlah akun pengiirm")
+```
+
+
+## Jumlah akun terilibat
+
+```{r}
+data_twit %>% 
+  group_by(parameter) %>% 
+  summarise(frekuensi = sum(user_count)) %>%
+  ggplot(aes(parameter, frekuensi)) +
+  geom_col() +
+  ggtitle("Jumlah akun yang ada dalam twit berdasarkan parameter") +
+  labs(x = "Parameter", y = "Jumlah akun terlibat")
+```
+
+## Topik yang dibahas
+
+```{r}
+# the LDA function using topicmodels package
+bigram_tm <- function(input_text, # should be a columm from a dataframe
+                       plot = T, # return a plot? TRUE by defult
+                       number_of_topics = 4) # number of topics (4 by default)
+{    
+  set.seed(2016)
+  # create a corpus (type of object expected by tm) and document term matrix
+  Corpus <- VCorpus(VectorSource(input_text)) # make a VCorpus object spec for RWeka
+  
+  # function for creating bigram in the DTM
+  BigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min=2, max=2))
+  # you can explore which term combination gave the most interpretable topic for you
+  # by changing numbers inside Weka_control
+  
+  DTM <- DocumentTermMatrix(Corpus, control=list(tokenize=BigramTokenizer))
+  
+  # remove any empty rows in our document term matrix (if there are any 
+  # we'll get an error when we try to run our LDA)
+  unique_indexes <- unique(DTM$i) # get the index of each unique value
+  DTM <- DTM[unique_indexes,] # get a subset of only those indexes
+  
+  # preform LDA & get the words/topic in a tidy text format
+  lda <- LDA(DTM, k = number_of_topics, control = list(seed = 1234))
+  topics <- tidy(lda, matrix = "beta")
+  
+  # get the top ten terms for each topic
+  top_terms <- topics  %>% # take the topics data frame and..
+    group_by(topic) %>% # treat each topic as a different group
+    top_n(10, beta) %>% # get the top 10 most informative words
+    ungroup() %>% # ungroup
+    arrange(topic, -beta) # arrange words in descending informativeness
+  
+  # if the user asks for a plot (TRUE by default)
+  if(plot == T){
+    # plot the top ten terms for each topic in order
+    top_terms %>% # take the top terms
+      mutate(term = reorder(term, beta)) %>% # sort terms by beta value 
+      ggplot(aes(term, beta, fill = factor(topic))) + # plot beta by theme
+      geom_col(show.legend = FALSE) + # as a bar plot
+      facet_wrap(~ topic, scales = "free") + # which each topic in a seperate plot
+      labs(x = NULL, y = "Beta") + # no x label, change y label 
+      coord_flip() # turn bars sideways
+  }else{ 
+    # if the user does not request a plot
+    # return a list of sorted terms instead
+    return(top_terms)
+  }
+}
+```
+
+
+```{r}
+tm_data_twit <- data_twit %>%
+  filter(word_count >= 2) %>%
+  select(parameter, date, clean_text, word_count)
+
+bigram_tm(tm_data_twit$clean_text, number_of_topics = 4, plot = T)
+```
+
+## Anak Bangsa
+```{r}
+data_twit %>%
+  filter(str_detect(clean_text, "\\banak bangsa\\b")) %>%
+  select(date, tweets) %>%
+  head(n = 10)
+```
+
+
+# Petisi tentang gojek
+
+```{r}
+id_daftar_petisi <- "18ff23plznh119FqpjEeIFzhcbRchVzIM"
+id_petisi <- "1b4ymEiW6TdTppDCzwRlTxru1MISkcAht"
+data_daftar_petisi <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_daftar_petisi))
+data_petisi <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_petisi))
+```
+
+```{r}
+data_daftar_petisi %>%
+  select(date) %>%
+  separate(date, into = c("tahun", "bulan", "tanggal")) %>%
+  group_by(tahun) %>%
+  count(tahun) %>%
+  ggplot(aes(tahun, n)) + geom_col() +
+  labs(x = "Tahun", y = "Jumlah Petisi")
+```
+
+## Perkembangan Jumlah Penandatangan
+```{r}
+data_daftar_petisi %>% 
+  select(date, jml_pendukung) %>%
+  group_by(date) %>% 
+  summarise(frekuensi = sum(jml_pendukung)) %>%
+  ggplot(aes(date, frekuensi, group = 1)) +
+  geom_line(show.legend = FALSE) +
+  ggtitle("Distribusi penandatangan petisi") +
+  labs(x = "Tahun", y = "Jumlah Pendukung") +
+  geom_text(aes(label=frekuensi), position=position_dodge(width = 0.9), vjust=-0.40) 
+```
+
+## Top 10 Petisi
+```{r}
+data_daftar_petisi %>%
+  arrange(desc(jml_pendukung)) %>%
+  select(title, jml_pendukung) %>%
+  top_n(10) %>%
+  kable()
+```
+
+## Topik komentar petisi
+```{r}
+data_petisi$clean_alasan <- data_petisi$Alasan
+
+data_petisi$clean_alasan <- replace_non_ascii(data_petisi$clean_alasan)
+data_petisi$clean_alasan <- replace_number(data_petisi$clean_alasan)
+
+data_petisi$clean_alasan <- gsub("\\bmenolak\\b", "tolak", data_petisi$clean_alasan)
+data_petisi$clean_alasan <- gsub("\\bsejenisnya\\b", "", data_petisi$clean_alasan) 
+data_petisi$clean_alasan <- gsub("\\bberbasis\\b", "", data_petisi$clean_alasan) 
+data_petisi$clean_alasan <- gsub("\\bmenandatangani\\b", "", data_petisi$clean_alasan)
+data_petisi$clean_alasan <- gsub("\\btandatangan\\b", "", data_petisi$clean_alasan) 
+data_petisi$clean_alasan <- gsub("\\bkota\\b", "", data_petisi$clean_alasan) 
+data_petisi$clean_alasan <- gsub("\\band\\b", "", data_petisi$clean_alasan) 
+
+data_petisi$clean_alasan <- replace_white(data_petisi$clean_alasan)
+```
+
+```{r}
+replace_reg <- "http://[A-Za-z]+|&amp;|&lt;|&gt;|RT|https|[@|#|pic]['_A-Za-z|[:punct:]|\\d]+"
+unnest_reg <- "([^A-Za-z])+"
+
+id_stop <- "1bLhytYfADumqTKCbYEvtJn8CAp436et6"
+stopwords <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_stop), header = FALSE)
+
+cltext <- data_petisi %>%
+  select(judul_petisi, clean_alasan) %>%
+  mutate(text = str_replace_all(clean_alasan,replace_reg,"")) %>%
+  unnest_tokens(word, clean_alasan, token="regex",pattern=unnest_reg) %>%
+  filter(!word %in% stopwords$V1,str_detect(word,"[a-z]")) %>%
+  filter(nchar(word)>2) %>%
+  filter(!word %in% c('ed','co','bd','ri', "br", "is", "the", "jek")) %>%
+  select(judul_petisi, word) %>%
+  group_by(judul_petisi) %>%
+  unnest_tokens(kata, word, token = "ngrams", n = 2) %>%
+  count(kata, sort = TRUE)
+
+total_words <- cltext %>% 
+  group_by(judul_petisi) %>% 
+  summarize(total = sum(n))
+
+petisi_words <- left_join(cltext, total_words)
+
+petisi_words <- petisi_words %>%
+  bind_tf_idf(kata, judul_petisi, n) %>%
+  arrange(desc(tf_idf))
+
+# Visualisasi tf-idf
+petisi_words %>%
+  arrange(desc(tf_idf)) %>%
+  mutate(kata = factor(kata, levels = rev(unique(kata)))) %>% 
+  group_by(judul_petisi) %>% 
+  top_n(6) %>% 
+  ungroup %>%
+  ggplot(aes(reorder(kata,tf_idf), tf_idf, fill = judul_petisi)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~judul_petisi, ncol = 2, scales = "free") + 
+  labs(x = NULL, y = "tf-idf") +
+  coord_flip()
+```
+**Keterangan:**
+
+1. petisi1 = Cabut larangan pengoperasian layanan transportasi berbasis online (Gojek, grabbike,dll)
+2. petisi2 = Tolak Pencabutan gojek Tasikmalaya!
+3. petisi3 = Jangan kembali renggut kebebasan masyarakat jawa barat untuk memilih transportasi!
+4. petisi4 = Kami membutuhkan gojek
+5. petisi5 = Dukung keberadaan gojek di purwokerto
+6. petisi6 = Hentikan permenhub 108
+
+# Playstore
+
+```{r}
+id_ps <- "1arRuBqRHpWTXL_PqwOQDch4u3e6lEpXF"
+data_playstore <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_ps), sep = ",", stringsAsFactors = FALSE)
+
+data_playstore$date <- as.Date(data_playstore$date)
+```
+
+
+```{r}
+data_playstore %>%
+  group_by(aplikasi) %>%
+  count(date, sort = TRUE) %>% 
+  ggplot(aes(x=date, y=n, colour=aplikasi)) +
+  geom_line(show.legend = FALSE) +
+  scale_x_date(labels = date_format("%Y-%m"), 
+               breaks = date_breaks("2 months")) +
+  facet_grid(aplikasi~., scales="free") + 
+  labs(x = "Tahun - Bulan", y = "Jumlah Komentar") +
+  theme(legend.position="top")
+```
+
+## Topik yang dibahas customer
+```{r}
+tm_ps_cust <- data_playstore %>%
+  filter(str_detect(aplikasi, "gojek_customer")) %>%
+  select(date, clean_text, aplikasi)
+
+bigram_tm(tm_ps_cust$clean_text, number_of_topics = 2)
+```
+
+## Topik yang dibahas driver
+```{r}
+tm_ps_driver <- data_playstore %>%
+  filter(str_detect(aplikasi, "gojek_driver")) %>%
+  select(date, clean_text, aplikasi)
+
+bigram_tm(tm_ps_driver$clean_text, number_of_topics = 2)
+```
+
+
+# Media online
+
+```{r}
+id_media <- "1hNGgygHzjGmKJDD3dbfJpQ833YoSVj_3" # cleaned username_all 
+data_media <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_media))
+```
+
+```{r}
+data_media %>%
+  select(tanggal, media) %>% 
+  separate(tanggal, into = c("tahun", "bulan", "tanggal"), sep = "-") %>%
+  group_by(tahun) %>%
+  count(media) %>%
+  ggplot(aes(tahun, n, fill = media)) +
+  geom_col(show.legend = FALSE) + theme(legend.position="bottom") +
+  ggtitle("Jumlah pemeberitaan tentang transportasi online") +
+  labs(x = "Tahun", y = "Jumlah Berita") +
+  facet_wrap(~media, scales = "free")
+```
+
+## Frame berita
+```{r}
+data_media %>%
+  select(clean_konten, media)%>%
+  unnest_tokens(kata, clean_konten, token = "ngrams", n = 2, to_lower = TRUE, 
+                drop = TRUE, collapse = NULL) %>%
+  group_by(media) %>%
+  count(kata, sort = TRUE) %>%
+  top_n(10) %>%
+  ggplot(aes(reorder(kata, n), n, fill = "media")) + 
+  geom_col(show.legend = FALSE, fill = "black") + 
+  coord_flip() + 
+  facet_wrap(~ media, scales = "free") +
+  ggtitle("Perbandingan term yang digunakan dalam berita") +
+  labs(x = "Bigram", y = "Jumlah kata")
+```
+
+## Topik dari kompas.com
+```{r}
+data_kompas <- data_media %>%
+  filter(media == "kompas") %>%
+  select(clean_konten)
+
+bigram_tm(data_kompas$clean_konten, plot = TRUE, number_of_topics = 2)
+```
+
+## Topik dari tempo
+```{r}
+data_tempo <- data_media %>%
+  filter(media == "tempo") %>%
+  select(clean_konten)
+
+bigram_tm(data_tempo$clean_konten, plot = TRUE, number_of_topics = 2)
+```
+
+## Topik dari detik
+```{r}
+data_detik <- data_media %>%
+  filter(media == "detik") %>%
+  select(clean_konten)
+
+bigram_tm(data_detik$clean_konten, plot = TRUE, number_of_topics = 2)
+```

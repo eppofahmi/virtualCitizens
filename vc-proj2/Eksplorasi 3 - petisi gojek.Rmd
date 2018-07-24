@@ -1,18 +1,20 @@
 ---
-title: "Komentar petisi gojek"
-output: 
+title: "Kemayaan yang real: *Text mining* pada komentar petisi daring di website change.org"
+output:
   html_notebook:
-    toc: true
+    number_sections: yes
+    toc: yes
     toc_depth: 3
-    toc_float: true
-    number_sections: true
+    toc_float: yes
+  word_document:
+    toc: yes
+    toc_depth: '3'
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 ```
 
-# Library
 
 ```{r}
 if (Sys.info()['sysname'] == 'Darwin') {
@@ -21,6 +23,7 @@ if (Sys.info()['sysname'] == 'Darwin') {
   dyn.load(libjvm)
 }
 
+library(googledrive)
 library(lubridate)
 library(tidyverse)
 library(tidytext)
@@ -28,56 +31,55 @@ library(stringr)
 library(tm)
 library(reshape2)
 library(scales)
-library(AnomalyDetection)
 library(igraph)
 library(ggraph)
 library(topicmodels)
 library(SnowballC)
 library(RWeka) 
+library(skimr)
+library(textclean)
 ```
 
-# Tentang Data
+# Data apa?
 
-Data yang digunakan di sini di ambil dari komentar dalam website change.org. Komentar diberikan oleh pemberi/pendukung petisi terhadap setiap petisi yang dilayangkan. Dalam hal ini petisi yang memiliki kata kunci gojek di dalam judulnya. 
+Data yang digunakan di sini berasal dari laman www.change.org yang didapat dengan metode scrapping. Kata kunci yang digunakan adalah "Gojek." Dengan metode dan kata kunci tersebut didapat 41 judul petisi dengan distribusi pendukung seperti dapat dilihat pada gambar di bawah ini.
 
 ```{r}
-dirwd <- paste(getwd(),"/wrangled data proj-2/",sep='')
-daftar_petisi <- read.csv(paste(dirwd,"daftar petisi ttg gojek.csv",sep=''), 
-                     header = TRUE, sep = ",", stringsAsFactors = FALSE)
-
-petisi_gojek <- read.csv(paste(dirwd,"petisi-gojek.csv",sep=''), 
-                     header = TRUE, sep = ",", stringsAsFactors = FALSE)
+id_daftar <- "18ff23plznh119FqpjEeIFzhcbRchVzIM"
+id_petisi <- "1b4ymEiW6TdTppDCzwRlTxru1MISkcAht"
+daftar_petisi <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_daftar))
+petisi_gojek <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_petisi))
 ```
 
-Sampai saat ini, terdapat 41 petisi yang memiliki kata kunci gojek. Beberapa petisi dengan pendukung terbanyak dapat dilihat pada gambar di bawah in.
+```{r}
+daftar_petisi %>%
+  select(title, date, jml_pendukung) %>%
+  arrange(desc(jml_pendukung)) %>%
+  head(n = 10)
+```
 
-![*Daftar 10 Petisi tentang gojek dengan pendukung tertinggi.*](/Volumes/mydata/RStudio/virtualCitizens/vc-proj2/daftar petisi.png)
+Beradasarkan tabel di atas diketahui bahwa hanya ada dua petisi yang mendapat dukungan cukup banyak (lebih dari 10 ribu). Petisi lainnya mendapatkan dukungan kurang dari 1000 penandatangan. Sementara berdasarkan judul, juga dapat diketahui bahwa kemungkinan besar petisi yang dilayangkan digunakan untuk mendukung kebradaan "Gojek" atau transportasi dari, baik di di Jakarta sebagai pusat, maupun di daerah lainnya. Beradasarkan judul petisi pula diketahui bahwa "Gojek" tidak hanya merepresentasikan PT Gojek, tapi juga merepresentasikan penyedia layanan sejenis, seperti Grab. Dengan kata lain, berdasarkan judul, term "Gojek" bisa jadi merupakan representasi dari "transportasi online."
 
-```{r, results='hide', echo=FALSE, include=FALSE}
-str(daftar_petisi)
+Selain itu, berdasarkan judul juga diketahui bahwa mayortitas petisi yang dilayangkan untuk mempetisi objek perundangan atau pemerintah (daerah dan pusat). Hal ini dapat dilihat dari daftar terpetisi berikut. 
+
+# Siapa yang dipetisi?
+
+```{r}
+#glimpse(daftar_petisi)
+daftar_petisi$terpetisi <- gsub("\\bMempetisi\\b", "", daftar_petisi$terpetisi)
 
 daftar_petisi %>%
-  select(title, jml_pendukung) %>%
   arrange(desc(jml_pendukung)) %>%
-  head(n=10) %>%
-  ggplot(aes(x = reorder(title, jml_pendukung), y = jml_pendukung)) +
-  geom_col() + coord_flip() +
-  labs( x= "Judul Petisi", y = "Jumlah Pendukung")
+  filter(jml_pendukung >= 1000) %>%
+  select(terpetisi, title, inisiator, jml_pendukung)
 ```
+Tabel di atas menunjukkan siapa saja orang/aktor yang dipetisi berdasarkan judul petisi yang mendapat dukungan lebih dari 1000 penandatangan. Di sini dapat diketahui bahwa aktor yang dipetisi cukup beragam, mulai dari pemerintah pusat dan daerah hingga aktor/organisasi bisnis. Namun, di sini juga ada yang sepertinya kurang tepat. Misalnya petisi yang digunakan untuk mempetisi Permenhub No. 108, idealnya, terpetisinya adalah pemerintah. Namun di sini PT Gojek juga dipetisi. Hal tersebut mungkin disengaja, atau sebaliknya juga disebabkan karena ketidak tahuan sistem dari pembuat. **Namun untuk membuktikan dugaan tersebut perlu dilakukan konfirmasi secara langsung dengan pembuatnya?**
 
-Dari daftar tersebut diketahui bahwa ada beberapa petisi yang cukup populer. Salah satunya bahkan didukung oleh lebih dari 60 rb pendukung. 
+Selain itu, tidak semua petisi dibuat untuk mendukung keberadaan transportasi online atau Gojek. Buktinya Nadiem Makarim (Nadiem karim), pemilik Gojek juga menjadi terpetisi dalam petisi yang dibuat Adven Kris, yaitu petisi dengan judul **"Perbaiki Sistem Gojek Yang Merugikan Driver."**
 
-1. petisi1 = Cabut larangan pengoperasian layanan transportasi berbasis online (Gojek, grabbike,dll)
-2. petisi2 = Tolak Pencabutan gojek Tasikmalaya!
-3. petisi3 = Jangan kembali renggut kebebasan masyarakat jawa barat untuk memilih transportasi!
-4. petisi4 = Kami membutuhkan gojek
-5. petisi5 = Dukung keberadaan gojek di purwokerto
-6. petisi6 = Hentikan permenhub 108
+# Kapan petisi dibuat?
 
-Sejak kemunculannya, transportasi online mendapat beragam sambutan dari masyarakat dan pemerintah. Dalam hal ini, ada pemerintah daerah yang menolak, namun masyarakatnya justru mendukung karena mereka menilai transportasi online dapat memudahkan kegiatan mereka sehari-hari. Ketika transportasi online dilarang, masyarakat melayangkan petisi online melalui laman www.change.org agar larangan tersebut dicabut.
-
-
-# Distribusi petisi 
+Petisi yang dibuat oleh masyrakat judul yang mengandung kata/term "gojek" tersebar dalam beberapa tahun seperti dapat dilihat pada gambar berikut.
 
 ```{r, fig.cap="Distribusi petisi ttg gojek"}
 daftar_petisi %>%
@@ -89,24 +91,46 @@ daftar_petisi %>%
   labs(x = NULL, y=NULL)
 ```
 
-Sejak 2015, hampir setiap tahun ada petisi tentang gojek. Pada 2017, bahkan petisi terkait gojek ada 28, sementara angka terkecil pada tahun 2016, 2 petisi. 
-
-# Siapa yang dipetisi
+Petisi dengan judul yang mengandung term "go jek" pertama kali dibuat. Berdasarkan gambar di atas, petisi paling banyak dibuat pada tahun 2017? ada apakah pada tahun tersebut? apakah itu bertepatan dengan ekspansi gojek dan transportasi online lainnya ke daerah selain Jakarta? pertanyaan-pertnyaan tersebut akan berkaitan dengan **garis waktu keberadaan aplikasi transportasi online?** Sebagaimana diketahui bahwa petisi di sini pertama kali dibuat pada 2015-07-20 sementara aplikasi gojek pertama kali diluncurkan ke publik sekitar awal tahun 2015. 
 
 ```{r}
-daftar_petisi %>%
-  select(terpetisi)
+skim(daftar_petisi$date)
 ```
 
-# Tf-idf dalam alasan
+# Apa isi komentar?
 
-```{r, echo=FALSE}
+Untuk menjawab pertanyaan tersebut saya mencoba membedakan komentar petisi yang ditujukan untuk PT Gojek Indonesia (Gojek) dan untuk selainnya secara manual. Dengan kata lain, pembedaan dilakukan dengan mempertimbangkan deskripsi petisi dan yang dipetisi. Dengan pendekatan tersebut, terdapat satu petisi yang dianggap sesuai untuk dibedakan, yaitu petisi dengan judul "Perbaiki Sistem Gojek Yang Merugikan Driver" yang dibuat Adven Kris. Petisi komentar dari petisi ini selanjutnya disebut komentra "minus," sementara yang lainnya disebut "plus."  
 
-# Cleaning text
+## Isi komentar "plus"
+
+Komentar petisi "plus" di sini diambil dari 6 petisi dengan jumlah pendukung terbanyak. Di mana enam petisi teratas (lihat tabel 1) didukung oleh 100.683 penandatangan. Berdasarkan tujuan petisi seratus ribu penandatangan tersebut merupakan pendukung kebaradaan transportasi online. Secara umum, distribusi pendukung komentar dalam 6 petisi ini dapat dilihat pada gambar berikut.
+
+```{r}
+petisi_gojek %>%
+  select(judul_petisi) %>%
+  group_by(judul_petisi) %>%
+  count(judul_petisi, sort = TRUE) %>%
+  ggplot(aes(reorder(judul_petisi, n), n)) + geom_col() +
+  coord_flip() + 
+  labs(x = NULL, y="Jumlah Komentar")
+```
+**Keterangan:**
+
+1. petisi1 = Cabut larangan pengoperasian layanan transportasi berbasis online (Gojek, grabbike,dll)
+2. petisi2 = Tolak Pencabutan gojek Tasikmalaya!
+3. petisi3 = Jangan kembali renggut kebebasan masyarakat jawa barat untuk memilih transportasi!
+4. petisi4 = Kami membutuhkan gojek
+5. petisi5 = Dukung keberadaan gojek di purwokerto
+6. petisi6 = Hentikan permenhub 108
+
+Gambar di tas menunjukkan bahwa petisi yang paling banyak mendapat komentar adalah petisi terkait dengan "hak rakyat" untuk memilih jenis transportasi. Petisi ini dibuat atas nama "Warga Bandung." Gambar berikut menunjukkan term-term utama dari komentar terhadap enam petisi di atas. 
+
+```{r}
 replace_reg <- "http://[A-Za-z]+|&amp;|&lt;|&gt;|RT|https|[@|#|pic]['_A-Za-z|[:punct:]|\\d]+"
 unnest_reg <- "([^A-Za-z])+"
 
-stopwords <- read.csv(paste(dirwd,"stopwords_indo.csv",sep=''), header = FALSE)
+id_stop <- "1bLhytYfADumqTKCbYEvtJn8CAp436et6"
+stopwords <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_stop), header = FALSE)
 
 cltext <- petisi_gojek %>%
   select(judul_petisi, Alasan) %>%
@@ -139,90 +163,121 @@ petisi_words %>%
   ungroup %>%
   ggplot(aes(reorder(kata,tf_idf), tf_idf, fill = judul_petisi)) +
   geom_col(show.legend = FALSE) +
-  labs(x = NULL, y = "tf-idf") +
   facet_wrap(~judul_petisi, ncol = 2, scales = "free") + 
-  labs(x = NULL, y = "tf-idf bigram to judul petisi") +
+  labs(x = NULL, y = "tf-idf") +
   coord_flip()
 ```
+**Keterangan: Gambar menunjukkan TF-IDF (Term Frequency-Invers Document Metrics), di mana term dengan frekuensi tinggi dalam keselurhan dokumen memiliki nilai lebih rendah dibanding term yang dengan frekeunsi tinggi dalam sebuah dokumen dan tidak ada didokumen lain.**
 
-# Semantic network
+Berdasarkan tf-idf term yang ditunjukkan oleh gambar di atas, diketahui bahwa seara umum petisi dibuat oleh masyarakat di daerah. Hal ini ditunjukkan dengan munculnya term seperti bandung (petisi3) dan purwokerto (petisi5), di mana di daerah tersebut terdapat kasus penolakan/pelarangan keberadaan transportasi online. Selain itu, secara umum juga dapat dilihat bahwa masyarakat merasa "membutuhkan" dan menilai transportasi online "membantu" kehidupan mereka, seperti diungkapkan oleh salah satu penandatangan dalam komentar berikut. 
 
-Semantic network di sini dibuat berdasarkan posisi sebuah term dalam bigram. 
+```{r}
+petisi_gojek %>%
+  filter(str_detect(Alasan, "\\bmembantu\\b")) %>%
+  arrange(desc(Likes)) %>%
+  select(Alasan, Nama) %>%
+  head(n = 2) %>%
+  print(Alasan)
+```
+**Keterangan: alasan diurutkan berdasarkan alasan yang mendapat "Likes" paling banyak**
 
-```{r, echo=FALSE, fig.cap="Semantic Network"}
-bigram_counts <- subset(petisi_words, select = c(2, 3)) %>%
-  separate(kata, into = c("word1", "word2"))
+Masyarakat merasa terbantu dengan keberadaan "Gojek" atau transportasi online karena beberapa alasan. Alasan tersebut diantaranya adalah mudah didapatkan, lebih nyaman dibanding transportasi publik yang sudah ada sebelumnya, dan lebih murah. Oleh karena itu, mereka (penandatangan "plus") mempersepsikan Gojek sebagai "kebutuhan," yang harus dipenuhi, dan melihat pemerintah tidak berhak melarang keberadaan transportasi online seperti yang disebutkan dalam komentar berikut.
+```{r}
+petisi_gojek %>%
+  filter(str_detect(Alasan, "\\bhak\\b")) %>%
+  arrange(desc(Likes)) %>%
+  select(Alasan, Nama) %>%
+  head(n = 2) %>%
+  print(Alasan)
+```
+**Keterangan: alasan diurutkan berdasarkan alasan yang mendapat "Likes" paling banyak**
 
-bigram_graph <- bigram_counts %>%
-  filter(n > 5) %>%
-  graph_from_data_frame()
+Berdasarkan persepsi itu pula penandatangan di sini berusaha membuat pemerintah (diwakili oleh presiden dan menteri) untuk membuat regulasi yang pada intinya menjamin terpenuhinya "hak" masyarakat untuk mendapatkan transportasi (yang membantu dan dibutuhkan mereka). Isu tentang transportasi online di sini dapat dianggap sebagai representasi ketidak berdayaan pemerintah mengimbangi akselerasi dan kreativitas teknologi. Karena itu pula beberapa point daru PERMENHUB 108 berikut ini ditolak. 
 
-ggraph(bigram_graph, layout = "fr") +
-  geom_edge_link() +
-  geom_node_point() +
-  geom_node_text(aes(label = name), vjust = 1, hjust = 1)
+1. Mobil harus mempunyai SRUT untuk uji kir
+2. Mobil harus atas nama badan hukum kop/pt 
+3. Mobil wajib bersetiker untuk mrngetahui wilayah oprasinya( stiker dishub) 
+4. Driver Wajib memiliki Sim A umum
+
+Dengan kata lain, di sini juga ada sudut pandang pemberi jasa (dalam kasus Gojek disebut mitra), yang melihat transportasi online sebagai sebuah lapangan pekerjaan. 
+
+## Isi komentar "minus"
+
+Kompleksitas isu seperti ditunjukkan oleh komentar-komentar penadatangan "plus" di atas tidak berhenti dengan petisi yang disebabkan adanya pelarang. Namun isu tentang transportasi online juga terkait dengan hak-hak mitra atau pemberi jasa transportasi online. Dalam konteks ini, salah satu petisi secara khusus ditujukan untuk perusahaan pembuat aplikasi transportasi online, yaitu PT Gojek Indonesia. Isi komentar petisi tersebut dapat dilihat pada gambar berikut. 
+
+```{r}
+# load data
+id_minus <- "1iho-zZ5L1jRpRY-WsQGYibOznWcD_k-3"
+petisi_gojek_min <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_minus), sep = ";", header = TRUE, stringsAsFactors = FALSE)
 ```
 
-# Topic modelling
+```{r, warning=FALSE, include=FALSE}
+petisi_gojek_min$Alasan <- replace_non_ascii(petisi_gojek_min$Alasan, remove.nonconverted = TRUE)
+petisi_gojek_min$Nama <- replace_non_ascii(petisi_gojek_min$Nama, remove.nonconverted = TRUE)
 
-```{r, echo=FALSE}
-# the LDA function using topicmodels package
-bigram_tm <- function(input_text, # should be a columm from a dataframe
-                       plot = T, # return a plot? TRUE by defult
-                       number_of_topics = 4) # number of topics (4 by default)
-{    
-  set.seed(2016)
-  # create a corpus (type of object expected by tm) and document term matrix
-  Corpus <- VCorpus(VectorSource(input_text)) # make a VCorpus object spec for RWeka
-  
-  # function for creating bigram in the DTM
-  BigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min=2, max=2))
-  # you can explore which term combination gave the most interpretable topic for you
-  # by changing numbers inside Weka_control
-  
-  DTM <- DocumentTermMatrix(Corpus, control=list(tokenize=BigramTokenizer))
-  
-  # remove any empty rows in our document term matrix (if there are any 
-  # we'll get an error when we try to run our LDA)
-  unique_indexes <- unique(DTM$i) # get the index of each unique value
-  DTM <- DTM[unique_indexes,] # get a subset of only those indexes
-  
-  # preform LDA & get the words/topic in a tidy text format
-  lda <- LDA(DTM, k = number_of_topics, control = list(seed = 1234))
-  topics <- tidy(lda, matrix = "beta")
-  
-  # get the top ten terms for each topic
-  top_terms <- topics  %>% # take the topics data frame and..
-    group_by(topic) %>% # treat each topic as a different group
-    top_n(10, beta) %>% # get the top 10 most informative words
-    ungroup() %>% # ungroup
-    arrange(topic, -beta) # arrange words in descending informativeness
-  
-  # if the user asks for a plot (TRUE by default)
-  if(plot == T){
-    # plot the top ten terms for each topic in order
-    top_terms %>% # take the top terms
-      mutate(term = reorder(term, beta)) %>% # sort terms by beta value 
-      ggplot(aes(term, beta, fill = factor(topic))) + # plot beta by theme
-      geom_col(show.legend = FALSE) + # as a bar plot
-      facet_wrap(~ topic, scales = "free") + # which each topic in a seperate plot
-      labs(x = NULL, y = "Beta") + # no x label, change y label 
-      coord_flip() # turn bars sideways
-  }else{ 
-    # if the user does not request a plot
-    # return a list of sorted terms instead
-    return(top_terms)
-  }
-}
+plus_minus <- petisi_gojek[,1:5]
+plus_minus$komentar <- "Plus"
+petisi_gojek_min$komentar <- "Minus"
+
+plus_minus <- bind_rows(plus_minus, petisi_gojek_min)
 ```
 
-Berikut ini adalah term dengan probabilitas tertinggi sebagai topik yang dibahas dalam petisi tentang gojek.   
+```{r}
+cltext1 <- plus_minus %>%
+  select(komentar, Alasan) %>%
+  mutate(text = str_replace_all(Alasan,replace_reg,"")) %>%
+  unnest_tokens(word, Alasan, token="regex",pattern=unnest_reg) %>%
+  filter(!word %in% stopwords$V1,str_detect(word,"[a-z]")) %>%
+  filter(nchar(word)>2) %>%
+  filter(!word %in% c('ed','co','bd','ri', "br", "is", "the", "jek")) %>%
+  select(komentar, word) %>%
+  group_by(komentar) %>%
+  unnest_tokens(kata, word, token = "ngrams", n = 2) %>%
+  count(kata, sort = TRUE)
 
-```{r, fig.cap="Hasil topic modelling"}
-tm_petisi <- subset(petisi_words, select = c(2, 3))
+total_words1 <- cltext1 %>% 
+  group_by(komentar) %>% 
+  summarize(total = sum(n))
 
-tm_petisi_gojek <- bigram_tm(tm_petisi$kata, number_of_topics = 4)
-tm_petisi_gojek
+petisi_words1 <- left_join(cltext1, total_words1)
+
+petisi_words1 <- petisi_words1 %>%
+  bind_tf_idf(kata, komentar, n) %>%
+  arrange(desc(tf_idf))
+
+# Visualisasi tf-idf
+petisi_words1 %>%
+  arrange(desc(tf_idf)) %>%
+  mutate(kata = factor(kata, levels = rev(unique(kata)))) %>% 
+  group_by(komentar) %>% 
+  filter(!str_detect(kata, "driver driver")) %>%
+  top_n(10) %>% 
+  ungroup %>%
+  ggplot(aes(reorder(kata,tf_idf), tf_idf, fill = komentar)) +
+  geom_col(show.legend = FALSE) +
+  labs(x = NULL, y = "tf-idf") +
+  facet_wrap(~komentar, ncol = 2, scales = "free") + 
+  labs(x = NULL, y = "tf-idf") +
+  coord_flip()
+```
+**Keterangan: Gambar menunjukkan tf-idf dengan membandingkan komentar dengan komentar yang sebelumnya "plus" untuk melihat keunikan term yang ada dalam komentar "minus"**
+
+Sesuai dengan judulnya, isi komentar petisi "minus" tentang gojek berkaitan dengan sistem aplikasi. Dalam konteks ini, driver sebagai mitra menuntut PT Gojek Indonesia untuk memperbaiki sistem aplikasi agar tidak merugikan mereka. Hal yang dianggap merugikan di antaranya adalah: sistem dan tarif yang diterapkan. Hal tersebut diungkapkan dalam komentar berikut. 
+
+```{r}
+plus_minus %>%
+  filter(komentar == "Minus") %>%
+  filter(str_detect(Alasan, "\\brugi\\b")) %>%
+  arrange(desc(Likes)) %>%
+  select(Alasan, Nama) %>%
+  head(n = 2) %>%
+  print(Alasan)
 ```
 
-Berdasarkan topic modelling di atas, term yang muncul dalam topic 1 dapat diinterpretasikan sebagai pandangan masyarakat tentang transprtasi onlin. Dalam konteks ini, kemungkinan mereka menganggap bahwa jenis transportasi online dapat membantu dan dibutuhkan oleh masyarakat. Oleh karena itu pula, dalam topic 2 dapat diinterpretasikan sebagai alasan mereka menandatangani petisi. Alasannya kemungkinan besar karena mereka menganggap pelarangan transportasi online justru "merugikan" masyarakat. Alasan lebih lanjut, dapat ditemui di hasil topic modelling 3 dan 4. Di mana di sana mereka juga menyatakan mendukung gojek karena dianggap dapat membuka "lapangan pekerjaan" serta "nyaman." Satu hal lagi, di sini, masyaraat juga menggap bahwa "online" memudahkan mereka untuk mendapatkan transportasi.   
+# Pembahasan dan Simpulan
+
+Berdasarkan waktunya, petisi-petisi yang dibuat di laman www.change.org yang terkait dengan kberadaan "transportasi online" cenderung mengikuti pola keberadaan aplikasi "transportasi online" di Indonesia. Hal ini dapat dilihat dari petisi yang pertama yang hanya berjarak enam bulan sejak aplikasi "Gojek" pertama kali diluncurkan. Jika laman petisis ini dianggap sebagai sebuah tempat publik, maka keberadaan aplikasi online dapat dikatakan memicu terungkapnya kebutuhan transportasi yang selama ini tidak disuarakan oleh publik. Dalam konteks ini, kebutuhan transportasi yang nyaman, aman, dan murah.
+
+Transportasi online, dengan segala dinamikanya yang terjadi saat ini di persepsikan sebagai layanan yang memenuhi/mendekati syarat transportasi publik dalam benak masyarakat. Untuk itu, ketika ada ekspansi transportasi online yang ditolak, ketika ada regulasi dan aktor yang menghalangi, masyarakat bertindak atas nama "hak" bukan atas nama "transportasi online" atau "Gojek."
+
+Fenomena petisi tentang transportasi online, dengan alasan-alasan yang real membuat kita sadar dengan apa yang disebut oleh Supel (2010) sebagai kemayaan yang real. Dalam konteks ini, alasan-alasan para penandatanganan tidak dapat disentuh langsung atau terjadi secara virtual. Namun wacana yang melatarinya berisfat real dan dapat dirasakan oleh mereka. Sejalan dengan dengan Dahlgren (2015), hal ini merupakan cara baru dalam menjadi "masyarakat". Dalam konteks yang sama Lim (2013) mengatakan *“the association is virtual, but the fight is real.”*

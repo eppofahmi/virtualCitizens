@@ -47,7 +47,7 @@ library(wordcloud)
 library(igraph)
 library(ggraph)
 library(quanteda)
-library(kableExtra)
+library(knitr)
 ```
 
 ```{r}
@@ -78,7 +78,8 @@ twit_to_change %>%
   group_by(is_duplicate) %>%
   count(is_duplicate) %>%
   summarise(n) %>%
-  print()
+  print() %>%
+  kable()
 ```
 
 Indikator **`is_duplicate`** dibuat berdasarkan konten twit, jika twit tersebut memiliki duplicate atau sama dengan twit lain yang lebih dulu diunggah berdasarkan kolom `date` maka pada kolom tersebut mendapat label **TRUE**, sebaliknya jika bukan labelnya **FALS.** Berdasarkan data di tabel maka twit yang akan dianalisis dalam laporan ini berjumlah **37410.** Sementara dilihat dari segi waktunya, data yang digunakan dapat dilihat pada gambar berikut. 
@@ -114,9 +115,8 @@ twit_to_change %>%
   filter(str_detect(user, "ChangeOrg_ID")) %>%
   arrange(desc(ret_count)) %>%
   select(user, date, tweets) %>%
-  head(n = 5) %>% 
-  kable() %>%
-  kable_styling()
+  head(n = 5) %>%
+  kable()
 ```
 
 Sementara twit yang dikirim oleh akun lain, contohnya dapat dilihat di bawah ini. Misalnya di sini kita ingin melihat oleh pengirim terbanyak kedua, yaitu akun **@wijayalabs**. 
@@ -125,8 +125,7 @@ Sementara twit yang dikirim oleh akun lain, contohnya dapat dilihat di bawah ini
 twit_to_change %>%
   filter(str_detect(user, "wijayalabs")) %>%
   select(user, date, tweets) %>%
-  head(n = 2) %>% kable() %>%
-  kable_styling()
+  head(n = 2) %>% kable()
 ```
 
 Dari gambar dan contoh twit di atas, dapat dilihat bahwa twit yang memention akun @ChangeOrg_ID digunakan untuk mengampanyekan petisi yang ada di laman change.org. Sementara jika dilihat dari keselurahan akun Twitter yang ada dalam twit komposisinya dapat dilihat pada gambar di bawah ini. Di mana sekamin tinggi berarti semakin sering username tersebut disebut oleh pengguna twitter dalam twit yang memention akun parameter. 
@@ -150,8 +149,7 @@ twit_to_change %>%
   dplyr::filter(grepl('@SBYudhoyono', tweets)) %>%
   select(user, date, tweets) %>%
   head(n = 5)%>%
-  kable() %>%
-  kable_styling()
+  kable()
 ```
 
 # Tagar, Term, TF-IDF
@@ -262,7 +260,7 @@ twit_to_change %>%
   filter(str_detect(clean_text, "benoa ubah")) %>%
   select(user, date, tweets) %>%
   head(n = 3) %>% 
-  kable() %>% kable_styling()
+  kable()
 ```
 
 # Topic modelling
@@ -357,7 +355,7 @@ bigram_counts %>%
 Dari gambar di atas dapat dilihat dengan jelas bahwa beberapa kata cenderung berdampingan dengan kata lain seara konsisten yang ditunjukkan dengan frekuensi yang tinggi atau warna semakin gelap. Sebagai contoh, kata teluk (pojok kiri atas) berdampingan dengan benoa, perpres, dan ubah. 
 
 ## Social Network
-Skenario yang sama dengan semantic network di atas juga dapat diaplikasikan pada aktor, untuk melihat keterhubungannya secara sekilas. Namun untuk social network yang lebih kompleks dapat dilakuka di gephi. Untuk itu, di sini (di R), saya hanya menyiapkan filenya saja. 
+Skenario yang sama dengan semantic network di atas juga dapat diaplikasikan pada aktor, untuk melihat keterhubungannya secara sekilas. Namun untuk social network yang lebih kompleks dapat dilakuka di gephi. Untuk itu, di sini (di R), saya hanya menyiapkan filenya saja.
 
 ```{r}
 to_change_net <- twit_to_change %>%
@@ -384,6 +382,6 @@ Dari hasil SNA dapat diketahui jumlah nodes (username yang memiliki koneksi) dal
 Berdasarkan data yang digunakan dalam laporan ini, yaitu twit yang memention akun @ChangeOrg_Id dari Desember 2013 hingga Maret 2018 diketahui beberapa hal: 
 
 1. Warga net menggunakan twitter untuk melakukan kampanye terkait dengan petisi yang sedang mereka lakukan atau yang ada di laman change.org. 
-2. Di dalam twitter, selain terdapat akun pengirim juga terdapat akun lain yang dapat diidentifikasi sebagai akun milik orang atau lembaga yang menjadi tujuan petisi dan alasan petisi. 
+2. Di dalam twitter, selain terdapat akun pengirim juga terdapat akun lain yang dapat diidentifikasi sebagai akun milik orang atau lembaga yang menjadi tujuan petisi dan alasan petisi.
 3. Berdasarkan data juga diketahui bahwa ada beberapa topik yang cukup populer dan menarik perhatian warga net. Hasil topic modelling menunjukkan bahwa dalam twit terdapat topik tentang uu-md3 yang dalam beberapa waktu terakhir memang banyak dibicarakan. Selain itu, juga ada pelarangan perdagangan hewan untuk dikonsumsi dan beberapa topik lainnya. Salah satu topik yang dapat dianggap paling populer dibanding yang lainnya adalah tentang reklamasi teluk benoa. Topik tentang teluk benoa dianggap paling popluer karena selain  muncul dalam topic modelling juga memiliki kata (bigram) yang cukup mendominasi (lihat bagian term, tf-idf, dan semantic network). 
 4. Oleh karena itu, topik teluk benoa layak untuk dikaji lebih mendalam dengan asumsi memiliki jangkangan yang cukup panjang dari segi waktu dan data yang cukup banyak untuk dianalisis secara otomatis dengan menggunakan machine learning.

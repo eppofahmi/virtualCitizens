@@ -21,7 +21,7 @@ if (Sys.info()['sysname'] == 'Darwin') {
   message (paste0('Load libjvm.dylib from: ',libjvm))
   dyn.load(libjvm)
 }
-
+library(googledrive)
 library(lubridate)
 library(tidyverse)
 library(tidytext)
@@ -41,9 +41,10 @@ library(RWeka)
 Data berupa komentar terhadap dua aplikasi dari gojek di playstore, yaitu untuk customer dan driver. 
 
 ```{r}
-dirwd <- paste(getwd(),"/wrangled data proj-2/",sep='')
-ps_gojek <- read.csv(paste(dirwd,"playstore-gojek.csv",sep=''), 
-                     header = TRUE, sep = ",", stringsAsFactors = FALSE)
+id_ps <- "1arRuBqRHpWTXL_PqwOQDch4u3e6lEpXF"
+ps_gojek <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_ps), sep = ",", stringsAsFactors = FALSE)
+
+ps_gojek$date <- as.Date(ps_gojek$date)
 ```
 
 # Perbandingan Jumlah
@@ -64,14 +65,15 @@ Gambar di bawah ini menunjukkan perbandingan kata yang digunakan dalam komentar 
 ```{r}
 ps_gojek %>%
   select(aplikasi, clean_text) %>%
+  unnest_tokens(kata, clean_text, token = "ngrams", n = 2) %>%
   group_by(aplikasi) %>%
-  unnest_tokens(bigram, clean_text, token = "ngrams", n=2) %>%
-  count(bigram, sort = TRUE) %>%
-  filter(!str_detect(bigram, "good good")) %>%
+  count(kata, sort = TRUE) %>%
   top_n(10) %>%
-  ggplot(aes(x = reorder(bigram, n), y = n, collour = "aplikasi")) + 
-  geom_col() + facet_wrap(~aplikasi, scales = "free_y") + coord_flip() + 
-  labs( x = "Bigram", y = "Jumlah Bigram")
+  ggplot(aes(reorder(kata, n), n, fill = aplikasi)) +
+  geom_col(show.legend = FALSE) + coord_flip() + 
+  facet_wrap(~aplikasi, scales = "free_y") +
+  labs(x = "bigram", y = "jumlah")
+
 ```
 
 Gambar di atas menunjukkan term (dalam bentuk bigram) yang ada dalam data, di mana beberapa di antaranya digunakan baik dalam komentar yang diberikan oleh customer maupun dirver. Kata tersebut adalah adanya fitur chat dan penilaian terhadap aplikasi, yaitu term "good". 
@@ -93,72 +95,90 @@ ps_gojek %>%
   scale_x_date(labels = date_format("%Y-%m"), 
                breaks = date_breaks("2 months")) +
   facet_grid(aplikasi~., scales="free") + 
-  labs(x = "Tahun - Bulan", y = "Jumlah Komentar")
+  labs(x = "Tahun - Bulan", y = "Jumlah Komentar") +
   theme(legend.position="top")
 ```
 
 Dari gambar di atas diketahi bahwa komentar terjauh diambil dari gojek untuk driver sekitar bulan 12 tahun 2016. Sementara data komentar untuk customer mayoritas berasal dari tahun 2018.
 
-# TF-IDF berdasarkan aplikasi
+# Konten 
+## Frekuensi
+```{r}
+glimpse(ps_gojek)
+
+ps_gojek %>%
+  select(aplikasi, clean_text) %>%
+  unnest_tokens(ngram, clean_text, token = "ngrams", n = 2, to_lower = FALSE) %>%
+  group_by(aplikasi) %>%
+  count(ngram, sort = TRUE) %>%
+  top_n(n = 10) %>%
+  ggplot(aes(reorder(ngram, n), n, fill = aplikasi)) +
+  geom_col(show.legend = FALSE) + coord_flip() +
+  facet_wrap(~aplikasi, scales = "free_y") +
+  labs(x = "bigram", y = "jumlah")
+```
+
+## TF-IDF
 Eksplorasi berikut digunakan untuk melihat kata terpenting berdasarkan nila tf-idf dari komentar untuk masing-masing aplikasi. 
 
 ```{r, echo=FALSE, fig.cap="TF-IDF untuk masing parameter"}
-ps_words <- ps_gojek %>%
-  select(aplikasi, clean_text) %>%
-  group_by(aplikasi) %>%
-  unnest_tokens(kata, clean_text, token = "ngrams", n = 2) %>%
-  count(kata, sort = TRUE)
+tf_idf <- function(kolom1, # column to be toknesed
+                   kolom2, # categorical column
+                   plot = T) {
+  # data
+  kolom1 <- tibble(kolom1)
+  kolom2 <- tibble(kolom2)
+  
+  # tokenising
+  mydata <- bind_cols(kolom1, kolom2)
+  my_words <- mydata %>%
+    unnest_tokens(kata, kolom1, token = "ngrams", n = 2, to_lower = FALSE) %>%
+    group_by(kolom2) %>%
+    count(kata, sort = TRUE)
+  
+  # total words
+  total_words <- my_words %>%
+    group_by(kolom2) %>%
+    add_tally(n)
+  
+  my_words <- left_join(my_words, total_words)
+  
+  # # tf-idf
+  my_words <- my_words %>%
+    bind_tf_idf(kata, kolom2, n) %>%
+    arrange(desc(tf_idf))
 
-total_words <- ps_words %>% 
-  group_by(aplikasi) %>% 
-  summarize(total = sum(n))
+  # # top ten terms for each category
+  top_terms <- my_words  %>%
+    group_by(kolom2) %>% # treat each topic as a different group
+    top_n(5, tf_idf) %>% # get the top 10 most informative words
+    ungroup() %>% # ungroup
+    arrange(kolom2, -tf_idf) # arrange words in descending informativeness
+  # 
+  # # if the user asks for a plot (TRUE by default)
+  if(plot == T){
+    # plot the top ten terms for each topic in order
+    top_terms %>% # take the top terms
+      mutate(kata = reorder(kata, tf_idf)) %>% # sort terms by beta value
+      ggplot(aes(kata, tf_idf, fill = factor(kolom2))) + # plot beta by theme
+      geom_col(show.legend = FALSE) + # as a bar plot
+      facet_wrap(~ kolom2, scales = "free_y") + # which each topic in a seperate plot
+      labs(x = NULL, y = "tf_idf") + # no x label, change y label
+      coord_flip() # turn bars sideways
+  }else{
+  #   # if the user does not request a plot
+  #   # return a list of sorted terms instead
+    return(top_terms)
+  }
+  
+}
 
-ps_words <- left_join(ps_words, total_words)
-
-ps_words <- ps_words %>%
-  bind_tf_idf(kata, aplikasi, n) %>%
-  arrange(desc(tf_idf))
-
-# Visualisasi tf-idf
-ps_words %>%
-  arrange(desc(tf_idf)) %>%
-  mutate(kata = factor(kata, levels = rev(unique(kata)))) %>% 
-  group_by(aplikasi) %>% 
-  top_n(10) %>% 
-  ungroup %>%
-  ggplot(aes(reorder(kata,tf_idf), tf_idf, fill = aplikasi)) +
-  geom_col(show.legend = FALSE) +
-  labs(x = NULL, y = "tf-idf") +
-  facet_wrap(~aplikasi, ncol = 2, scales = "free") + 
-  labs(x = NULL, y = "tf-idf trigram to Aplikasi") +
-  coord_flip()
+tf_idf(ps_gojek$clean_text, ps_gojek$aplikasi, plot = T)
 ```
 
 Dari gambar di atas diketahui bahwa berdasarkan komentar kustomer pada aplikasi gojek di playstore cenderung membicarakan penilaian yang direpresentasikan oleh term "good" yang juga berasosiasi dengan term "app" atau aplikasi. 
 
-Sementara pada driver cendeung menekankan pentingnya fitur chat yang direpresentasikan oleh adanya term "chat". Menariknya, dalam komentar driver (mitra) juga muncul term "bad." Selain itu, driver juga melaporkan adanya penggunaan gitur "fake gps" yang mungkin merugikan mereka. 
-
-# Semantic Network
-
-Semantic network di sini dibuat berdasarkan posisi sebuah term dalam bigram. 
-
-```{r, echo=FALSE, fig.cap="Semantic Network"}
-bigram <- ps_gojek %>%
-  select(clean_text) %>%
-  unnest_tokens(bigram, clean_text, token = "ngrams", n = 2) %>%
-  count(bigram, sort = TRUE) %>%
-  separate(bigram, into = c("word1", "word2"))
-
-bigram_graph <- bigram %>%
-  filter(n > 25) %>%
-  graph_from_data_frame()
-
-ggraph(bigram_graph, layout = "fr") +
-  geom_edge_link() +
-  geom_node_point() +
-  geom_node_text(aes(label = name), vjust = 1, hjust = 1)
-
-```
+Sementara pada driver cendeung menekankan pentingnya fitur chat yang direpresentasikan oleh adanya term "chat". Menariknya, dalam komentar driver (mitra) juga muncul term "bad." Selain itu, driver juga melaporkan adanya penggunaan Fitur "fake gps" yang mungkin merugikan mereka. 
 
 # Topic Modelling
 
@@ -225,7 +245,8 @@ tm_ps_costum <- ps_gojek %>%
   select(date, clean_text, aplikasi)
 
 tm_ps_gojek1 <- bigram_tm(tm_ps_costum$clean_text, number_of_topics = 2)
-tm_ps_gojek
+
+tm_ps_gojek1
 ```
 
 ## Mitra

@@ -48,16 +48,14 @@ library(quanteda)
 library(googledrive)
 library(skimr)
 library(textclean)
-library(kableExtra)
+library(knitr)
 ```
 
 # Data
 Skrip di bawah ini mengunduh data yang ada dalam googledrive saya. Data yang diunduh telah diolah sehingga bisa dilakukan eksplorasi secara langsung. Namun sebelum lebih lanjut saya ingin mengenalkan terlebih dahulu salah satu tanda utama yang sering digunakan dalam skrip yaitu tanda pagar `#`. Tanda pagar digunakan untuk memberikan komentar, dan komentar tidak dieksekusi sebagai sebuah perintah. Di sini komentar berfungsi untuk memberikan keterangan dari skrip yang dibuat. Misalnya:
 
 skrip pertama: `id_petisi <- "1GAmUZ2TrPTdCJrnu9pxyFnNExabn8i39"`
-
 skrip kedua: `id_petisi <- "1GAmUZ2TrPTdCJrnu9pxyFnNExabn8i39"` # id data komentar petisi
-
 kalimat setelah tanda pagar `#` pada skrip kedua dibaca sebagai komentar
 
 ```{r}
@@ -100,14 +98,9 @@ Penasaran apa yang dihasilkan dengan fungsi2 di atas?
 
 **BUATLAH BLOK SKRIP DI BAWAH TULISAN INI....**
 
-
-
 Jika fungsi tersebut berhasil ditulis dengan benar, seharusnya saat ini kita sedang melihat ouput informasi yang dihasilkan. dengan informasi tersebut kita bisa membuat deskripsi terkait data yang digunakan. 
 
 **BUATLAH DESKRIPSI DI BAWAH TULISAN INI....**
-
-
-
 ## Daftar Petisi
 Beberapa latihan di atas, merupakan dasar yang harus dikuasai dalam eksplorasi yang lebih lanjut. Mungkin saat ini kita juga ingin mengetahui judul masing-masing petisi yang ada kata **teluk benua**nya. Untuk itu, di sini saya juga ingin mengenalkan salah satu fungsi dasar dari R, yaitu `print()`. Misalnya kita ingin mengetahui judul petisi yang ada di data frame `daftar_petisi`. Informasi tentang hal tersebut terdapat dalam kolom `title`. Maka, skripnya adalah sebagai berikut:
 ```{r}
@@ -119,8 +112,7 @@ Dengan menjalankan skrip di atas, saat ini kita bisa membaca judul-judul petisi.
 daftar_petisi %>% # nama data
   select(title) %>% # memilih kolom berdasarkan namanya
   head(n = 3) %>% # menentukan jumlah baris yang di print
-  kable() %>% # membuat ouput menjadi tabel 
-  kable_styling(c("striped", "bordered")) # jenis tabel
+  kable()
 ```
 
 **Challange:** Cobalah kopi paste skrip di atas dan aplikasikan untuk data `petisi_tb`. 
@@ -153,8 +145,7 @@ daftar_petisi %>%
   filter(jml_pendukung >= 50000) %>%
   select(title, date, inisiator, jml_pendukung) %>%
   arrange(date) %>%
-  kable() %>%
-  kable_styling(c("striped", "bordered"))
+  kable()
 ```
 
 **Keterangan:** Untuk mengetahui inisiator petisi geser tanda play disamping `date` pada tabel di atas. 
@@ -192,7 +183,6 @@ petisi_tb %>%
 ```
 
 **Interpretasi:**
-
 
 ## Term Petisi 2
 
@@ -291,8 +281,7 @@ petisi_tb %>%
   arrange(desc(likes)) %>%
   select(nama, alasan) %>%
   head(n = 3) %>%
-  kable() %>%
-  kable_styling(c("striped", "bordered"))
+  kable()
 ```
 
 jika ingiin membuatnya menjadi data frame sehingga bisa dilihat di environment, maka dapat menggunakan skrip berikut:
@@ -300,12 +289,11 @@ jika ingiin membuatnya menjadi data frame sehingga bisa dilihat di environment, 
 ```{r}
 anak_cucu <- petisi_tb %>%
   filter(judul == "petisi_1") %>%
-  filter(str_detect(alasan_clean, "anak cucu")) %>%
+  filter(str_detect(alasan_clean, "laut")) %>%
   arrange(desc(likes)) %>%
   select(alasan) %>%
   head(n = 3) %>%
-  kable() %>%
-  kable_styling(c("striped", "bordered"))
+  kable()
 ```
 
 Di environment saat ini sudah ada data baru bernama anak cucu, dan dapat disimpan ke drive (hardisk) dengan skrip berikut:
@@ -325,8 +313,7 @@ petisi_tb %>%
   arrange(desc(likes)) %>%
   select(nama, alasan) %>%
   head(n = 3) %>%
-  kable() %>%
-  kable_styling(c("striped", "bordered"))
+  kable()
 ```
 
 ## Kata Penting Petisi 3
@@ -338,8 +325,7 @@ petisi_tb %>%
   arrange(desc(likes)) %>%
   select(nama, alasan) %>%
   head(n = 3) %>%
-  kable() %>%
-  kable_styling(c("striped", "bordered"))
+  kable()
 ```
 
 # Topic
@@ -420,7 +406,6 @@ bigram_tm(petisi3$alasan_clean, plot = TRUE, number_of_topics = 2)
 ```
 
 **Interpretasi:**
-
 Petisi tiga ini sepertinya digunakan untuk mendapat dukungan publik internasional. Oleh karena itu petisi dilayangkan dan dijelaskan dalam bahasa inggris. 
 
 Apa yang mereka tulis tentang "dont want"?
@@ -432,8 +417,7 @@ petisi_tb %>%
   filter(str_detect(alasan, "\\bdont want\\b")) %>%
   select(nama, alasan) %>%
   head(n=3) %>%
-  kable() %>%
-  kable_styling(c("striped", "bordered"))
+  kable()
 ```
 
 Apa yang mereka tulis tentang "balinese"?
@@ -444,6 +428,5 @@ petisi_tb %>%
   filter(str_detect(alasan, "\\bbalinese\\b")) %>%
   select(nama, alasan) %>%
   head(n=3) %>%
-  kable() %>%
-  kable_styling(c("striped", "bordered"))
+  kable()
 ```
