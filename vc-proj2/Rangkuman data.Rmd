@@ -8,13 +8,6 @@ output:
     toc: yes
     toc_depth: 3
     toc_float: yes
-  word_document:
-    toc: yes
-    toc_depth: '3'
-  html_document:
-    df_print: paged
-    toc: yes
-    toc_depth: '3'
 ---
 
 ```{r setup, include=FALSE}
@@ -31,18 +24,24 @@ if (Sys.info()['sysname'] == 'Darwin') {
   dyn.load(libjvm)
 }
 
-library(googledrive)
-library(topicmodels)
-library(tidyverse)
-library(tidytext)
-library(textclean)
-library(ggplot2)
-library(knitr)
-library(RWeka)
-library(tm)
-library(reshape2)
-library(lubridate)
-library(scales)
+usePackage <- function(p) {
+  if (!is.element(p, installed.packages()[,1]))
+    install.packages(p, dep = TRUE)
+  require(p, character.only = TRUE)
+}
+
+usePackage("googledrive")
+usePackage("topicmodels")
+usePackage("tidyverse")
+usePackage("tidytext")
+usePackage("textclean")
+usePackage("ggplot2")
+usePackage("knitr")
+usePackage("RWeka")
+usePackage("tm")
+usePackage("reshape2")
+usePackage("lubridate")
+usePackage("scales")
 ```
 
 
@@ -52,6 +51,16 @@ library(scales)
 id_tw_gojek <- "1ALZxvnmISCHuRzawaP5K6FjUTN3Wy700"
 data_twit <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_tw_gojek))
 ```
+
+```{r}
+#glimpse(data_twit)
+# twit cleaning
+data_twit$tweets <- replace_non_ascii(data_twit$tweets)
+data_twit$tweets <- replace_emoji(data_twit$tweets)
+data_twit$tweets <- replace_word_elongation(data_twit$tweets)
+data_twit$tweets <- replace_white(data_twit$tweets)
+```
+
 
 ```{r}
 data_twit %>%
@@ -77,6 +86,20 @@ data_twit %>%
   labs(x = "Parameter", y = "Jumlah akun pengiirm")
 ```
 
+## Akun pengirim paling banyak
+
+```{r}
+data_twit %>%
+  select(user, parameter) %>%
+  group_by(parameter) %>%
+  count(user, sort = TRUE) %>%
+  top_n(10) %>%
+  ggplot(aes(reorder(user, n), n, fill = parameter)) +
+  geom_col(show.legend = FALSE) + coord_flip() +
+  facet_wrap(~parameter, scales = "free") +
+  ggtitle("Akun pengirim twit terbanyak per parameter pencarian") +
+  labs(x = "Username", y = "Jumlah Twit")
+```
 
 ## Jumlah akun terilibat
 
@@ -88,6 +111,22 @@ data_twit %>%
   geom_col() +
   ggtitle("Jumlah akun yang ada dalam twit berdasarkan parameter") +
   labs(x = "Parameter", y = "Jumlah akun terlibat")
+```
+
+## Akun paling sering terlibat
+
+```{r}
+data_twit %>%
+  select(user_all, parameter) %>%
+  unnest_tokens(user1, user_all, token = "words", to_lower = FALSE) %>%
+  group_by(parameter) %>%
+  count(user1, sort = TRUE) %>%
+  top_n(10) %>%
+  ggplot(aes(reorder(user1, n), n, fill = parameter)) +
+  geom_col(show.legend = FALSE) + coord_flip() +
+  facet_wrap(~parameter, scales = "free") +
+  ggtitle("Akun paling sering disbeut (terlibat) per parameter pencarian") +
+  labs(x = "Username", y = "Jumlah Twit")
 ```
 
 ## Topik yang dibahas
@@ -152,12 +191,48 @@ tm_data_twit <- data_twit %>%
 bigram_tm(tm_data_twit$clean_text, number_of_topics = 4, plot = T)
 ```
 
-## Anak Bangsa
+## Close reading (CR) twit
+### CR Berdasar kata kunci
 ```{r}
 data_twit %>%
-  filter(str_detect(clean_text, "\\banak bangsa\\b")) %>%
+  filter(str_detect(clean_text, "positif")) %>% # kata kunci
   select(date, tweets) %>%
-  head(n = 10)
+  head(n = 2) %>% # jumlah berita yang ditampilkan
+  kable()
+```
+
+### CR Berdasar akun
+```{r}
+data_twit %>%
+  filter(str_detect(user, "ulinyusron")) %>% # kata kunci
+  select(user, date, tweets) %>%
+  head(n = 10) %>% # jumlah berita yang ditampilkan
+  kable()
+```
+
+### CR Berdasar parameter + kata kunci
+```{r}
+data_twit %>%
+  filter(str_detect(parameter, "#savegojek")) %>% # kata kunci
+  filter(str_detect(clean_text, "gojek")) %>% # kata kunci
+  arrange(desc(ret_count)) %>%
+  select(user, date, tweets) %>%
+  head(n = 5) %>% # jumlah berita yang ditampilkan
+  kable()
+```
+
+### CR Berdasar tahun + kata kunci
+```{r}
+#glimpse(data_twit)
+
+data_twit %>%
+  separate(date, into = c("tahun", "tanggal", "bulan")) %>%
+  filter(tahun == 2016) %>% #...............................tahun yang dipilih
+  filter(str_detect(clean_text, "gojek")) %>% #.............kata kunci
+  arrange(desc(ret_count)) %>% #............................urutan twit berdasarkan RT
+  select(user, tahun, tweets) %>% #.........................data yang ditampilkan
+  head(n = 5) %>% #.........................................jumlah berita yang ditampilkan
+  kable()
 ```
 
 
@@ -218,6 +293,7 @@ data_petisi$clean_alasan <- gsub("\\bkota\\b", "", data_petisi$clean_alasan)
 data_petisi$clean_alasan <- gsub("\\band\\b", "", data_petisi$clean_alasan) 
 
 data_petisi$clean_alasan <- replace_white(data_petisi$clean_alasan)
+data_petisi$clean_alasan <- tolower(data_petisi$clean_alasan)
 ```
 
 ```{r}
@@ -271,6 +347,28 @@ petisi_words %>%
 5. petisi5 = Dukung keberadaan gojek di purwokerto
 6. petisi6 = Hentikan permenhub 108
 
+## Close reading (CR) petisi
+### CR Berdasar kata kunci petisi
+```{r}
+data_petisi %>%
+  filter(str_detect(clean_alasan, "jonan")) %>% #.........kata kunci
+  select(Nama, Waktu, Alasan) %>%
+  head(n = 5) %>% #.........................................jumlah komentar
+  kable()
+```
+
+### CR Berdasar judul + kata kunci petisi
+
+```{r}
+data_petisi %>%
+  filter(str_detect(judul_petisi, "petisi1")) %>% #.........judul petisi lihat keterangan
+  filter(str_detect(clean_alasan, "menteri")) %>% #.........kata kunci
+  select(Nama, Waktu, Alasan) %>%
+  head(n = 2) %>% #.........................................jumlah komentar
+  kable()
+```
+
+
 # Playstore
 
 ```{r}
@@ -278,6 +376,10 @@ id_ps <- "1arRuBqRHpWTXL_PqwOQDch4u3e6lEpXF"
 data_playstore <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_ps), sep = ",", stringsAsFactors = FALSE)
 
 data_playstore$date <- as.Date(data_playstore$date)
+data_playstore$text <- replace_non_ascii(data_playstore$text)
+data_playstore$text <- replace_emoji(data_playstore$text)
+data_playstore$text <- replace_word_elongation(data_playstore$text)
+data_playstore$text <- replace_white(data_playstore$text)
 ```
 
 
@@ -303,6 +405,30 @@ tm_ps_cust <- data_playstore %>%
 bigram_tm(tm_ps_cust$clean_text, number_of_topics = 2)
 ```
 
+## Close reading Customer
+### Close reading kata kunci Customer
+```{r}
+data_playstore %>%
+  filter(str_detect(aplikasi, "gojek_customer")) %>%
+  filter(str_detect(clean_text, "fitur chat")) %>%
+  select(username, date, text) %>%
+  head(n = 5) %>%
+  kable()
+```
+
+### Close reading tahun + kata kunci Customer
+```{r}
+data_playstore %>%
+  separate(date, into = c("tahun", "bulan", "tanggal")) %>%
+  filter(tahun == 2018) %>%
+  filter(str_detect(aplikasi, "gojek_customer")) %>%
+  filter(str_detect(clean_text, "app")) %>%
+  select(username, tahun, text) %>%
+  head(n = 5) %>%
+  kable()
+```
+
+
 ## Topik yang dibahas driver
 ```{r}
 tm_ps_driver <- data_playstore %>%
@@ -312,12 +438,46 @@ tm_ps_driver <- data_playstore %>%
 bigram_tm(tm_ps_driver$clean_text, number_of_topics = 2)
 ```
 
+## Close reading Mitra
+### CR berdasarkan kata kunci
+```{r}
+data_playstore %>%
+  filter(str_detect(aplikasi, "gojek_driver")) %>%
+  filter(str_detect(clean_text, "fitur chat")) %>%
+  select(date, text) %>%
+  head(n = 5) %>%
+  kable()
+```
+
+### CR berdasar tahun + kata kunci driver
+```{r}
+data_playstore %>%
+  separate(date, into = c("tahun", "bulan", "tanggal")) %>%
+  filter(tahun == 2017) %>% #.....................................tahun
+  filter(bulan == 11) %>% #.....................................bulan
+  filter(str_detect(aplikasi, "gojek_driver")) %>%
+  filter(str_detect(clean_text, "gps")) %>%
+  select(username, tahun, text) %>%
+  head(n = 5) %>%
+  kable()
+```
+
+
 
 # Media online
 
 ```{r}
 id_media <- "1hNGgygHzjGmKJDD3dbfJpQ833YoSVj_3" # cleaned username_all 
 data_media <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_media))
+```
+
+```{r}
+# Cleaning
+data_media$konten <- replace_html(data_media$konten)
+data_media$konten <- replace_incomplete(data_media$konten)
+data_media$konten <- replace_kern(data_media$konten)
+data_media$konten <- replace_non_ascii(data_media$konten)
+data_media$konten <- replace_white(data_media$konten)
 ```
 
 ```{r}
@@ -343,14 +503,14 @@ data_media %>%
   count(kata, sort = TRUE) %>%
   top_n(10) %>%
   ggplot(aes(reorder(kata, n), n, fill = "media")) + 
-  geom_col(show.legend = FALSE, fill = "black") + 
+  geom_col(show.legend = FALSE, fill = "gray29") + 
   coord_flip() + 
   facet_wrap(~ media, scales = "free") +
   ggtitle("Perbandingan term yang digunakan dalam berita") +
   labs(x = "Bigram", y = "Jumlah kata")
 ```
 
-## Topik dari kompas.com
+## Topik dari kompas
 ```{r}
 data_kompas <- data_media %>%
   filter(media == "kompas") %>%
@@ -358,6 +518,18 @@ data_kompas <- data_media %>%
 
 bigram_tm(data_kompas$clean_konten, plot = TRUE, number_of_topics = 2)
 ```
+
+## Close reading kompas
+
+```{r}
+data_media %>%
+  filter(str_detect(media, "kompas")) %>%
+  filter(str_detect(clean_konten, "peraturan menteri")) %>%
+  select(tanggal, konten) %>%
+  head(n = 1) %>% # jumlah berita yang ditampilkan
+  kable()
+```
+
 
 ## Topik dari tempo
 ```{r}
@@ -368,6 +540,17 @@ data_tempo <- data_media %>%
 bigram_tm(data_tempo$clean_konten, plot = TRUE, number_of_topics = 2)
 ```
 
+## Close reading tempo 
+```{r}
+data_media %>%
+  filter(str_detect(media, "tempo")) %>%
+  filter(str_detect(clean_konten, "peraturan menteri")) %>%
+  select(tanggal, konten) %>%
+  head(n = 1) %>% # jumlah berita yang ditampilkan
+  kable()
+```
+
+
 ## Topik dari detik
 ```{r}
 data_detik <- data_media %>%
@@ -376,3 +559,14 @@ data_detik <- data_media %>%
 
 bigram_tm(data_detik$clean_konten, plot = TRUE, number_of_topics = 2)
 ```
+
+## Close reading detik 
+```{r}
+data_media %>%
+  filter(str_detect(media, "detik")) %>%
+  filter(str_detect(clean_konten, "peraturan menteri")) %>%
+  select(tanggal, konten) %>%
+  head(n = 1) %>% # jumlah berita yang ditampilkan
+  kable()
+```
+

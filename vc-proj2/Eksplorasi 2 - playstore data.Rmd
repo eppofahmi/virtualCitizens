@@ -29,12 +29,11 @@ library(stringr)
 library(tm)
 library(reshape2)
 library(scales)
-library(AnomalyDetection)
-library(igraph)
-library(ggraph)
 library(topicmodels)
 library(SnowballC)
 library(RWeka) 
+library(knitr)
+library(textclean)
 ```
 
 # Tentang Data
@@ -45,6 +44,11 @@ id_ps <- "1arRuBqRHpWTXL_PqwOQDch4u3e6lEpXF"
 ps_gojek <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_ps), sep = ",", stringsAsFactors = FALSE)
 
 ps_gojek$date <- as.Date(ps_gojek$date)
+
+ps_gojek$text <- replace_non_ascii(ps_gojek$text)
+ps_gojek$text <- replace_emoji(ps_gojek$text)
+ps_gojek$text <- replace_word_elongation(ps_gojek$text)
+ps_gojek$text <- replace_white(ps_gojek$text)
 ```
 
 # Perbandingan Jumlah
@@ -240,11 +244,11 @@ Berikut ini adalah term dengan probabilitas tertinggi sebagai topik yang dibahas
 
 ```{r, fig.cap="Hasil topic modelling"}
 # execution
-tm_ps_costum <- ps_gojek %>%
+tm_ps_custom <- ps_gojek %>%
   filter(str_detect(aplikasi, "gojek_customer")) %>%
   select(date, clean_text, aplikasi)
 
-tm_ps_gojek1 <- bigram_tm(tm_ps_costum$clean_text, number_of_topics = 2)
+tm_ps_gojek1 <- bigram_tm(tm_ps_custom$clean_text, number_of_topics = 2)
 
 tm_ps_gojek1
 ```
@@ -259,3 +263,24 @@ tm_ps_mitra <- ps_gojek %>%
 tm_ps_gojek <- bigram_tm(tm_ps_mitra$clean_text, number_of_topics = 2)
 tm_ps_gojek
 ```
+
+# Close reading 1 - Customer
+```{r}
+ps_gojek %>%
+  filter(str_detect(aplikasi, "gojek_customer")) %>%
+  filter(str_detect(clean_text, "fitur chat")) %>%
+  select(date, text) %>%
+  head(n = 5) %>%
+  kable()
+```
+
+# Close reading 2 - Mitra
+```{r}
+ps_gojek %>%
+  filter(str_detect(aplikasi, "gojek_driver")) %>%
+  filter(str_detect(clean_text, "fitur chat")) %>%
+  select(date, text) %>%
+  head(n = 5) %>%
+  kable()
+```
+
