@@ -13,32 +13,48 @@ runtime: shiny
 library(flexdashboard)
 library(formattable)
 library(highcharter)
+library(timeSeries)
 library(tidyverse)
 library(networkD3)
 library(dygraphs)
 library(viridis)
 library(treemap)
 library(shinyBS)
+library(repmis)
 library(shiny)
 library(DT)
 ```
 
 ```{r dataVircit, include=FALSE}
-## sumber data
-rangkuman <- readRDS("/Volumes/mydata/rSkilss/vircit-readings/rangkuman.rds")
-## data eksplorasi
-data_eksplorasi <- readRDS("/Volumes/mydata/rSkilss/vircit-readings/data_eksplorasi.rds")
-## time series
-ts_change <- readRDS("/Volumes/mydata/rSkilss/vircit-readings/ts_change.rds")
-ts_gojek <- readRDS("/Volumes/mydata/rSkilss/vircit-readings/ts_gojek.rds")
-## table output
-data_vircit <- readRDS("/Volumes/mydata/rSkilss/vircit-readings/data_vircit.rds")
-## semantic network
-data_net <- readRDS("/Volumes/mydata/rSkilss/vircit-readings/semantic_network.rds")
-## social network
-net_user <- readRDS("/Volumes/mydata/rSkilss/vircit-readings/net_user.rds")
+# rangkuman
+rangkuman <- readRDS(gzcon(url("https://github.com/eppofahmi/virtualCitizens/blob/master/dashboardData/rangkuman.rds?raw=true")))
+# eksplorasi
+data_eksplorasi <- readRDS(gzcon(url("https://github.com/eppofahmi/virtualCitizens/blob/master/dashboardData/data_eksplorasi.rds?raw=true")))
+# timeseries
+ts_change <- readRDS(gzcon(url("https://github.com/eppofahmi/virtualCitizens/blob/master/dashboardData/ts_change.rds?raw=true")))
+ts_gojek <- readRDS(gzcon(url("https://github.com/eppofahmi/virtualCitizens/blob/master/dashboardData/ts_gojek.rds?raw=true")))
+# table output
+data_vircit <- readRDS(gzcon(url("https://github.com/eppofahmi/virtualCitizens/blob/master/dashboardData/data_vircit.rds?raw=true")))
+# semantic network
+data_net <- readRDS(gzcon(url("https://github.com/eppofahmi/virtualCitizens/blob/master/dashboardData/semantic_network.rds?raw=true")))
+# social network
+net_user <- readRDS(gzcon(url("https://github.com/eppofahmi/virtualCitizens/blob/master/dashboardData/net_user.rds?raw=true")))
 
-# about
+## sumber data ----------------------------------------
+# rangkuman <- readRDS("/Volumes/mydata/RStudio/FinalVirtualCitizens/dashboardData/rangkuman.rds")
+# ## data eksplorasi
+# data_eksplorasi <- readRDS("/Volumes/mydata/RStudio/FinalVirtualCitizens/dashboardData/data_eksplorasi.rds")
+# ## time series
+# ts_change <- readRDS("/Volumes/mydata/RStudio/FinalVirtualCitizens/dashboardData/ts_change.rds")
+# ts_gojek <- readRDS("/Volumes/mydata/RStudio/FinalVirtualCitizens/dashboardData/ts_gojek.rds")
+# ## table output
+# data_vircit <- readRDS("/Volumes/mydata/RStudio/FinalVirtualCitizens/dashboardData/data_vircit.rds")
+# ## semantic network
+# data_net <- readRDS("/Volumes/mydata/RStudio/FinalVirtualCitizens/dashboardData/semantic_network.rds")
+# ## social network
+# net_user <- readRDS("/Volumes/mydata/RStudio/FinalVirtualCitizens/dashboardData/net_user.rds")
+# 
+# about cols
 tm <- treemap(rangkuman, index = c("kasus", "sumber_data"),
               vSize = "logjumlah", vColor = "jumlah",
               type = "value", palette = magma(20))
@@ -85,7 +101,6 @@ renderDygraph({
   dyout
 })
 ```
-
 
 ### Tweets' Gojek
 
@@ -182,21 +197,50 @@ bsTooltip('topbigram2', "Tentukan banyaknya term yang akan dilihat", placement =
 
 helpText("KETERANGAN: Plot dapat disimpan dengan mengarakahkan kursor kepojok kanan plot dan memilih jenis file yang ingin disimpan. Plot dapat menampilkan data per group dengan mengklik pengelompokkan dibagian bawah plot. Tabel dapat diunduh dengan mengklik tombol Download.")
 
+# nama file 
+namafile <- reactive({
+  if (input$kasus121 == "gojek") {
+    nama1 <- paste0("gojek", "-", as.character(input$sdata1))
+    
+    # filtering based on input parameter
+    if (input$sdata1 == "media") {
+      nama1 <- paste0(as.character(nama1), "-", as.character(input$analisisMediaGojek))}
+    else if (input$sdata1 == "petisi") {
+      nama1 <- paste0(as.character(nama1), "-", (input$analisisPetisiGojek))}
+    else if (input$sdata1 == "playstore_driver") {
+      nama1 <- paste0(as.character(nama1), "-", (input$analisisPlaystoreDriver))}
+    else if (input$sdata1 == "playstore_customer") {
+      nama1 <- paste0(as.character(nama1), "-", (input$analisisPlaystoreCustomer))}
+    else {
+      nama1 <- paste0(as.character(nama1), "-", (input$analisisTwitterGojek))}
+    } # if 
+  
+  else {
+    nama1 <- paste0("change", "-", as.character(input$sdata2))
+    # filtering based on input parameter
+    if (input$sdata2 == "media") {
+      nama1 <- paste0(as.character(nama1), "-", as.character(input$analisisMediaChange))}
+    else if (input$sdata2 == "petisi") {
+      nama1 <- paste0(as.character(nama1), "-", as.character(input$analisisPetisiChange))}
+    else {
+      nama1 <- paste0(as.character(nama1), "-", as.character(input$analisisTwitterChange))
+      }
+  } # else
+  return(as.character(nama1))
+})
+
 # download action -------------------------------------------------------------------
 downloadHandler(filename = function() {
-     paste('result', as.character(input$sdata2), '.csv', sep='')
-   },
-     content = function(file) {
-     write.csv(tabeldf(), file, row.names = FALSE)
-   }
-)
+  paste(namafile(), '.csv', sep='')},
+  content = function(file) {
+    write.csv(tabeldf(), file, row.names = FALSE)
+    })
 ```
-
 
 OutputPlot {data-width=400}
 -----------------------------------------------------------------------------------------
 
-### Plot
+### Exploration
 
 ```{r}
 renderHighchart({
@@ -330,8 +374,7 @@ tabeldf <- reactive({
       df0$value <- round(df0$value, digits = 5)}
     else {
       df0 <- df0[[input$analisisTwitterChange]]
-      df0$value <- round(df0$value, digits = 5)
-    }
+      df0$value <- round(df0$value, digits = 5)}
   } # else
   return(df0)
 })
@@ -415,7 +458,6 @@ bsTooltip(id = "start", "Klik untuk melihat hasil setelah pengaturan di atas sel
           placement = "top")
 ```
     
-
 OutputSNA {data-height=500}
 -----------------------------------------------------------------------------------------
 
@@ -469,7 +511,6 @@ renderForceNetwork({
 })
 ```
 
-
 ### Klik tombol download untuk mengunduh network {data-width=100}
 
 ```{r}
@@ -517,7 +558,6 @@ renderText({
 })
 ```
 
-
 Semantic {data-navmenu=Analytics data-orientation=rows data-icon="glyphicon-text-size"}
 =========================================================================================
 
@@ -556,6 +596,8 @@ selectInput("arah212", "Arrows",
 bsTooltip(id = "arah212", "True untuk memberikan arah pada edges, False untuk sebaliknya", 
           placement = "top")
 
+textInput(inputId = "netfilter2", label = "Filter term")
+
 # input 4 - opacity ---------------------------------------------------------------------
 sliderInput("opacity212", "Opacity", 1, 
                   min = 0.1,
@@ -563,13 +605,14 @@ sliderInput("opacity212", "Opacity", 1,
                   step = .1)
 bsTooltip(id = "opacity212", "Atur kecerahan network", placement = "top")
 
+
 # action button -------------------------------------------------------------------------
 actionButton("mulai", "Generate Network")
 bsTooltip(id = "mulai", "Klik untuk melihat hasil setelah pengaturan di atas selesai", 
           placement = "top")
 
 # help text -----------------------------------------------------------------------------
-helpText("KETERANGAN: Untuk membaca network arahkan kursor pada salah satu node dan melihat arah dan keterhubungannya dengan node lain. Gunakan scroll untuk memperbesar tampilan network.")
+helpText("KETERANGAN: Klik tombol download untuk mengunduh network")
 
 # Donload Button ------------------------------------------------------------------------
 downloadButton("downloadsem", "Download Network")
@@ -746,9 +789,3 @@ renderDataTable({
   } # else
 }) # renderDataTable
 ```
-
-Help {data-orientation="rows" data-icon="glyphicon-question-sign"}
-=========================================================================================
-
-How to1? {vertical_layout: scroll}
------------------------------------------------------------------------------------------

@@ -1,0 +1,12 @@
+name: publicness
+title: publicness
+username:
+account: myeda
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 472443
+bundleId: 1608415
+url: https://myeda.shinyapps.io/publicness/
+when: 1538030780.42527
+asMultiple: FALSE
+asStatic: FALSE
