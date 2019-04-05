@@ -1,5 +1,5 @@
 ---
-title: "rangkuman data gojek"
+title: "Rangkuman data gojek"
 author: "Ujang fahmi"
 date: "7/24/2018"
 output:
@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 ```
 
 # Intro
-Rangkuman data yang sudah didapat tentang Gojek
+Untuk mengetahui konsep publicness yang muncul melalui keberadaan transportasi online. Kami menggunakan studi kasus terhadap keberadaan gojek yang muncul sejak tahun 2015. Oleh karena itu, data yang digunakan dalam penelitian ini berasal dari beberapa sumber dengan kata kunci utama "go jek." Dalam konteks ini data diambil dari: (1) Twitter; (2) Laman Change.org; (3) Platstore; dan (4) Media Online.  
 
 ```{r}
 if (Sys.info()['sysname'] == 'Darwin') {
@@ -46,7 +46,8 @@ usePackage("scales")
 
 
 # Twit tentang gojek
-## Data
+Data pertama diambil dari Twitter dengan beberapa parameter, yatu tagar **(1) #savedrivergojek; (2) #savegojek; (3) #saveojekonline;** dan **(4) twit yang menyebut (mention) akun @CeritaTranspOL**. Twit dengan parameter yang disebutkan tersebut dikumpulkan sejak tahun 2015 hingga 2018 dengan jumlah seperti dapat dilihat pada gambar berikut. 
+
 ```{r}
 id_tw_gojek <- "1ALZxvnmISCHuRzawaP5K6FjUTN3Wy700"
 data_twit <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_tw_gojek))
@@ -61,18 +62,20 @@ data_twit$tweets <- replace_word_elongation(data_twit$tweets)
 data_twit$tweets <- replace_white(data_twit$tweets)
 ```
 
-
 ```{r}
 data_twit %>%
-  select(date, parameter) %>%
-  separate(date, into = c("tahun", "bulan", "tanggal")) %>%
-  group_by(tahun) %>%
-  count(parameter) %>%
-  ggplot(aes(tahun, n, fill = parameter)) + 
-  geom_col() + theme(legend.position="top") + 
-  ggtitle("Jumlah Twit berdasarkan parameter mendapatkannya") + 
-  labs(x = "Tahun", y = "Jumlah")
+  group_by(parameter) %>%
+  count(date, sort = TRUE) %>% 
+  ggplot(aes(x=date, y=n, colour = parameter)) +
+  geom_line(show.legend = FALSE) +
+  scale_x_date(labels = date_format("%Y-%m"), 
+               breaks = date_breaks("6 months")) +
+  facet_grid(~parameter, scales="free") + 
+  labs(x = "Tahun - Bulan", y = "Jumlah Komentar") +
+  theme(legend.position="top")
 ```
+
+
 
 ## Jumlah akun pengirim
 

@@ -1,0 +1,96 @@
+---
+title: "TM Teluk Benua"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+```
+
+## Pendahuluan
+Bagian ini digunakan untuk melakukan analisis isi dengan algiritme LDA dan visualisasi dengan ldavis
+
+## Data
+Data yang digunakan `tm_benua.csv`, yaitu file yang berisi date, text (isinya adalah twit yang setelah dibersihkan memiliki minimal 2 term dalam row), dan jumlah term per row. 
+
+```{r}
+tm_telukBenua <- read.csv("tm_benua.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
+```
+
+## Library
+
+```{r}
+if (Sys.info()['sysname'] == 'Darwin') {
+  libjvm <- paste0(system2('/usr/libexec/java_home',stdout = TRUE)[1],'/jre/lib/server/libjvm.dylib')
+  message (paste0('Load libjvm.dylib from: ',libjvm))
+  dyn.load(libjvm)
+}
+library(topicmodels)
+library(LDAvis)
+library(RWeka)
+library(tm)
+```
+
+## Funsi ldavis bigram
+
+```{r}
+ldavis_tm <- function(input_text, # should be a columm from a dataframe
+                      plot = T, # return a plot? TRUE by defult
+                      number_of_topics = 4) # number of topics (4 by default)
+{    
+  # create a corpus (type of object expected by tm) and document term matrix
+  Corpus <- VCorpus(VectorSource(input_text)) # make a VCorpus object spec for RWeka
+  
+  # function for creating bigram in the DTM
+  BigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min=2, max=2))
+  # you can explore which term combination gave the most interpretable topic for you
+  # by changing numbers inside Weka_control
+  
+  DTM <- DocumentTermMatrix(Corpus, control=list(tokenize=BigramTokenizer))
+  
+  # remove any empty rows in our document term matrix (if there are any 
+  # we'll get an error when we try to run our LDA)
+  rowTotals <- apply(DTM , 1, sum) #Find the sum of words in each Document
+  dtm.new   <- DTM[rowTotals> 0, ] #remove all docs without words
+  unique_indexes <- unique(dtm.new$i) # get the index of each unique value
+  DTMa <- dtm.new[unique_indexes,]
+  
+  # function for ldavis
+  topicmodels2LDAvis <- function(x, ...){
+    post <- topicmodels::posterior(x)
+    if (ncol(post[["topics"]]) < 3) stop("The model must contain > 2 topics")
+    mat <- x@wordassignments
+    LDAvis::createJSON(
+      phi = post[["terms"]], 
+      theta = post[["topics"]],
+      vocab = colnames(post[["terms"]]),
+      doc.length = slam::row_sums(mat, na.rm = TRUE),
+      term.frequency = slam::col_sums(mat, na.rm = TRUE)
+    )
+  }
+  # excuting dtm 
+  lda <- LDA(DTMa, k = number_of_topics, control = list(seed = 1234))
+  # visualizing
+  serVis(topicmodels2LDAvis(lda), out.dir = "LDAVis_output_change", open.browser = FALSE)
+  
+  print("succes, please check your directory")
+  
+}
+```
+
+## Pembagian data 
+```{r}
+
+```
+
+
+
+## 1st try
+Result: fatal error
+
+```{r}
+# ldavis_tm(tm_telukBenua$clean_text, number_of_topics = 4)
+```
+

@@ -8,12 +8,6 @@ output:
     toc: yes
     toc_depth: 3
     toc_float: yes
-  pdf_document:
-    toc: yes
-    toc_depth: '3'
-  word_document:
-    toc: yes
-    toc_depth: '3'
 ---
 
 ```{r setup, include=FALSE}
@@ -262,6 +256,21 @@ twit_to_change %>%
   head(n = 3) %>% 
   kable()
 ```
+
+# Perplexity
+```{r}
+test_perplex <- tm_perplexity(tm_tochange$clean_text,
+                         number_of_topics = 4,
+                         min_words = 1,
+                         max_words = 1,
+                         min_k = 2,
+                         max_k = 50,
+                         multi = 10)
+
+test_perplex
+```
+
+
 
 # Topic modelling
 Topic modelling menggunakan data dari kolom `clean_text` dan filter `is_duplicate` = FALSE. Selain itu, karena topic modelling akan dilakukan dengan bigram twit yang setelah dibersihkan hanya memiliki 1 term dihilangkan dari data. Asumsinya, data dari twit tersebut tidak dapat memberikan konteks dari term yang ada secara lokal. Total twit yang dijadikan input topic modelling **33.819** twit. 

@@ -133,7 +133,7 @@ rm(clean_text)
 
 # 8. Periode =====================================
 # Periode dibagi berdasarkan tahun
-bns_raw <- btr_raw %>%
+bns_raw <- bns_raw %>%
   mutate(periode = case_when(
     date >= "2013-07-01" & date <= "2013-12-31" ~ "periode_1",
     date >= "2014-01-01" & date <= "2014-12-31" ~ "periode_2",

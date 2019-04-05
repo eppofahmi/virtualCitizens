@@ -52,9 +52,6 @@ library(knitr)
 ```{r}
 id_tw_gojek <- "1ALZxvnmISCHuRzawaP5K6FjUTN3Wy700"
 twit_gojek <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_tw_gojek))
-
-twit_gojek <- twit_gojek %>%
-  filter(word_count >= 2)
 ```
 
 ```{r, fig.cap="Perbandingan twit antar parameter"}

@@ -1,0 +1,754 @@
+---
+title: "Virtual Citizens and the Construction of Publicness"
+output: 
+  flexdashboard::flex_dashboard:
+    vertical_layout: fill
+    favicon: logo-ugm.png
+    social: menu
+    theme: united
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(formattable)
+library(highcharter)
+library(tidyverse)
+library(networkD3)
+library(dygraphs)
+library(viridis)
+library(treemap)
+library(shinyBS)
+library(shiny)
+library(DT)
+```
+
+```{r dataVircit, include=FALSE}
+## sumber data
+rangkuman <- readRDS("/Volumes/mydata/rSkilss/vircit-readings/rangkuman.rds")
+## data eksplorasi
+data_eksplorasi <- readRDS("/Volumes/mydata/rSkilss/vircit-readings/data_eksplorasi.rds")
+## time series
+ts_change <- readRDS("/Volumes/mydata/rSkilss/vircit-readings/ts_change.rds")
+ts_gojek <- readRDS("/Volumes/mydata/rSkilss/vircit-readings/ts_gojek.rds")
+## table output
+data_vircit <- readRDS("/Volumes/mydata/rSkilss/vircit-readings/data_vircit.rds")
+## semantic network
+data_net <- readRDS("/Volumes/mydata/rSkilss/vircit-readings/semantic_network.rds")
+## social network
+net_user <- readRDS("/Volumes/mydata/rSkilss/vircit-readings/net_user.rds")
+
+# about
+tm <- treemap(rangkuman, index = c("kasus", "sumber_data"),
+              vSize = "logjumlah", vColor = "jumlah",
+              type = "value", palette = magma(20))
+```
+
+Home {data-orientation=rows data-icon="glyphicon-home"}
+=========================================================================================
+
+Explanation {data-height=275}
+-----------------------------------------------------------------------------------------
+
+### About
+
+Penelitian ini dilakukan untuk mengeksplorasi konsep virtual Citizen dan publicness yang berkembang di dunia maya. Untuk melakukannya data dikumpulkan dari empat sumber yang berbeda seperti dapat dilihat pada plot di sebelah kanan (`data source`) dalam dua kasus yang berbeda yaitu keberadaan laman petisi daring `change` dan penyedia aplikasi jasa transportasi daring `gojek`.  
+
+Terdapat tiga analisis  yang dapat dilihat pada halaman/page `Analytics`. Bagian `Exploration` berisi `term frequency`, `tfidf`, dan `topicmodelling` dari masing-masing sumber data dan parameter yang digunakan untuk mendapatkanya. Bagian `SNA` hanya dihasilkan dari data yang diambil dari Twitter. Sementara `Semantic` merupakan hubungan antar kata dalam sumber data yang digunakan. Terakhir, bagian `Readings` berisi tabel yang dapat digunakan untuk melakukan konfirmasi hasil metode lainnya secara kualitatif.
+
+### Data Sources
+
+```{r datasource}
+renderHighchart(
+  hctreemap(tm, allowDrillToNode = TRUE) %>% 
+  hc_tooltip(pointFormat = "<b>{point.name}</b>:<br>
+                           Jumlah: {point.valuecolor:,.0f}<br>
+                           Log: {point.value:,.0f}") %>% 
+  hc_exporting(enabled = TRUE) # enable export 
+)
+```
+
+DataTimeSeries {data-height=275 .tabset}
+-----------------------------------------------------------------------------------------
+
+### Tweets' Change
+
+```{r changedist}
+dyout <- dygraph(ts_change) %>%
+    dySeries("balinotforsale", label = "#balinotforsale") %>%
+    dySeries("balitolakreklamasi", label = "#balitolakreklamasi") %>%
+    dySeries("to_@changeorg_id", label = "to_@changeorg_id") %>%
+    dyOptions(stackedGraph = TRUE) %>%
+    dyRangeSelector(height = 20)
+
+renderDygraph({
+  dyout
+})
+```
+
+
+### Tweets' Gojek
+
+```{r gojekdist}
+renderDygraph({
+  dygraph(ts_gojek) %>%
+    dySeries("saveojekonline", label = "#saveojekonline") %>%
+    dySeries("savegojek", label = "#savegojek") %>%
+    dySeries("savedrivergojek", label = "#savedrivergojek") %>%
+    dySeries("to_@ceritatranspol", label = "to_@ceritatranspol") %>%
+    dyOptions(stackedGraph = TRUE) %>%
+    dyRangeSelector(height = 20)
+})
+```
+
+Exploration {data-navmenu=Analytics data-orientation=columns data-icon="glyphicon-search"}
+=========================================================================================
+
+SidebarExplore {.sidebar}
+-----------------------------------------------------------------------------------------
+
+```{r sidebaranalytics}
+# kasus
+selectInput(inputId = "kasus121", label = "Cases", 
+            choices = c("change", "gojek"), 
+            selected = "gojek")
+
+# sumber data gojek
+conditionalPanel(condition = "input.kasus121 == 'gojek'", 
+                 selectInput(inputId = "sdata1", "Data source", 
+                             choices = c("twitter", "petisi", "media", 
+                                         "playstore driver" = "playstore_driver", 
+                                         "playstore customer" = "playstore_customer"), 
+                             selected = "twitter"), 
+                 conditionalPanel(condition = "input.sdata1 == 'playstore_driver'",
+                                  selectInput("analisisPlaystoreDriver", "Method", 
+                                              choices = c("frekuensi", "tfidf", 
+                                                          "topicmodelling"),
+                                              selected = "topicmodelling")),
+                 conditionalPanel(condition = "input.sdata1 == 'playstore_customer'",
+                                  selectInput("analisisPlaystoreCustomer", "Method", 
+                                              choices = c("frekuensi", "tfidf", 
+                                                          "topicmodelling"),
+                                              selected = "topicmodelling")),
+                 conditionalPanel(condition = "input.sdata1 == 'twitter'", 
+                                  selectInput("analisisTwitterGojek", "Method", 
+                                              choices = c("frekuensi", "tfidf", 
+                                                          "topicmodelling"),
+                                              selected = "topicmodelling")),
+                 conditionalPanel(condition = "input.sdata1 == 'media'", 
+                                  selectInput("analisisMediaGojek", "Method", 
+                                              choices = c("frekuensi", "tfidf"), 
+                                              selected = "frekuensi")),
+                 conditionalPanel(condition = "input.sdata1 == 'petisi'", 
+                                  selectInput("analisisPetisiGojek", "Method", 
+                                              choices = c("frekuensi", "tfidf", 
+                                                          "topicmodelling"), 
+                                              selected = "topicmodelling"))
+                 )
+
+# sumber data change
+conditionalPanel(condition = "input.kasus121 == 'change'", 
+                 selectInput(inputId = "sdata2", "Data source", 
+                             choices = c("twitter", "petisi", "media"), 
+                             selected = "twitter"), 
+                 conditionalPanel(condition = "input.sdata2 == 'twitter'", 
+                                  selectInput("analisisTwitterChange", "Method", 
+                                              choices = c("frekuensi", "tfidf",
+                                                          "topicmodelling"),
+                                              selected = "topicmodelling")),
+                 conditionalPanel(condition = "input.sdata2 == 'media'", 
+                                  selectInput("analisisMediaChange", "Method", 
+                                              choices = c("frekuensi", "tfidf"), 
+                                              selected = "frekuensi")),
+                 conditionalPanel(condition = "input.sdata2 == 'petisi'", 
+                                  selectInput("analisisPetisiChange", "Method", 
+                                              choices = c("frekuensi", "tfidf", 
+                                                          "topicmodelling"), 
+                                              selected = "topicmodelling"))
+                 )
+
+# top term
+sliderInput("topbigram2", label = "Top n",
+            min = 5, max = 15, value = 5, step = 1)
+
+bsTooltip('kasus121', "Pilih salah satu kasus", placement = "top")
+bsTooltip('sdata1', "Pilih sumber data yang ingin dilihat", placement = "top")
+bsTooltip('sdata2', "Pilih sumber data yang ingin dilihat", placement = "top")
+
+bsTooltip('analisisTwitterChange', "Pilih metode yang digunakan", placement = "top")
+bsTooltip('analisisTwitterGojek', "Pilih metode yang digunakan", placement = "top")
+
+bsTooltip('topbigram2', "Tentukan banyaknya term yang akan dilihat", placement = "top")
+
+helpText("KETERANGAN: Plot dapat disimpan dengan mengarakahkan kursor kepojok kanan plot dan memilih jenis file yang ingin disimpan. Plot dapat menampilkan data per group dengan mengklik pengelompokkan dibagian bawah plot. Tabel dapat diunduh dengan mengklik tombol Download.")
+
+# download action -------------------------------------------------------------------
+downloadHandler(filename = function() {
+     paste('result', as.character(input$sdata2), '.csv', sep='')
+   },
+     content = function(file) {
+     write.csv(tabeldf(), file, row.names = FALSE)
+   }
+)
+```
+
+
+OutputPlot {data-width=400}
+-----------------------------------------------------------------------------------------
+
+### Plot
+
+```{r}
+renderHighchart({
+  if (input$kasus121 == "gojek") {
+    df0 <- data_eksplorasi[[c(input$kasus121, input$sdata1)]] 
+    
+    # filtering based on parameter
+    if (input$sdata1 == "media") {
+      df0 <- df0[[input$analisisMediaGojek]]
+      df0 <- df0 %>%
+        select(1,2,3) %>% 
+        group_by(group) %>%
+        top_n(as.numeric(input$topbigram2)) %>%
+        ungroup() %>%
+        arrange(desc(value))}
+    else if (input$sdata1 == "petisi") {
+      df0 <- df0[[input$analisisPetisiGojek]]
+      df0 <- df0 %>%
+        select(1,2,3) %>% 
+        group_by(group) %>%
+        top_n(as.numeric(input$topbigram2)) %>%
+        ungroup() %>%
+        arrange(desc(value))}
+    else if (input$sdata1 == "playstore_driver") {
+      df0 <- df0[[input$analisisPlaystoreDriver]]
+      df0 <- df0 %>%
+        select(1,2,3) %>% 
+        group_by(group) %>%
+        top_n(as.numeric(input$topbigram2)) %>%
+        ungroup() %>%
+        arrange(desc(value))}
+    else if (input$sdata1 == "playstore_customer") {
+      df0 <- df0[[input$analisisPlaystoreCustomer]]
+      df0 <- df0 %>%
+        select(1,2,3) %>% 
+        group_by(group) %>%
+        top_n(as.numeric(input$topbigram2)) %>%
+        ungroup() %>%
+        arrange(desc(value))}
+    
+    else {
+      df0 <- df0[[input$analisisTwitterGojek]]
+      df0 <- df0 %>%
+        select(1,2,3) %>% 
+        group_by(group) %>%
+        top_n(as.numeric(input$topbigram2)) %>%
+        ungroup() %>%
+        arrange(desc(value))}
+
+    hchart(df0, "bar", hcaes(x = term, y = value, group = group, color = group)) %>%
+      hc_exporting(enabled = TRUE)
+    } # if 
+  
+  else {
+    df1 <- data_eksplorasi[[c(input$kasus121, input$sdata2)]] 
+    
+    # filtering based on parameter
+    if (input$sdata2 == "media") {
+      df1 <- df1[[input$analisisMediaChange]]
+      df1 <- df1 %>%
+        select(1,2,3) %>% 
+        group_by(group) %>%
+        top_n(as.numeric(input$topbigram2)) %>%
+        ungroup() %>%
+        arrange(desc(value))}
+    else if (input$sdata2 == "petisi") {
+      df1 <- df1[[input$analisisPetisiChange]]
+      df1 <- df1 %>%
+        select(1,2,3) %>% 
+        group_by(group) %>%
+        top_n(as.numeric(input$topbigram2)) %>%
+        ungroup() %>%
+        arrange(desc(value))}
+    else {
+      df1 <- df1[[input$analisisTwitterChange]]
+      df1 <- df1 %>%
+        select(1,2,3) %>% 
+        group_by(group) %>%
+        top_n(as.numeric(input$topbigram2)) %>%
+        ungroup() %>%
+        arrange(desc(value))
+    }
+    
+    hchart(df1, "bar", hcaes(x = term, y = value, group = group, color = group)) %>%
+      hc_exporting(enabled = TRUE)
+  } # else
+  
+}) # renderHighchart
+```
+
+OutputTable {data-width=250}
+-----------------------------------------------------------------------------------------
+    
+### Result Table
+
+```{r}
+# Donload Button ---------------------------------------------------------------------
+downloadButton("downloadData", "Download Table")
+
+# data -------------------------------------------------------------------------------
+tabeldf <- reactive({
+  if (input$kasus121 == "gojek") {
+    df0 <- data_eksplorasi[[c(input$kasus121, input$sdata1)]] 
+    
+    # filtering based on input parameter
+    if (input$sdata1 == "media") {
+      df0 <- df0[[input$analisisMediaGojek]]
+      df0$value <- round(df0$value, digits = 5)}
+    else if (input$sdata1 == "petisi") {
+      df0 <- df0[[input$analisisPetisiGojek]]
+      df0$value <- round(df0$value, digits = 5)}
+    else if (input$sdata1 == "playstore_driver") {
+      df0 <- df0[[input$analisisPlaystoreDriver]]
+      df0$value <- round(df0$value, digits = 5)}
+    else if (input$sdata1 == "playstore_customer") {
+      df0 <- df0[[input$analisisPlaystoreCustomer]]
+      df0$value <- round(df0$value, digits = 5)}
+    else {
+      df0 <- df0[[input$analisisTwitterGojek]]
+      df0$value <- round(df0$value, digits = 5)}
+    } # if 
+  
+  else {
+    df0 <- data_eksplorasi[[c(input$kasus121, input$sdata2)]]
+    # filtering based on input parameter
+    if (input$sdata2 == "media") {
+      df0 <- df0[[input$analisisMediaChange]]
+      df0$value <- round(df0$value, digits = 5)}
+    else if (input$sdata2 == "petisi") {
+      df0 <- df0[[input$analisisPetisiChange]]
+      df0$value <- round(df0$value, digits = 5)}
+    else {
+      df0 <- df0[[input$analisisTwitterChange]]
+      df0$value <- round(df0$value, digits = 5)
+    }
+  } # else
+  return(df0)
+})
+
+# visual yang tampil ----------------------------------------------------------------
+renderDataTable({
+  datatable(tabeldf(), filter = list(position = 'top', clear = TRUE),
+            options = list(searching = TRUE, searchHighlight = TRUE, regex = TRUE,
+                           lengthMenu = list(c(7,-1), c('7',"All"))))
+})
+```
+
+
+SNA {data-navmenu=Analytics data-orientation=rows data-icon="glyphicon-equalizer"}
+=========================================================================================
+
+SidebarSNA {.sidebar}
+-----------------------------------------------------------------------------------------
+
+```{r inputSNA}
+# input 1 - kasus -------------------------------------------------------------------------
+selectInput("kasus1", "Case", 
+            choices = c("Change" ="change", "Gojek" = "gojek"), 
+            selected = "gojek")
+
+# input 2 - sumber data/tagar ------------------------------------------------------------
+conditionalPanel(condition = "input.kasus1 == 'change'", 
+                 selectInput("sumbertagar1", "Data source",
+                             choices = c("balinotforsale", 
+                                         "balitolakreklamasi"),
+                             selected = "balinotforsale"))
+bsTooltip(id = "sumbertagar1", "Sumber data berdasarkan parameter", 
+          placement = "top")
+# ----------------------------------------------------------------------------------------
+conditionalPanel(condition = "input.kasus1 == 'gojek'", 
+                 selectInput("sumbertagar2", "Data source",
+                             choices = c("twit gojek" = "savegojek"),
+                             selected = "savegojek"))
+bsTooltip(id = "sumbertagar2", "Sumber data berdasarkan parameter", 
+          placement = "top")
+
+# input 3 - nodes size ------------------------------------------------------------------
+selectInput("theSize", "Nodes sizes",
+            choices = c("modularity" = "modularity_class",
+                        "eccentricity" = "Eccentricity",
+                        "closness" = "closnesscentrality",
+                        "betweeness" = "betweenesscentrality",
+                        "eigencentrality" = "eigencentrality"),
+            selected = "eigencentrality")
+bsTooltip(id = "theSize", "Besar nodes berdasarkan nilai yang dipilih", 
+          placement = "top")
+
+# input 4 - nodes group ------------------------------------------------------------------
+selectInput("theGroup", "Nodes Group",
+            choices = c("modularity" = "modularity_class",
+                        "eccentricity" = "Eccentricity",
+                        "closness" = "closnesscentrality",
+                        "betweeness" = "betweenesscentrality",
+                        "eigencentrality" = "eigencentrality"),
+            selected = "modularity")
+bsTooltip(id = "theGroup", "Pengelompokan nodes berdasarkan nilai yang dipilih", 
+          placement = "top")
+
+# input 5 - arrow -----------------------------------------------------------------------
+selectInput("arah008", "Arrows", 
+            choices = c("True" = "TRUE", "False" = "FALSE"), 
+            selected = "True")
+bsTooltip(id = "arah008", "True untuk memberikan arah pada edges, False untuk sebaliknya", 
+          placement = "top")
+
+# input 6 - opacity ---------------------------------------------------------------------
+sliderInput("opacity1", "Opacity", 1, 
+                  min = 0.1,
+                  max = 1,  
+                  step = .1)
+bsTooltip(id = "opacity1", "Atur kecerahan network", placement = "top")
+
+# action --------------------------------------------------------------------------------
+actionButton("start", "Generate network")
+bsTooltip(id = "start", "Klik untuk melihat hasil setelah pengaturan di atas selesai", 
+          placement = "top")
+```
+    
+
+OutputSNA {data-height=500}
+-----------------------------------------------------------------------------------------
+
+### Social Network Analysis
+
+```{r sna}
+# data ----------------------------------------------------------------------------------
+sna_vis <- reactive({
+  if (input$kasus1 == "change") {
+    forceNetwork(Links = net_user[[c(input$kasus1, input$sumbertagar1, "edges")]],
+               Nodes = net_user[[c(input$kasus1, input$sumbertagar1, "nodes")]],
+               Source = "source",
+               Target = "target",
+               Value = "value",
+               NodeID = "Label",
+               Nodesize = input$theSize,
+               Group = input$theGroup,
+               arrows = as.logical(input$arah008),
+               opacity = input$opacity1,
+               linkColour = "#666",
+               colourScale = JS("d3.scaleOrdinal(d3.schemeCategory10);"),
+               linkDistance = 150,
+               opacityNoHover = TRUE,
+               fontSize = 14,
+               zoom = TRUE)
+  }
+  else {
+    forceNetwork(Links = net_user[[c(input$kasus1, input$sumbertagar2, "edges")]],
+               Nodes = net_user[[c(input$kasus1, input$sumbertagar2, "nodes")]],
+               Source = "source",
+               Target = "target",
+               Value = "value",
+               NodeID = "Label",
+               Nodesize = input$theSize,
+               Group = input$theGroup,
+               arrows = as.logical(input$arah008),
+               opacity = input$opacity1,
+               linkColour = "#666",
+               colourScale = JS("d3.scaleOrdinal(d3.schemeCategory10);"),
+               linkDistance = 150,
+               opacityNoHover = TRUE,
+               fontSize = 14,
+               zoom = TRUE)
+  }
+})
+
+# Visualisasi network --------------------------------------------------------------------
+renderForceNetwork({
+  req(input$start)
+  sna_vis()
+})
+```
+
+
+### Klik tombol download untuk mengunduh network {data-width=100}
+
+```{r}
+# Donload Button ------------------------------------------------------------------------
+downloadButton("downloadGraph", "Download Network")
+
+downloadHandler(
+    filename = function() {
+      if (input$kasus1 == "change") {
+        paste0("SNA-", as.character(input$kasus1), "-", 
+               as.character(input$sumbertagar1), '.html')
+      }
+      else {
+        paste0("SNA-", as.character(input$kasus1), "-", "4parameters", '.html')
+      }
+    },
+    content = function(file) {
+      saveNetwork(sna_vis(), file)
+    }
+  )
+
+# Keterangan -------------------------------------------------------------------------
+renderText({
+  req(input$start)
+
+  if (input$kasus1 == "gojek") {
+    paste("KETERANGAN: SNA dari kasus Gojek, ",
+          "dengan data yang diambil dari Twitter menggunakan 4 parameter, yaitu: ",
+          "#savegojek, #saveojekonline, #savedrivergojek, dan twit yang memention akun
+          @CeritaTranspOL. ", "Besar nodes dalam network dibuat berdasarkan nilai: ",
+          as.character(input$theSize), ". ", "Nodes dikelompokan sesuai dengan nilai: ",
+          as.character(input$theGroup), " setiap nodes", ".",
+          sep = "")
+  }
+  else {
+    paste("KETERANGAN: SNA dari kasus Change, ",
+          "dengan data yang diambil dari twitter menggunakan parameter: ",
+          as.character(input$sumbertagar1), ". ",
+          "Besar nodes dalam network dibuat berdasarkan nilai: ",
+          as.character(input$theSize), ". ", "Nodes dikelompokan sesuai dengan nilai: ",
+          as.character(input$theGroup), " setiap nodes", ".",
+          sep = "")
+  }
+
+})
+```
+
+
+Semantic {data-navmenu=Analytics data-orientation=rows data-icon="glyphicon-text-size"}
+=========================================================================================
+
+SidebarSemantic {.sidebar}
+-----------------------------------------------------------------------------------------
+
+```{r inputNetwork}
+# input 1 - kasus -----------------------------------------------------------------------
+selectInput("kasus212", "Cases", 
+            choices = c("change", "gojek"), 
+            selected = "gojek")
+
+# input 2 - sumber data -----------------------------------------------------------------
+conditionalPanel(condition = "input.kasus212 == 'gojek'", 
+                 selectInput("sumber212", "Data source",
+                             choices = c("twitter", 
+                                         "petisi" = "web_petisi", 
+                                         "playstore"),
+                             selected = "twitter"))
+bsTooltip(id = "sumber212", "Data berdasarkan sumbernya", 
+          placement = "top")
+
+# ---------------------------------------------------------------------------------------
+conditionalPanel(condition = "input.kasus212 == 'change'", 
+                 selectInput("sumber213", "Data source",
+                             choices = c("twitter", 
+                                         "petisi" = "web_petisi"),
+                             selected = "twitter"))
+bsTooltip(id = "sumber213", "Data berdasarkan sumbernya", 
+          placement = "top")
+
+# input 3 - arrow -----------------------------------------------------------------------
+selectInput("arah212", "Arrows", 
+            choices = c("True"= "TRUE", "False"= "FALSE"), 
+            selected = "True")
+bsTooltip(id = "arah212", "True untuk memberikan arah pada edges, False untuk sebaliknya", 
+          placement = "top")
+
+# input 4 - opacity ---------------------------------------------------------------------
+sliderInput("opacity212", "Opacity", 1, 
+                  min = 0.1,
+                  max = 1,  
+                  step = .1)
+bsTooltip(id = "opacity212", "Atur kecerahan network", placement = "top")
+
+# action button -------------------------------------------------------------------------
+actionButton("mulai", "Generate Network")
+bsTooltip(id = "mulai", "Klik untuk melihat hasil setelah pengaturan di atas selesai", 
+          placement = "top")
+
+# help text -----------------------------------------------------------------------------
+helpText("KETERANGAN: Untuk membaca network arahkan kursor pada salah satu node dan melihat arah dan keterhubungannya dengan node lain. Gunakan scroll untuk memperbesar tampilan network.")
+
+# Donload Button ------------------------------------------------------------------------
+downloadButton("downloadsem", "Download Network")
+
+downloadHandler(
+    filename = function() {
+      if (input$kasus1 == "change") {
+        paste0("semanticNetwork-", as.character(input$kasus212), "-", 
+               as.character(input$sumber213), '.html')
+      }
+      else {
+        paste0("semanticNetwork-", as.character(input$kasus212), "-", 
+               as.character(input$sumber212), '.html')
+      }
+    },
+    content = function(file) {
+      saveNetwork(semnetPlot(), file)
+    }
+  )
+```
+
+OutputSemantic {data-height=560}
+-----------------------------------------------------------------------------------------
+
+### Semantic Network Analysis
+
+```{r semnet}
+# data ---------------------------------------------------------------------------------
+
+semnetPlot <- reactive({
+  
+  if (input$kasus212 == "gojek") {
+    forceNetwork(Links = data_net[[c(input$kasus212, input$sumber212, "edges")]],
+               Nodes = data_net[[c(input$kasus212, input$sumber212, "nodes")]],
+               Source = "source",Target = "target",
+               Value = "value",
+               NodeID = "Label",
+               Nodesize = "eigencentrality",
+               Group = "modularity_class",
+               arrows = as.logical(input$arah212),
+               charge = -30,
+               opacity = input$opacity212,
+               linkColour = "#666",
+               colourScale = JS("d3.scaleOrdinal(d3.schemeCategory10);"),
+               linkDistance = 150,
+               opacityNoHover = TRUE,
+               fontSize = 14,
+               zoom = TRUE)
+  }
+  else {
+    forceNetwork(Links = data_net[[c(input$kasus212, input$sumber213, "edges")]],
+               Nodes = data_net[[c(input$kasus212, input$sumber213, "nodes")]],
+               Source = "source",Target = "target",
+               Value = "value",
+               NodeID = "Label",
+               Nodesize = "eigencentrality",
+               Group = "modularity_class",
+               arrows = as.logical(input$arah212),
+               charge = -30,
+               opacity = input$opacity212,
+               linkColour = "#666",
+               colourScale = JS("d3.scaleOrdinal(d3.schemeCategory10);"),
+               linkDistance = 150,
+               opacityNoHover = TRUE,
+               fontSize = 14,
+               zoom = TRUE)
+  }
+})
+
+# vis -----------------------------------------------------------------------------------
+renderForceNetwork({
+  req(input$mulai)
+  semnetPlot()
+})
+```
+
+Readings {data-icon="glyphicon-align-left"}
+=========================================================================================
+
+SideReading {.sidebar}
+-----------------------------------------------------------------------------------------
+```{r inputReading}
+selectInput(inputId = "kasus", label = "Cases", 
+            choices = c("change", "gojek"), 
+            selected = "gojek")
+
+# input sumber data gojek
+conditionalPanel(condition = "input.kasus == 'gojek'", 
+                 selectInput(inputId = "sumberData1", "Data source", 
+                             choices = c("twitter", "petisi", "media", "playstore"), 
+                             selected = "playstore"), 
+                 conditionalPanel(condition = "input.sumberData1 == 'playstore'",
+                                  selectInput("parameterPlaystore", "Parameter", 
+                                              choices = c("customer", "driver"), 
+                                              selected = "driver")), 
+                 conditionalPanel(condition = "input.sumberData1 == 'twitter'", 
+                                  selectInput("parameterTwitterGojek", "Parameter", 
+                                              choices = c("savedrivergojek", "saveojekonline", 
+                                                          "savegojek", "CeritaTranspOL"),
+                                              selected = "savedrivergojek")),
+                 conditionalPanel(condition = "input.sumberData1 == 'media'", 
+                                  selectInput("parameterMediaGojek", "Parameter", 
+                                              choices = c("detik", "tempo", "kompas"), 
+                                              selected = "tempo")),
+                 conditionalPanel(condition = "input.sumberData1 == 'petisi'", 
+                                  selectInput("parameterPetisiGojek", "Parameter", 
+                                              choices = c("petisi_1", "petisi_2", "petisi_3", 
+                                                          "petisi_4", "petisi_5", "petisi_6"), 
+                                              selected = "petisi_6"))
+                 )
+
+# input sumber data change
+conditionalPanel(condition = "input.kasus == 'change'", 
+                 selectInput(inputId = "sumberData2", "Data Source", 
+                             choices = c("twitter", "petisi", "media"), 
+                             selected = "twitter"), 
+                 conditionalPanel(condition = "input.sumberData2 == 'twitter'",
+                                  selectInput("parameterTwitterChange", "Parameter", 
+                                              choices = c("balinotforsale" = "bns", 
+                                                          "balitolakreklamasi" = "btr", 
+                                                          "changeOrg_ID"), 
+                                              selected = "changeOrg_ID")), 
+                 conditionalPanel(condition = "input.sumberData2 == 'petisi'",
+                                  selectInput("parameterPetisiChange", "Parameter", 
+                                              choices = c("petisi_1", "petisi_2", "petisi_3"), 
+                                              selected = "petisi1")), 
+                 conditionalPanel(condition = "input.sumberData2 == 'media'",
+                                  selectInput("parameterMediaChange", "Parameter", 
+                                              choices = c("balipost", "beritabali", 
+                                                          "tempo", "kompas"), 
+                                              selected = "balipost"))
+                 )
+
+# keterangan
+helpText("KETERANGAN: Tabel menampilkan data untuk masing-masing kasus, sumber data, dan atau parameter yang digunakan. Parameter media sama dengan nama media. Kolom pencarian dapat dilakukan per kolom dengan dengan menggunakan/mengisi baris di bawah nama masing-masing kolom.")
+```
+
+OutputReading {vertical_layout: scroll}
+-----------------------------------------------------------------------------------------
+
+```{r}
+renderDataTable({
+  if (input$kasus == "gojek") {
+    df0 <- data_vircit[[c(input$kasus, input$sumberData1)]] 
+    
+    # filtering based on parameter
+    if (input$sumberData1 == "media") {
+      df0 <- df0[[input$parameterMediaGojek]]}
+    else if (input$sumberData1 == "petisi") {
+      df0 <- df0[[input$parameterPetisiGojek]]}
+    else if (input$sumberData1 == "playstore") {
+      df0 <- df0[[input$parameterPlaystore]]}
+    else {
+      df0 <- df0[[input$parameterTwitterGojek]]
+    }
+    datatable(df0, filter = list(position = 'top', clear = TRUE), 
+              options = list(searching = TRUE, searchHighlight = TRUE, regex = TRUE,
+                             lengthMenu = list(c(5,6,7,8, -1), 
+                                               c('5','6','7','8', "All")))) 
+    } # if 
+  else {
+    df1 <- data_vircit[[c(input$kasus, input$sumberData2)]] 
+    # filtering based on parameter
+    if (input$sumberData2 == "media") {
+      df1 <- df1[[input$parameterMediaChange]]}
+    else if (input$sumberData2 == "petisi") {
+      df1 <- df1[[input$parameterPetisiChange]]}
+    else {
+      df1 <- df1[[input$parameterTwitterChange]]
+    }
+    datatable(df1, filter = list(position = 'top', clear = TRUE), 
+              options = list(searching = TRUE, searchHighlight = TRUE, regex = TRUE,
+                             lengthMenu = list(c(5,6,7,8, -1), c('5','6','7','8', "All"))))
+  } # else
+}) # renderDataTable
+```
+
+Help {data-orientation="rows" data-icon="glyphicon-question-sign"}
+=========================================================================================
+
+How to1? {vertical_layout: scroll}
+-----------------------------------------------------------------------------------------

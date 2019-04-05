@@ -1,0 +1,148 @@
+ad17269	eppofahmi	Mon Jun 4 09:31:12 2018	recommit	a3ce93fd504ae80049abeb1107447e0ec86356c0
+a3ce93f	eppofahmi	Mon Jun 4 09:23:26 2018	some data source changes in all reports	dffe5d909fac1b8811559c945ffc248702a3269a
+dffe5d9	eppofahmi	Thu May 31 12:20:00 2018	membaca twit berdasarkan kata kunci	60712954d438256129d140fa2637226ef0c6acc6
+6071295	eppofahmi	Thu May 31 12:14:28 2018	Merge branch 'master' of github.com:eppofahmi/virtualCitizens	ae739d08ab1ea4cd38210eff1ecce027a327a0c9 fbe1fc6cc8978c9b31a579570e4a74f88e683ec4
+ae739d0	eppofahmi	Thu May 31 12:10:54 2018	gdrive update	6ec54823f346d3fe6b25c6577d3ff4c84dd7f116
+fbe1fc6	eppofahmi	Thu May 31 11:51:55 2018	yes just commit	22c531708aeb49fc270a6bb632425a8e22a404d6 6ec54823f346d3fe6b25c6577d3ff4c84dd7f116
+22c5317	eppofahmi	Thu May 31 11:50:07 2018	dell pc	0e8eab71257869de76a1bf58e67236599d97efbb
+6ec5482	eppofahmi	Thu May 31 11:46:24 2018	just gits	efeeaa8376a208af93ff4e4a092e5b10947ff18d
+efeeaa8	eppofahmi	Fri May 25 04:43:22 2018	write to txt	f74d108ab3c3db38d3a5510784cc2b4afe80fff6
+f74d108	eppofahmi	Fri May 25 04:17:06 2018	fix	07e4798796232a61611c3d16de1af41dab8ad6db
+07e4798	eppofahmi	Fri May 25 03:49:12 2018	final media cleaning	11c2a52478630bdcc6d0aafeb39e26fcab1d562e
+11c2a52	eppofahmi	Thu May 24 14:18:29 2018	total words	9096c9988701685f6182fa8d2e5164c85122991b
+9096c99	eppofahmi	Thu May 24 13:29:04 2018	btr dalam media	df02f787016dc1c8e92c23a21fae9575d5006402
+df02f78	eppofahmi	Thu May 24 13:26:08 2018	data	9b2e544295bffd0f677ba23280f6ccbbd09c2359
+9b2e544	eppofahmi	Thu May 24 11:31:55 2018	iki nggo mba nuri	034ad0a18ae50f815dbac20055c95a20c1591863
+034ad0a	eppofahmi	Thu May 24 11:16:42 2018	just pull	7c38c58009373a5a4733e6c676376455670fa490
+7c38c58	eppofahmi	Tue May 22 17:01:12 2018	Celaning komentar di petisi	6341939ddedb137b5d0638616296eea75f227df8
+6341939	eppofahmi	Tue May 22 15:15:22 2018	net	e3cb4cafda1c5b63fe3ea3b793118c074c616812
+e3cb4ca	eppofahmi	Tue May 22 15:14:17 2018	petisi change	63482b60079c9a86ff872441193202268762498e
+63482b6	eppofahmi	Tue May 22 02:04:47 2018	eksplorasi topic mmodelling	4ede57fe09645c6e6bad450b2d897218ea85e62e
+4ede57f	eppofahmi	Mon May 21 18:43:51 2018	media data wrangling and cleaning	a559a6c0a915bd420219fa1ba1bf5c7ec0e0d863
+a559a6c	eppofahmi	Mon May 21 17:34:58 2018	1st media exploration	af380fc26fbb34ab6f5407764f980edbfdce904e
+af380fc	eppofahmi	Mon May 21 02:51:50 2018	media data and finishing tb report	4cc4c2e82e15bb4d49682fc6b3d4e32f97afb944
+4cc4c2e	eppofahmi	Sat May 19 02:20:02 2018	interpretasi topic modelling	0e8eab71257869de76a1bf58e67236599d97efbb
+0e8eab7	eppofahmi	Thu May 17 12:35:33 2018	drive download	4ff32cb21716a4330eb9516cfd739a0913953b39
+4ff32cb	eppofahmi	Thu May 17 12:20:54 2018	person tweets	2de62a900e968c35ed65a5e4aae04c70c1752cc8
+2de62a9	eppofahmi	Thu May 17 02:34:45 2018	wrangling	909a8781c109be194b31862d4a1ac2c9d2bbf368
+909a878	eppofahmi	Wed May 16 13:11:49 2018	tolak reklamasi dalam media	b51ea029134f16b9b4cebeafab91736e32241516
+b51ea02	eppofahmi	Wed May 16 13:10:06 2018	transpol dalam media	6e45576519b47c903c48ca67dacaaa44a7b001d4
+6e45576	eppofahmi	Tue May 8 15:47:55 2018	new commit	c7a8c553928cefd6a6a88cf65bb8ead550d32b07
+c7a8c55	eppofahmi	Tue May 8 15:45:38 2018	new data sources	8b00d9932f46772ff0e3b8b29b2096ba45606c5d
+8b00d99	eppofahmi	Tue May 8 15:44:44 2018	new data sources	260c5330853d155ad67097ce3613c9472d00c169
+260c533	eppofahmi	Fri May 4 12:55:51 2018	Merge branch 'master' of github.com:eppofahmi/virtualCitizens	e8d06d79fa4de94a59fafde33608b1a8c9da94b8 5d046ec52ddb3a992d30b360f59a3b1d41eaeb65
+e8d06d7	eppofahmi	Fri May 4 12:53:32 2018	new data sources parameter	997333287d32fca04996b335876d586a59df8758
+5d046ec	eppofahmi	Thu May 3 13:50:13 2018	oke	a37df020ae8f4f036ab39992f0e64b61f81b96c8 cee215ca4920a840e7dbf588ea227d08cb7ba1b5
+a37df02	eppofahmi	Thu May 3 13:49:32 2018	download file	62f675dec53c71890b73baecf1dac93363ee2965
+cee215c	eppofahmi	Thu May 3 13:42:21 2018	177	997333287d32fca04996b335876d586a59df8758
+9973332	eppofahmi	Thu May 3 12:12:02 2018	minor edit	d3844c20d8e4acd07bc72f1763fd864504d7327c
+d3844c2	eppofahmi	Thu May 3 11:58:41 2018	07 Creating graph file	dc42b7272966e9597e8734cac2f4ce87ec393bd2
+dc42b72	eppofahmi	Wed May 2 12:55:34 2018	id	62f675dec53c71890b73baecf1dac93363ee2965
+62f675d	eppofahmi	Wed May 2 12:47:05 2018	gdrive	c0ffa2b3544d3a1931e9c0845d2fcbb7d76d1dd4
+c0ffa2b	eppofahmi	Wed May 2 12:45:31 2018	download gdrive file	33589bbe0d5cc0175607a82ca87849a9f834ffc1
+33589bb	eppofahmi	Wed May 2 10:44:13 2018	user data cleaning	ef7c38760120095ee9df28fcf9c5c0db3d4faca9
+ef7c387	eppofahmi	Tue May 1 18:35:46 2018	new wrangling scenario and ekploration to teluk benoa twit	5019748e74e3a73306befe24eaae2d72a484d430
+5019748	eppofahmi	Mon Apr 30 21:58:49 2018	clean clean clean	2e2695f11e282f630d21bccb064a7cdb59f90576
+2e2695f	eppofahmi	Mon Apr 30 16:50:51 2018	tag and username cleaning	439099362278c477ff1bf0c7cdc3ccc144e93c8a
+4390993	eppofahmi	Mon Apr 30 14:35:57 2018	new regex for hashtag, username and removing special urls from change	4cbbbe223ec75ce0e7d3a98e999a2781aa93c732
+4cbbbe2	eppofahmi	Sat Apr 28 13:48:21 2018	renaming files	5cfcf37d887a67459d0c7d3ab25a97833523e3a4
+5cfcf37	eppofahmi	Sat Apr 28 13:34:53 2018	eksplorasi 1 untuk mengetahui wacana di change org	db3e3fef073ffc723ac7263e275922da2fe1c937
+db3e3fe	eppofahmi	Fri Apr 27 18:35:44 2018	deleting 2 files	7712b49f6e147a5e7b6cfe6f0ebba296abe8940d
+7712b49	eppofahmi	Fri Apr 27 14:19:32 2018	hashtag cleaning	a78c3eec7c938e8878db448840162ef7ebdb0b84
+a78c3ee	eppofahmi	Fri Apr 27 10:53:04 2018	new data source and exploration	65d4308c08a2cf69ad1d1e71f5fa921c9417291a
+65d4308	eppofahmi	Thu Apr 26 13:06:25 2018	new wrangling	5e30142d2ee0aac1c930e1ccf306c7808eee766f
+5e30142	eppofahmi	Thu Apr 26 13:02:16 2018	user cleaning	8ddf1fcc278af42f79a9a803551e2ae4a8d727b6
+8ddf1fc	eppofahmi	Thu Apr 26 10:20:34 2018	petisi scrapper update	2bd321df943718eb767dc6414dc23c91ded2a2e1
+2bd321d	eppofahmi	Wed Apr 25 17:00:09 2018	project desc and data	47259d4b5a505d8d0a9a10d25a787501a639676d
+47259d4	eppofahmi	Tue Apr 24 17:35:02 2018	pic... cleaning from user_all	c43cf052cd7d827890c7dd383928d3b22852d8ae
+c43cf05	eppofahmi	Tue Apr 24 14:41:46 2018	gojek network	f5630b9e7f2150cff4410c80ef92c299bc6a8a0e
+f5630b9	eppofahmi	Tue Apr 24 12:25:06 2018	topic modelling	b2e0eab00d11470b6d1850a4703621e85bb75fe3
+b2e0eab	eppofahmi	Tue Apr 24 09:18:13 2018	eksplorasi petisi gojek.. next topic modelling	bd1ffde1d754b9463d4b18711e11a0ea37975799
+bd1ffde	eppofahmi	Mon Apr 23 21:54:30 2018	data new	e52dadfd67a7df3c6a63b847f11c88694af96211
+e52dadf	eppofahmi	Mon Apr 23 14:01:05 2018	2nd data exploration	9826335ca0263810cf55f9b6198451a674285e89
+9826335	eppofahmi	Mon Apr 23 12:11:52 2018	keterangan	5cc0d556ba0b491f08ff4f018a8fa8f342c58cf7
+5cc0d55	eppofahmi	Mon Apr 23 10:52:30 2018	topic modelling	04d9cc56c5b883c81809a00c5d6338797bbbf6f3
+04d9cc5	eppofahmi	Mon Apr 23 00:25:44 2018	sem net	29ecb244e15de3cd9ce8d83a0e7f9c5a18eb3798
+29ecb24	eppofahmi	Sun Apr 22 16:52:19 2018	tfidf	a19aeef29820067aea937b7b3f6b1cb893a35c23
+a19aeef	eppofahmi	Sun Apr 22 11:44:05 2018	yes	0b2858104af9024c5b18ff876926280976dc3cd9
+0b28581	eppofahmi	Sun Apr 22 11:40:01 2018	new file	c3744b3b4efe9cbb197c8c02542966e0dbc70e75
+c3744b3	eppofahmi	Sun Apr 22 11:39:29 2018	del again	de4c98c4d6c138f47e6223df009f55f0280c74fd
+de4c98c	eppofahmi	Sun Apr 22 11:37:33 2018	del	7f992f75e1c77aedda7f34fc620d424520770c6e
+7f992f7	eppofahmi	Sun Apr 22 10:33:11 2018	some notes	ccf23f4d70959baa17b57539b206cf0cad1e2565
+ccf23f4	eppofahmi	Sun Apr 22 10:26:49 2018	wrangling twit gojek	62640867039033085ee6b3794e195b049d98e27a
+6264086	eppofahmi	Sun Apr 22 09:29:19 2018	new data wrangling	1c6db8a3946258e1aba88fb7a9793068d498b132
+1c6db8a	eppofahmi	Sun Apr 22 05:39:00 2018	wrangling twit	894c17b6f47e5e91e305217d874b51f846b5f2ba
+894c17b	eppofahmi	Sun Apr 22 05:23:57 2018	del	df573395cacb424a0dffbb120bdbb6673c679c7e
+df57339	Ujang Fahmi	Sat Apr 21 23:21:25 2018	Update Description proj-2	93b9d7255e5f31c78a2812e7901f7197a07847d0
+93b9d72	Ujang Fahmi	Sat Apr 21 23:17:06 2018	Update Description proj-3	53b1ac76be08140d073bcafa7d3734c26f593dbf
+53b1ac7	Ujang Fahmi	Sat Apr 21 23:02:56 2018	Update Description proj-2	b7732980dd058d77fd4060a4306f235b1de9fe67
+b773298	eppofahmi	Sat Apr 21 22:01:15 2018	cleaning scrap data	8ef61288f5666ee7958eea6389ddb861c868ffa7
+8ef6128	eppofahmi	Sat Apr 21 17:24:00 2018	daftar petisi	0d853fb18d9c589691fe3a17b6807b317138db6b
+0d853fb	eppofahmi	Sat Apr 21 17:04:50 2018	okey	772f248b6852f6df32c5186e9e523f14318d8183
+772f248	eppofahmi	Sat Apr 21 17:04:10 2018	Merge branch 'master' of github.com:eppofahmi/virtualCitizens	8b5f92618461b5eba93f1ab5222b904770762608 101eaed6e5f40f2f5d22e4074aadc4078b4111ad
+8b5f926	eppofahmi	Sat Apr 21 17:03:46 2018	delete reset	5bd8507b93a3dc87f4472b77b91f2d34b19d5a49
+101eaed	Ujang Fahmi	Sat Apr 21 16:59:15 2018	keterangan sudah atau belum	5bd8507b93a3dc87f4472b77b91f2d34b19d5a49
+5bd8507	eppofahmi	Sat Apr 21 16:51:04 2018	nama kolom	d814579fe181704b051826034df7527d29a32851
+d814579	eppofahmi	Sat Apr 21 16:43:29 2018	keterangan kolom	44a2471f66b6ccd08ecee025afc8e89aed66241e
+44a2471	eppofahmi	Sat Apr 21 16:19:44 2018	new data source	e2664c7cc339da90f938e3050d8f39d56443fad1
+e2664c7	eppofahmi	Sat Apr 21 15:53:32 2018	bali not for sale	908639bd879128a18f4777f8e96c1f9e7d907cc2
+908639b	eppofahmi	Sat Apr 21 15:52:15 2018	rename	03a5e27489ff13b7e6f58129fb1f3bcc25471f04
+03a5e27	eppofahmi	Sat Apr 21 15:29:15 2018	add source identity and query parameters	b3c66f93d4dd1c12a2908158dd738c3649639296
+b3c66f9	eppofahmi	Sat Apr 21 14:59:16 2018	wrangling playstore	95750b278ea2a42a5913f99c5f8335951f7ab503
+95750b2	eppofahmi	Sat Apr 21 14:21:33 2018	wrangling playstore data	86ea40b9638bd987eb75a57b8fd8a9881112634f
+86ea40b	eppofahmi	Sat Apr 21 11:18:55 2018	add	188d7889c8d78759c804535c8c50b021da43e6c3
+188d788	eppofahmi	Sat Apr 21 11:18:31 2018	add project description	fce71e903c1ba5a11ab231b509f4973ca6652cc4
+fce71e9	eppofahmi	Sat Apr 21 11:04:43 2018	desc	ae2c234eb9b7032ec749ae70e9c12d5eae3a5a2c
+ae2c234	eppofahmi	Sat Apr 21 11:04:18 2018	rename	3460668c82f1ae369553d468f32236f5f3ab454d
+3460668	eppofahmi	Sat Apr 21 11:01:46 2018	del old description	00a650916c13ab16a047e8e68576d931c67d0c60
+00a6509	eppofahmi	Sat Apr 21 11:00:24 2018	deskripsi proyek	62ec12e3e87b05f7be4538c3e3d75715e66597ba
+62ec12e	eppofahmi	Sat Apr 21 10:45:33 2018	skrip untuk scrapping daftar petisi	eb8e5bfce768f5e2140ac1bdeac2f857ba324c39
+eb8e5bf	eppofahmi	Sat Apr 21 10:44:08 2018	scrapper del	600e0e764413b5cb40ef578fc79ae848dcd4b2a4
+600e0e7	eppofahmi	Sat Apr 21 10:42:40 2018	del tweet wrangling	f667604cab77a29fdcf80966131fc706ac86b977
+f667604	eppofahmi	Sat Apr 21 10:39:23 2018	add some doc	75e32cf8028d5409dc180a7c71a9efac8ba8ce76
+75e32cf	eppofahmi	Sat Apr 21 10:38:11 2018	change file	b7ca29c1c03e91787395aec566a2da698e4af283
+b7ca29c	eppofahmi	Sat Apr 21 00:26:33 2018	wrangling	8503c5fe6c42cd10469adaf053c18d2b4012cb56
+8503c5f	eppofahmi	Thu Apr 19 06:55:21 2018	explore 3 - to 4	8fbf3ee80f510aa863ce6c5b83a8f3f810ddd573
+8fbf3ee	eppofahmi	Thu Apr 19 05:06:36 2018	rename	e7495c32adbf259964b4b74df119d4ee7cbd5a4d
+e7495c3	eppofahmi	Thu Apr 19 05:05:55 2018	rename	50885f900923ea6ecf88b0cb645647dba2611990
+50885f9	eppofahmi	Thu Apr 19 05:03:03 2018	eksplore 1 dan 2	6385e8627e0ccd372f368e649aed2d5d10a31aac
+6385e86	eppofahmi	Thu Apr 19 03:20:20 2018	tm	a27ed9bf884a96b278f7f535dcd1097336b95bd0
+a27ed9b	eppofahmi	Thu Apr 19 03:06:56 2018	tb - 1 up	4a8b8c7238498b785aceaff4a7c7f1e35d423353
+4a8b8c7	eppofahmi	Wed Apr 18 14:15:51 2018	topic modelling of drivers' comment	ca80579036a82b66aa538a55dbe285cd2eff5541
+ca80579	eppofahmi	Wed Apr 18 12:19:20 2018	new data exploration	7691cafd1cb0a116ca26b32860ad9fede31c130d
+7691caf	eppofahmi	Wed Apr 18 10:12:09 2018	tm teluk benua	679f933ef71ed795e7ead60c2021d7a8879b54dc
+679f933	eppofahmi	Wed Apr 18 08:37:38 2018	new cleaning dictr	6b342d738424da0571b3335d22b28c8b48a4b0a4
+6b342d7	eppofahmi	Wed Apr 11 17:19:02 2018	data need tobe cleaned for the next process	505e2f0666dd1fbe3857767353c48c8231441d74
+505e2f0	eppofahmi	Tue Apr 10 17:10:31 2018	distribusi	31f0521f9684a091d6940b1d778b75bbd85bc059
+31f0521	eppofahmi	Mon Apr 9 19:32:40 2018	write tsv	03147cc7d0be465ed7cf0d411c27c58630369d7f
+03147cc	eppofahmi	Mon Apr 9 17:48:36 2018	Stop to scrap tweets using new keywords in python. Next i'll put the data here	3473afb4cdc92f5dd1da1097be35fa4882d5454d
+3473afb	eppofahmi	Mon Apr 9 17:38:05 2018	new case studies for publicness	0c6a419ceb564bfab3dcf49855f40ce0b6e5b18e
+0c6a419	eppofahmi	Fri Apr 6 06:56:54 2018	celaning tweet column and take the hashtag	af31672c5b888cd4d903353999825e8ead036fe8
+af31672	eppofahmi	Wed Apr 4 22:42:04 2018	data tweet handling1	4809eff30dc281937740f60c568f7cc83f2d5a65
+4809eff	eppofahmi	Wed Apr 4 17:08:17 2018	header	b45542cb0dadb364d4d6132763e150875c162378
+b45542c	eppofahmi	Wed Apr 4 16:39:57 2018	changes some desc	1ab1e0c05fe57571d0a68667ab72048761886b6d 9f4d518a7a5dc2fb0d43949664237644fa1b1df5
+1ab1e0c	eppofahmi	Wed Apr 4 16:38:21 2018	change desc	06ac7e0cd08484d54169a5554d0275d1800ecafd
+06ac7e0	eppofahmi	Wed Apr 4 16:36:22 2018	add files to proj3 for wrangling twitter data	3d80d2d4213bbf64de96c2e00f872cf0bc065850
+9f4d518	eppofahmi	Wed Apr 4 16:32:06 2018	Set theme jekyll-theme-cayman	118741fb4313b72f1686d2bc9fa3d2b778f85059
+118741f	eppofahmi	Wed Apr 4 16:23:45 2018	Update description-proj2.R	8298e6762e10a2e297007822b80588b1ef1465db
+8298e67	eppofahmi	Wed Apr 4 16:22:10 2018	Update description-proj2.R	592fc6ce28fe0a2d8f1970167b0b8f848bb57b9d
+592fc6c	eppofahmi	Wed Apr 4 16:17:35 2018	Update description-proj3.R	8cd9fb136fe0bba8b2367b98d90c552c4a531086
+8cd9fb1	eppofahmi	Wed Apr 4 12:29:41 2018	Update description proj 1.R	6e901dfcc58648e1b12c9d9b853f87115c819f04
+6e901df	eppofahmi	Wed Apr 4 12:20:32 2018	Update README.md	3d80d2d4213bbf64de96c2e00f872cf0bc065850
+3d80d2d	eppofahmi	Wed Apr 4 11:40:27 2018	add description proj 2	36b83a0e370223643fa814b16a0053d94ac571f3
+36b83a0	eppofahmi	Wed Apr 4 11:35:53 2018	add description to proj 1	08a21d58d8d2a62c5e1d362d83d0efc504c8d92b
+08a21d5	eppofahmi	Wed Apr 4 11:35:17 2018	changing file name	c96cb8edb51705e39c3375cd6406636c0398bef8
+c96cb8e	eppofahmi	Wed Apr 4 11:31:25 2018	adding project description	04a40fca5837cd54afd4e33843e04bba7cfa8b0e
+04a40fc	eppofahmi	Wed Apr 4 11:30:35 2018	description	abcc5f515c40b007f1fbb188843bb5e4a78ada63
+abcc5f5	eppofahmi	Wed Apr 4 11:27:38 2018	add proj 2	d4217ab10d17a989bfe4bdfbfdde612017c71168
+d4217ab	eppofahmi	Wed Apr 4 11:26:38 2018	yes 1	ff902cac3bc293fb08d42997f5bb820f944b68f9
+ff902ca	eppofahmi	Wed Apr 4 11:25:07 2018	test 1 proj3	1a60ef6f375fb3d6f22ad90bb1bfb73e3dea4920
+1a60ef6	eppofahmi	Wed Apr 4 11:23:43 2018	yes test	107e7dee2528ec3bbb7f7986367e412ed2a5b835
+107e7de	eppofahmi	Wed Apr 4 11:22:22 2018	project 3 test	0702b25111948f77585b2e87dcbe6012c2d5fe86
+0702b25	eppofahmi	Wed Apr 4 11:13:07 2018	add proj	d462abd6ffacc3672ab28bf06ad1364957bd55e9
+d462abd	eppofahmi	Wed Apr 4 11:09:11 2018	Merge branch 'master' of github.com:eppofahmi/virtualCitizens	001fb8e51af929cec153e7371d38f2c8deb21cab a9069cfa48fa1a718202c2925beb8b0969dde052
+001fb8e	eppofahmi	Wed Apr 4 11:08:15 2018	tes2	a1471079b99e1341f2457bd4fa8e121dac7023dc
+a147107	eppofahmi	Wed Apr 4 10:55:23 2018	project1	7c3b2f0ef89d2b80cdaf850cb5d224111b1624cf
+a9069cf	eppofahmi	Wed Apr 4 10:52:04 2018	Add files via upload	7c3b2f0ef89d2b80cdaf850cb5d224111b1624cf
+7c3b2f0	eppofahmi	Wed Apr 4 10:45:23 2018	first collecting data1	d1ab1818d329f08b772ccd19712805a794cc0ed5
+d1ab181	eppofahmi	Wed Apr 4 10:37:19 2018	Initial commit	

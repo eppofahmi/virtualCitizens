@@ -1,0 +1,316 @@
+---
+title: "Rangkuman Change"
+author: "Ujang fahmi"
+date: "8/18/2018"
+output:
+  html_notebook:
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+  word_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, 
+                      warning = FALSE, 
+                      message = FALSE, 
+                      fig.pos = "h", 
+                      fig.width=8, 
+                      fig.height=5,
+                      fig.align = "center",
+                      fig.path = "/Volumes/mydata/RStudio/virtualCitizens/vc-proj3/R/plot")
+```
+
+# Pendahuluan
+Tulisan ini merupakan rangkuman proses pengumpulan data, pre-rpocessing, dan analisis data dari penelitian tentang publicness dibalik keberadaan laman petisi daring www.change.org. Laporan ini terdiri dari beberapa bagian: (1) Data; (2) Hasil dan Pembahasan; dan (3) Simpulan.  
+
+# Data dan Metode
+Data yang digunakan dalam penelitian dikumpulkan dengan skenario: **Pertama**, mengetahui petisi yang paling banyak dibahas oleh warga net di media sosial. Untuk mengetahui hal tersebut, informasi dikumpulkan melalui pengumpulan data dari Twitter dengan parameter twit yang memention akun `@ChangeOrg_ID`. **Kedua**, mengetahui jumlah petisi, jumlah pendukung petisi, dan alasan penandatangan petisi terkait dengan isu yang paling sering dibahas. Untuk itu, data kedua dikumpulkan dari website `www.change.org`. **Ketiga**, mengetahui wacana yang berkembang dibalik isu petisi. Untuk mengetahui hal tersebut, data pertama yang digunakan adalah pembicaraan warga net di Twitter yang didapat dengan kata kunci tagar **#balinotforsale** dan **#balitolakreklamasi**. Secara umum, rangkuman twit yang digunakan dalam penelitian ini dapat dilihat pada tabel berikut. 
+
+
+```{r}
+# Runing RJava
+if (Sys.info()['sysname'] == 'Darwin') {
+  libjvm <- paste0(system2('/usr/libexec/java_home',stdout = TRUE)[1],'/jre/lib/server/libjvm.dylib')
+  message (paste0('Load libjvm.dylib from: ',libjvm))
+  dyn.load(libjvm)
+}
+
+library(tidyverse)
+library(ggplot2)
+library(stringr)
+library(lubridate)
+library(topicmodels)
+library(tm)
+library(tidytext)
+library(RWeka)
+library(reshape2)
+library(wordcloud)
+library(igraph)
+library(ggraph)
+library(quanteda)
+library(googledrive)
+library(skimr)
+library(textclean)
+library(knitr)
+library(simpletable)
+```
+
+
+```{r}
+# Laman Change
+id_petisi <- "1GAmUZ2TrPTdCJrnu9pxyFnNExabn8i39"
+id_list_petisi <- "1VwCnz04fkwplVKiQ-7TSinIvZgu6pjMD"
+petisi_daftar <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_list_petisi), progress = FALSE)
+petisi_komentar <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_petisi), progress = FALSE)
+
+# 2. Twitter
+id0 <- "1RAalTLYhpprDCpE_wos48ymufN8mjMG_" # twit-mention-change.csv 
+id1 <- "11WTedaaE79EtT4vOGNU2vfG7xgcLtJcE" # twit-tagar-balitolakreklamasi.csv
+id2 <- "1984jmFur63PmYvoC8Ab6P2iwfUQYVp71" # twit-tagar-balinotforsale.csv
+id3 <- "1Pw0WZIuou9bw7nog1xCJqOVZDR-TCk88" # cleaned username_all 
+
+# twit yang didapat dengan parameter memention akun Twitter @ChangeOrg_ID
+twit_to_change <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id0), progress = FALSE)
+# twit yang didapat dengan parameter tagar #balitolakreklamasi
+twit_btr <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id1), progress = FALSE)
+# twit yang didapat dengan parameter tagar #balinotforsale
+twit_bns <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id2), progress = FALSE)
+
+# 3. Media 
+id_media <- "1MI7WGILkpdyLt8iU9-7NUwr7d5yv0UnJ" # cleaned username_all 
+media_data <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_media), progress = FALSE)
+
+# 4. Hasil wawancara
+id_wawancara <- "15aNLp7pfXk2pba1cTtl3J8Wf37NLBHFq"
+wawancara <- read_csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id_wawancara), progress = FALSE)
+```
+
+**Tabel 1. Rangkuman twit**
+```{r, results='asis'}
+rangkuman_twit_change <- read_delim("rangkuman twit change.csv", delim = ";")
+
+rangkuman_twit_change %>%
+  arrange(desc(akun_pengirim)) %>%
+  tablecode(tabletype = "gridtable")
+```
+*Source: Tweet dengan tagar #BTR, #BNS dan yang memention akun @ChangeOrg_ID*
+
+Selain itu, untuk mengetahui wacana yang berkembang juga digunakan data dari sumber lain yaitu dari media massa daring (lokal: balipost, beritabali; nasional: kompas, tempo) dan wawancara yang dilakukan terhadap partisipan penelitian. Partisipan di dalam penelitian ini adalah pengguna Twitter yang menjadi *influencer* dalam jejaring pengirim twit dengan dua tagar di yang disebutkan di atas. Dalam konteks ini, *influencer* ditentukan dengan membuat *Social Network Analysis* (SNA). Secara spesifik, influencer ditentukan berdasarkan `eigencentrality` masing-masing akun. 
+
+Wacana yang berkembang dibalik isu petisi yang juga banyak dibahas oleh masyarakat di media sosial diakukan dengan metode campuran antara Topic Modelling dan Analisis Wacana. Oleh karena itu, metode yang digunakan dalam studi ini dapat disebut menggunakan metode Corpus Asisted Dicsourse Studies (CADS), yaitu dengan memanfaatkan metode corpus linguistik (penggunaan topic modelling) dan analisis wacana `[referensi]`. 
+
+Tahapan analisis wacana dilakukan dengan terlebih dahulu melakukan pre-processing data dari Twitter. Pre-processing di sini meliputi penghilangan URLSs, stopwords, tagar, dan nama akun *(username)*. Selanjutnya, Topic Modelling dilakukan dengan menggunakan algoritme Laten Dirichelet Allocation (LDA) yang diperkenalkan oleh Blei et al. `[referensi]` untuk mendapatkan topik dari korpus yang berasal dari twit yang sudah dibersihakn. Dari segi jumlah, topik yang didapat dari korpus di evaluasi dengan menggunakan `perplexity`. Gambar berikut merupakan salah satu contoh hasil perhitungan perplexity dari twit dengan tagar #balitolakreklamasi dan #balinotforsale. 
+
+```{r}
+data_tm <- bind_rows(twit_bns, twit_btr)
+data_tm <- data_tm %>%
+  filter(word_count >= 2) %>%
+  select(clean_text) %>%
+  mutate(is_dup = duplicated(clean_text)) %>%
+  filter(is_dup == FALSE) %>%
+  select(clean_text)
+
+data_tm <- tweet_cleaner(data = data_tm, column = 1)
+```
+
+```{r, dpi=200}
+perplexity_twit_bali <- tm_perplexity(data_tm$clean_text,
+                         number_of_topics = 4,
+                         min_words = 1,
+                         max_words = 1,
+                         min_k = 5,
+                         max_k = 50,
+                         multi = 5)
+perplexity_twit_bali
+```
+**Gambar 1. Perplexity dari Twit yang mengandung tagar #balitolakreklamsi dan #balinotforsale**
+
+*Source: Twit yang mengandung tagar #balitolakreklamasi dan #balinotforsale*
+
+Dari gambar di atas diketahui bahwa jumlah topik optimal yang dapat diambil dari korpus adalah 5-35 topik. Selanjutnya, topik-topik tersebut di interpretasikan dengan analisis wacana. Secara teknis, masing-masing topik yang muncul di kelompokkan menjadi beberapa kategori sesuai dengan konteks yang ada dibelakangnya. Konteks topik di sini didapat dengan cara membandingkan konteks real topik dengan yang terjadi dan tercatat pada sumber data lain (media dan wawancara). Dengan kata lain, interpretability topik dievalusi dengan melakukan `intra-topic semantic validity`, yaitu validasi dengan mengambil sampel dokumen untuk dibaca secara manual `[referensi]`, membandingkannya dengan sumber data lain dan melakukan intertextuality dari analisis wacana `[referensi]`. 
+
+# Hasil dan Pembahasan
+## Petisi yang banyak dibahas
+Untuk mengetahui isu yang banyak mendapatkan respons dari warga net (virtual citizens) kami melakukan beberapa observasi. Pertama, kami melakukan observasi di media sosial. Dalam konteks ini, Twitter dipilih sebagai media sosial yang dijadikan sample karena Twitter memiliki kebijakan yang tidak membatasi pesan untuk menyebar secara luas dan lebih cepat dibanding media sosial lainnya. Twit yang digunakan di dapat dengan metode semi automatif scrapping dengan parameter twit yang memention akun @changeOrg_ID. Gambar berikut menunjukkan distribusi twit yang digunakan untuk mengetahui topik petisi yang dibahas. 
+
+```{r, dpi=200, fig.cap="Distribusi Twit mention to Change"}
+twit_to_change %>%
+  select(date) %>%
+  group_by(date) %>%
+  count(date) %>%
+  ggplot(aes(date, n, group = 1)) + 
+  geom_line()
+```
+**Gambar 2. Distribusi twit yang ditujukan pada akun @ChangeOrg_ID**
+
+*Source: Tweets yang memention akun @ChangeOrg_ID*
+
+Gambar di atas menunjukkan bahwa petisi online cukup populer di media sosia, khususnya antara tahun 2014 hingga 2015. Selan itu, distribusinya cenderung fluktuatif. Kemungkinan hal tersebut dipengaruhi oleh perisitiwa di dunia nyata yang diangkat menjadi petisi di laman www.change.org. Untuk mengetahui topik yang dibahas oleh wara net melalui twit tersebut kami melakukan analisis konten yang hasilnya dapat dilihat pada gambar berikut. 
+
+```{r, include=FALSE, dpi=200}
+tm_twitToChange <- twit_to_change %>%
+  filter(word_count >= 2) %>% 
+  filter(is_duplicate == FALSE) %>%
+  select(clean_text, tweets)
+tm_twitToChange <- as.data.frame(tm_twitToChange)
+twitToChange <- tm_twitToChange
+twitToChange <- tweet_cleaner(data = twitToChange, column = 1)
+tm_twitToChange$clean_text <- twitToChange$clean_text
+tm_twitToChange$word_count <- sapply(tm_twitToChange$clean_text, function(x) 
+    length(unlist(strsplit(as.character(x), "\\W+"))))
+tm_twitToChange <- tm_twitToChange %>%
+  filter(word_count >= 2)
+tm_twitToChange <- tm_twitToChange %>%
+  mutate(duplicated(clean_text))
+tm_twitToChange <- tm_twitToChange %>%
+  select(clean_text, is_dup = `duplicated(clean_text)`)
+tm_twitToChange <- tm_twitToChange %>%
+  filter(is_dup == FALSE)
+
+tm_perplexity(tm_twitToChange$clean_text,
+                         number_of_topics = 4,
+                         min_words = 1,
+                         max_words = 1,
+                         min_k = 5,
+                         max_k = 50,
+                         multi = 5)
+```
+
+```{r, fig.width = 11, fig.height = 7, dpi=200}
+tm_Tochange <- bigram_tm(input_text = tm_twitToChange, 
+                         plot = T, 
+                         min_words = 2, 
+                         max_words = 2, 
+                         topic_term = 5, 
+                         number_of_topics = 10)
+tm_Tochange
+```
+**Gambar 3. Hasil Topic modelling twit yang memention akun @ChangeOrg_ID**
+
+*Source: Tweets yang memention akun @ChangeOrg_ID*
+
+Hasil topik modelling di atas menunjukkan bahwa media sosial Twitter digunakan oleh warga net untuk mensosialisasikan petisi yang mereka usung di laman www.change.org. Hal ini dibuktikan dengan munculnya topik ajakan untuk tandatangan. Selain itu, media sosial juga digunakan untuk menunjukkan isu petisi. Dalam konteks ini, hasil berdasarkan twit terdapat beberapa isu yang mnejadi perhatian publik, di antaranya adalah isu tentang hukuman untuk pelaku kekerasan seksual (predator sesksual), UUMD3, dan reklamasi Teluk Benoa di Bali. Gambar berikut menunjukkan jumlah asal dokumen yang membahas ketiga isu petisi di atas. 
+
+```{r, dpi=200}
+tb <- twit_to_change %>% 
+  filter(str_detect(clean_text, 'teluk|benoa')) %>%
+  mutate(issu = "teluk benua")
+predator <- twit_to_change %>% 
+  filter(str_detect(clean_text, 'predator|seksual')) %>%
+  mutate(issu = "predator")
+md3 <- twit_to_change %>% 
+  filter(str_detect(clean_text, 'uumd')) %>%
+  mutate(issu = "uumd3")
+dok_tm <- bind_rows(tb, predator, md3)
+rm(tb, predator, md3)
+
+dok_tm %>%
+  select(issu) %>%
+  group_by(issu) %>%
+  count(issu) %>%
+  ggplot(aes(issu, n)) + geom_col() + 
+  ggtitle("Perbandingan Jumlah Twit (dokumen) asal topik") +
+  xlab("Isu") + ylab("Jumlah Twit")
+```
+**Gambar 4. Perbandingan Jumlah Twit yang membahas tiga isu petisi**
+
+*Source: Tweets yang memention akun @ChangeOrg_ID*
+
+Dari gambar di atas diketahui bahwa isu petisi di laman change.org yang paling banyak dibahas oleh warga net adalah isu terkait dengan penolakan reklamasi Teluk Benoa di Bali, disusul oleh isu undang-undang terkait dengan hukuman pelaku kekerasan seksual, dan UUMD3. Berdasarkan data tersebut, selanjutnya pembahasan tentang *virtual publicness* akan dilakukan dengan menggunakan wacana yang berkembang dibalik keberadaan isu reklamasi Teluk Benoa.
+
+## Reklamasi Teluk Benoa
+### Reasons' construction
+Di laman www.change.org petisi dapat dibuat oleh setiap individu maupun kelompok dan organisasi. Dalam konteks ini, terdapat 12 petisi yang memiliki kata kunci "Teluk Benoa" baik yang dibuat oleh indivudu maupun kelompok masyarakat seperti dapat dilihat pada tabel berikut. 
+
+**Tabel 2. Daftar petisi tentang Teluk Benoa**
+```{r, results="asis"}
+petisi_daftar %>%
+  filter(jml_pendukung > 1000) %>%
+  arrange(date) %>%
+  select(-link) %>%
+  select(-terpetisi) %>%
+  tablecode(tabletype = "gridtable", width = 6)
+```
+**Keterangan: Tabel hanya menunjukkan petisi yang didukung oleh lebih dari 1000 penandatangan**
+
+*Source: Daftar petisi di laman www.change.org yang mengandung kata kunci Teluk Benoa*
+
+Tabel di atas menunjukkan bahwa petisi tentang Teluk Benoa dengan pendukung terbanyak diinisiasi oleh kelompok masyarkat, yaitu ForBALI (Forum Rakyat Bali Tolak Reklamasi). Selain kelompok atau organisasi kemasyarakatan petisi juga ada yang dinisiasi oleh musisi lokal. Alasan mereka menandatangani petisi dapat dilihat dari konten komentar yang dibuat oleh penandatangan petisi seperti dapat dilihat pada hasil topic modelling berikut.
+
+```{r, include=FALSE}
+petisi_tm <- petisi_komentar %>%
+  select(alasan) %>%
+  as.data.frame()
+petisi_tm_clean <- tweet_cleaner(data = petisi_tm, column = 1)
+petisi_tm$clean_text <- petisi_tm_clean$clean_text
+petisi_tm$word_count <- sapply(petisi_tm$clean_text, function(x) 
+    length(unlist(strsplit(as.character(x), "\\W+"))))
+rm(petisi_tm_clean)
+petisi_tm <- petisi_tm %>%
+  filter(word_count >= 2)
+
+tm_perplexity(input_text = petisi_tm$clean_text, 
+              min_words = 1, 
+              max_words = 1, 
+              min_k = 2, 
+              max_k = 20, 
+              multi = 5, 
+              number_of_topics = 4)
+```
+
+```{r, dpi=200, fig.width=8, fig.height=5}
+tm_petisi <- bigram_tm(input_text = petisi_tm$clean_text, 
+          plot = T, min_words = 2, max_words = 2,
+          topic_term = 10, number_of_topics = 4)
+
+tm_petisi
+```
+**Gambar 5. Topik dari komentar petisi tentang Teluk Benoa**
+
+*Source: Komentar penadatangan petisi di laman www.change.org yang mengandung kata kunci Teluk Benoa*
+
+Hasil topik modelling di atas menunjukkan bahwa masyarakat mendukung petisi untuk menolak reklamasi Teluk Benoa karena meraka mencintai bali. Dalam konteks ini, pendukung petisi menganggap reklamasi akan merusak keadaan alam/lingkungan. Selain itu, reklamsi juga dianggap hanya mewakili sebagian kelompok masyarakat, khususnya yang memiliki modal saja seperti dituliskan oleh seorang komentator berikut.
+
+**Tabel 3. Contoh alasan penandatangan petisi penolakan reklamasi Teluk Benoa di Bali**
+```{r, results="asis"}
+petisi_komentar$alasan <- replace_non_ascii(petisi_komentar$alasan)
+petisi_komentar$alasan <- replace_white(petisi_komentar$alasan)
+
+petisi_komentar %>%
+  filter(str_detect(alasan_clean, "rusak")) %>%
+  select(nama, alasan) %>%
+  head(n = 2) %>% 
+  tablecode(tabletype = "gridtable", width = 6)
+```
+*Source: Komentar penadatangan petisi di laman www.change.org yang mengandung kata kunci Teluk Benoa*
+
+Lebih jauh lagi, penolakan reklamsi juga didasarkan oleh adanya keputusan pemerintah yang menetapkan kawasan Teluk Benoa sebagai kawasan konservasi. Namun seperti dikatakan oleh salah seorang partisipan penelitian, ketetapan/pertauran tersebut sepertinya dengan sengaja di dikurangi luas kawasannya agar proyek reklamasi dapat dilakukan. Salah seorang partisipan menjelaskan hal berikut: **"... sepanjang teluk benua adalah kawasan konservasi tidak boleh di reklamasi."**
+
+```{r}
+# Skrip untuk mengetahui apa yang dikatakan oleh partisipan penelitian
+# wawancara %>%
+#   filter(str_detect(percakapan, "konservasi")) %>%
+#   select(percakapan) %>%
+#   kable()
+```
+
+### The virtual citizens
+Media sosial memungkinkan interaksi terjadi dalam dua bentul. Pertama interaksi antar pengguna media sosial. Kedua, interaksi antara pengguna media sosial dengan media yang digunakan. Dalam waktu yang sama pengguna media sosial dapat menjadi produser sekaligus konsumen wacana yang berkembang secara vitual. Dengan kata lain, selain memungkinkan terjadinya komunitas virtual, interaksi yang terjadi juga memungkinkan munculnya tokoh-tokoh virtual yang menjadi influencer gerakan penolakan reklamasi. Untuk membuktikan asumsi tersebut kami melakukan Social Network Analisis (SNA) yang hasilnya dapat dilihat pada [**tautan ini**](https://eppofahmi.github.io/sna-vircit/#).
+
+Secara visual dapat dilihat bahwa interaksi yang terjadi antar pengguna Twitter dalam twit yang mengandung dua tagar yang digunakan sebagai penanda gerakan penolakan reklamasi Teluk Benoa merupakan sebuah kelompok warga net yang saling terhubung satu sama lain.  
+
+### Shared meaning
+
+```{r, dpi=200}
+tm_change <- bigram_tm(input_text = data_tm, plot = F, min_words = 1, 
+          max_words = 1, topic_term = 10, number_of_topics = 15)
+```
+
+# Simpulan
