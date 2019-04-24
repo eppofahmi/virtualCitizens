@@ -1,0 +1,5841 @@
+{
+  "gojek": {
+    "media": {
+      "frekuensi": [
+        {
+          "group": "kompas",
+          "term": "taksi online",
+          "value": 377
+        },
+        {
+          "group": "tempo",
+          "term": "taksi online",
+          "value": 267
+        },
+        {
+          "group": "kompas",
+          "term": "ojek online",
+          "value": 193
+        },
+        {
+          "group": "tempo",
+          "term": "transportasi online",
+          "value": 186
+        },
+        {
+          "group": "tempo",
+          "term": "ojek online",
+          "value": 178
+        },
+        {
+          "group": "kompas",
+          "term": "transportasi online",
+          "value": 171
+        },
+        {
+          "group": "tempo",
+          "term": "menteri perhubungan",
+          "value": 99
+        },
+        {
+          "group": "tempo",
+          "term": "jawa barat",
+          "value": 86
+        },
+        {
+          "group": "tempo",
+          "term": "angkutan online",
+          "value": 83
+        },
+        {
+          "group": "tempo",
+          "term": "pengemudi ojek",
+          "value": 83
+        },
+        {
+          "group": "tempo",
+          "term": "peraturan menteri",
+          "value": 77
+        },
+        {
+          "group": "kompas",
+          "term": "menteri perhubungan",
+          "value": 71
+        },
+        {
+          "group": "tempo",
+          "term": "tempo jakarta",
+          "value": 69
+        },
+        {
+          "group": "kompas",
+          "term": "jakarta kompas",
+          "value": 64
+        },
+        {
+          "group": "kompas",
+          "term": "kendaraan bermotor",
+          "value": 64
+        },
+        {
+          "group": "kompas",
+          "term": "pengemudi ojek",
+          "value": 62
+        },
+        {
+          "group": "tempo",
+          "term": "kendaraan bermotor",
+          "value": 62
+        },
+        {
+          "group": "kompas",
+          "term": "budi karya",
+          "value": 61
+        },
+        {
+          "group": "tempo",
+          "term": "kementerian perhubungan",
+          "value": 58
+        },
+        {
+          "group": "kompas",
+          "term": "kementerian perhubungan",
+          "value": 57
+        },
+        {
+          "group": "kompas",
+          "term": "supir taksi",
+          "value": 57
+        },
+        {
+          "group": "kompas",
+          "term": "undang undang",
+          "value": 57
+        },
+        {
+          "group": "kompas",
+          "term": "angkutan online",
+          "value": 53
+        },
+        {
+          "group": "kompas",
+          "term": "angkutan orang",
+          "value": 52
+        },
+        {
+          "group": "kompas",
+          "term": "peraturan menteri",
+          "value": 52
+        },
+        {
+          "group": "tempo",
+          "term": "berbasis aplikasi",
+          "value": 51
+        },
+        {
+          "group": "tempo",
+          "term": "perhubungan nomor",
+          "value": 50
+        },
+        {
+          "group": "kompas",
+          "term": "perusahaan aplikasi",
+          "value": 48
+        },
+        {
+          "group": "tempo",
+          "term": "oktober twothousandandseventeen",
+          "value": 44
+        },
+        {
+          "group": "tempo",
+          "term": "angkutan orang",
+          "value": 39
+        }
+      ],
+      "tfidf": [
+        {
+          "group": "tempo",
+          "term": "tempo jakarta",
+          "value": 0.0024
+        },
+        {
+          "group": "tempo",
+          "term": "rp ribu",
+          "value": 0.0008
+        },
+        {
+          "group": "tempo",
+          "term": "twothousandandeighteen baca",
+          "value": 0.0006
+        },
+        {
+          "group": "tempo",
+          "term": "fine indonesia",
+          "value": 0.0005
+        },
+        {
+          "group": "tempo",
+          "term": "ojek konvensional",
+          "value": 0.0005
+        },
+        {
+          "group": "tempo",
+          "term": "twentyseven maret",
+          "value": 0.0005
+        },
+        {
+          "group": "tempo",
+          "term": "gubernur jawa",
+          "value": 0.0004
+        },
+        {
+          "group": "tempo",
+          "term": "maret twothousandandseventeen",
+          "value": 0.0004
+        },
+        {
+          "group": "tempo",
+          "term": "peraturan gubernur",
+          "value": 0.0004
+        },
+        {
+          "group": "tempo",
+          "term": "twentyeight maret",
+          "value": 0.0004
+        },
+        {
+          "group": "tempo",
+          "term": "jakarta menteri",
+          "value": 0.0003
+        },
+        {
+          "group": "tempo",
+          "term": "jasa daring",
+          "value": 0.0003
+        },
+        {
+          "group": "tempo",
+          "term": "ketua perkumpulan",
+          "value": 0.0003
+        },
+        {
+          "group": "tempo",
+          "term": "pemerintah jawa",
+          "value": 0.0003
+        },
+        {
+          "group": "tempo",
+          "term": "roda berbasis",
+          "value": 0.0003
+        },
+        {
+          "group": "kompas",
+          "term": "jakarta kompas",
+          "value": 0.0022
+        },
+        {
+          "group": "kompas",
+          "term": "bandara soekarno",
+          "value": 0.0008
+        },
+        {
+          "group": "kompas",
+          "term": "beroperasi bandara",
+          "value": 0.0005
+        },
+        {
+          "group": "kompas",
+          "term": "pm perhubungan",
+          "value": 0.0005
+        },
+        {
+          "group": "kompas",
+          "term": "resmi beroperasi",
+          "value": 0.0005
+        },
+        {
+          "group": "kompas",
+          "term": "online bandara",
+          "value": 0.0004
+        },
+        {
+          "group": "kompas",
+          "term": "pengamat transportasi",
+          "value": 0.0004
+        },
+        {
+          "group": "kompas",
+          "term": "kompas kementerian",
+          "value": 0.0003
+        },
+        {
+          "group": "kompas",
+          "term": "kompas menteri",
+          "value": 0.0003
+        },
+        {
+          "group": "kompas",
+          "term": "kota sukabumi",
+          "value": 0.0003
+        },
+        {
+          "group": "kompas",
+          "term": "menhub budi",
+          "value": 0.0003
+        },
+        {
+          "group": "kompas",
+          "term": "trayek pm",
+          "value": 0.0003
+        },
+        {
+          "group": "kompas",
+          "term": "aplikasi gratis",
+          "value": 0.0003
+        },
+        {
+          "group": "kompas",
+          "term": "bantu berdiskusi",
+          "value": 0.0003
+        },
+        {
+          "group": "kompas",
+          "term": "berdiskusi perusahaan",
+          "value": 0.0003
+        }
+      ]
+    },
+    "petisi": {
+      "frekuensi": [
+        {
+          "group": "petisi_1",
+          "term": "berbasis online",
+          "value": 11
+        },
+        {
+          "group": "petisi_1",
+          "term": "transportasi berbasis",
+          "value": 10
+        },
+        {
+          "group": "petisi_1",
+          "term": "ojek online",
+          "value": 6
+        },
+        {
+          "group": "petisi_1",
+          "term": "gojek bantu",
+          "value": 5
+        },
+        {
+          "group": "petisi_1",
+          "term": "online bantu",
+          "value": 5
+        },
+        {
+          "group": "petisi_1",
+          "term": "transportasi online",
+          "value": 5
+        },
+        {
+          "group": "petisi_1",
+          "term": "bantu masyarakat",
+          "value": 3
+        },
+        {
+          "group": "petisi_1",
+          "term": "bantu orang",
+          "value": 3
+        },
+        {
+          "group": "petisi_1",
+          "term": "gojek sejenisnya",
+          "value": 3
+        },
+        {
+          "group": "petisi_1",
+          "term": "grab bike",
+          "value": 3
+        },
+        {
+          "group": "petisi_1",
+          "term": "indonesia maju",
+          "value": 3
+        },
+        {
+          "group": "petisi_1",
+          "term": "industri kreatif",
+          "value": 3
+        },
+        {
+          "group": "petisi_1",
+          "term": "lapangan kerja",
+          "value": 3
+        },
+        {
+          "group": "petisi_1",
+          "term": "layanan transportasi",
+          "value": 3
+        },
+        {
+          "group": "petisi_1",
+          "term": "masyarakat pemerintah",
+          "value": 3
+        },
+        {
+          "group": "petisi_2",
+          "term": "gojek bantu",
+          "value": 18
+        },
+        {
+          "group": "petisi_2",
+          "term": "gojek purwokerto",
+          "value": 13
+        },
+        {
+          "group": "petisi_2",
+          "term": "ojek online",
+          "value": 11
+        },
+        {
+          "group": "petisi_2",
+          "term": "bantu masyarakat",
+          "value": 7
+        },
+        {
+          "group": "petisi_2",
+          "term": "dukung gojek",
+          "value": 7
+        },
+        {
+          "group": "petisi_2",
+          "term": "lapangan kerja",
+          "value": 7
+        },
+        {
+          "group": "petisi_2",
+          "term": "lapangan pekerjaan",
+          "value": 6
+        },
+        {
+          "group": "petisi_2",
+          "term": "gojek memudahkan",
+          "value": 5
+        },
+        {
+          "group": "petisi_2",
+          "term": "kota purwokerto",
+          "value": 5
+        },
+        {
+          "group": "petisi_2",
+          "term": "masyarakat purwokerto",
+          "value": 5
+        },
+        {
+          "group": "petisi_2",
+          "term": "purwokerto gojek",
+          "value": 5
+        },
+        {
+          "group": "petisi_2",
+          "term": "transportasi online",
+          "value": 5
+        },
+        {
+          "group": "petisi_2",
+          "term": "driver gojek",
+          "value": 4
+        },
+        {
+          "group": "petisi_2",
+          "term": "keberadaan gojek",
+          "value": 4
+        },
+        {
+          "group": "petisi_2",
+          "term": "murah aman",
+          "value": 4
+        },
+        {
+          "group": "petisi_3",
+          "term": "permenhub onehundredandeight",
+          "value": 18
+        },
+        {
+          "group": "petisi_3",
+          "term": "taksi online",
+          "value": 10
+        },
+        {
+          "group": "petisi_3",
+          "term": "tolak permenhub",
+          "value": 10
+        },
+        {
+          "group": "petisi_3",
+          "term": "pm onehundredandeight",
+          "value": 9
+        },
+        {
+          "group": "petisi_3",
+          "term": "driver online",
+          "value": 8
+        },
+        {
+          "group": "petisi_3",
+          "term": "lapangan pekerjaan",
+          "value": 6
+        },
+        {
+          "group": "petisi_3",
+          "term": "transportasi online",
+          "value": 6
+        },
+        {
+          "group": "petisi_3",
+          "term": "taxi online",
+          "value": 5
+        },
+        {
+          "group": "petisi_3",
+          "term": "mahkamah agung",
+          "value": 3
+        },
+        {
+          "group": "petisi_3",
+          "term": "menandatangani petisi",
+          "value": 3
+        },
+        {
+          "group": "petisi_3",
+          "term": "mengeluarkan aturan",
+          "value": 3
+        },
+        {
+          "group": "petisi_3",
+          "term": "mobil pribadi",
+          "value": 3
+        },
+        {
+          "group": "petisi_3",
+          "term": "permen onehundredandeight",
+          "value": 3
+        },
+        {
+          "group": "petisi_3",
+          "term": "tolak pm",
+          "value": 3
+        },
+        {
+          "group": "petisi_3",
+          "term": "anak istri",
+          "value": 2
+        },
+        {
+          "group": "petisi_4",
+          "term": "transportasi online",
+          "value": 97
+        },
+        {
+          "group": "petisi_4",
+          "term": "ojek online",
+          "value": 38
+        },
+        {
+          "group": "petisi_4",
+          "term": "memilih transportasi",
+          "value": 32
+        },
+        {
+          "group": "petisi_4",
+          "term": "angkutan online",
+          "value": 30
+        },
+        {
+          "group": "petisi_4",
+          "term": "bebas memilih",
+          "value": 21
+        },
+        {
+          "group": "petisi_4",
+          "term": "online bantu",
+          "value": 21
+        },
+        {
+          "group": "petisi_4",
+          "term": "supir angkot",
+          "value": 17
+        },
+        {
+          "group": "petisi_4",
+          "term": "aman nyaman",
+          "value": 13
+        },
+        {
+          "group": "petisi_4",
+          "term": "jasa transportasi",
+          "value": 13
+        },
+        {
+          "group": "petisi_4",
+          "term": "berhak memilih",
+          "value": 12
+        },
+        {
+          "group": "petisi_4",
+          "term": "transportasi konvensional",
+          "value": 12
+        },
+        {
+          "group": "petisi_4",
+          "term": "hak memilih",
+          "value": 11
+        },
+        {
+          "group": "petisi_4",
+          "term": "nyaman aman",
+          "value": 10
+        },
+        {
+          "group": "petisi_4",
+          "term": "taksi online",
+          "value": 10
+        },
+        {
+          "group": "petisi_4",
+          "term": "masyarakat memilih",
+          "value": 9
+        },
+        {
+          "group": "petisi_5",
+          "term": "butuh gojek",
+          "value": 15
+        },
+        {
+          "group": "petisi_5",
+          "term": "gojek bantu",
+          "value": 12
+        },
+        {
+          "group": "petisi_5",
+          "term": "gojek solo",
+          "value": 12
+        },
+        {
+          "group": "petisi_5",
+          "term": "membutuhkan gojek",
+          "value": 10
+        },
+        {
+          "group": "petisi_5",
+          "term": "ojek online",
+          "value": 8
+        },
+        {
+          "group": "petisi_5",
+          "term": "gojek gojek",
+          "value": 7
+        },
+        {
+          "group": "petisi_5",
+          "term": "kota solo",
+          "value": 7
+        },
+        {
+          "group": "petisi_5",
+          "term": "ojek pangkalan",
+          "value": 7
+        },
+        {
+          "group": "petisi_5",
+          "term": "driver gojek",
+          "value": 6
+        },
+        {
+          "group": "petisi_5",
+          "term": "kemajuan teknologi",
+          "value": 6
+        },
+        {
+          "group": "petisi_5",
+          "term": "kota surakarta",
+          "value": 6
+        },
+        {
+          "group": "petisi_5",
+          "term": "aman nyaman",
+          "value": 5
+        },
+        {
+          "group": "petisi_5",
+          "term": "masyarakat kota",
+          "value": 5
+        },
+        {
+          "group": "petisi_5",
+          "term": "solo gojek",
+          "value": 5
+        },
+        {
+          "group": "petisi_5",
+          "term": "jalan raya",
+          "value": 4
+        },
+        {
+          "group": "petisi_6",
+          "term": "gojek bantu",
+          "value": 24
+        },
+        {
+          "group": "petisi_6",
+          "term": "ojek online",
+          "value": 15
+        },
+        {
+          "group": "petisi_6",
+          "term": "gojek tasikmalaya",
+          "value": 14
+        },
+        {
+          "group": "petisi_6",
+          "term": "kota tasikmalaya",
+          "value": 13
+        },
+        {
+          "group": "petisi_6",
+          "term": "gojek gojek",
+          "value": 9
+        },
+        {
+          "group": "petisi_6",
+          "term": "angkutan kota",
+          "value": 8
+        },
+        {
+          "group": "petisi_6",
+          "term": "kota tasik",
+          "value": 7
+        },
+        {
+          "group": "petisi_6",
+          "term": "setuju gojek",
+          "value": 7
+        },
+        {
+          "group": "petisi_6",
+          "term": "dukung gojek",
+          "value": 6
+        },
+        {
+          "group": "petisi_6",
+          "term": "gojek bermanfaat",
+          "value": 6
+        },
+        {
+          "group": "petisi_6",
+          "term": "transportasi online",
+          "value": 6
+        },
+        {
+          "group": "petisi_6",
+          "term": "ugal ugalan",
+          "value": 6
+        },
+        {
+          "group": "petisi_6",
+          "term": "angkutan konvensional",
+          "value": 5
+        },
+        {
+          "group": "petisi_6",
+          "term": "driver gojek",
+          "value": 5
+        },
+        {
+          "group": "petisi_6",
+          "term": "keberadaan gojek",
+          "value": 5
+        }
+      ],
+      "tfidf": [
+        {
+          "group": "petisi_1",
+          "term": "gojek sejenisnya",
+          "value": 0.0054
+        },
+        {
+          "group": "petisi_1",
+          "term": "grab bike",
+          "value": 0.0054
+        },
+        {
+          "group": "petisi_1",
+          "term": "berbasis online",
+          "value": 0.0045
+        },
+        {
+          "group": "petisi_1",
+          "term": "transportasi berbasis",
+          "value": 0.0041
+        },
+        {
+          "group": "petisi_1",
+          "term": "gojek grabtaxi",
+          "value": 0.0036
+        },
+        {
+          "group": "petisi_1",
+          "term": "keputusan menteri",
+          "value": 0.0036
+        },
+        {
+          "group": "petisi_1",
+          "term": "menteri jonan",
+          "value": 0.0036
+        },
+        {
+          "group": "petisi_1",
+          "term": "sejenisnya bantu",
+          "value": 0.0036
+        },
+        {
+          "group": "petisi_1",
+          "term": "startup indonesia",
+          "value": 0.0036
+        },
+        {
+          "group": "petisi_1",
+          "term": "terbantu moda",
+          "value": 0.0036
+        },
+        {
+          "group": "petisi_1",
+          "term": "usaha anak",
+          "value": 0.0036
+        },
+        {
+          "group": "petisi_1",
+          "term": "industri kreatif",
+          "value": 0.0033
+        },
+        {
+          "group": "petisi_1",
+          "term": "bantu mempermudah",
+          "value": 0.0022
+        },
+        {
+          "group": "petisi_1",
+          "term": "bantu mobilitas",
+          "value": 0.0022
+        },
+        {
+          "group": "petisi_1",
+          "term": "gojek grab",
+          "value": 0.0022
+        },
+        {
+          "group": "petisi_2",
+          "term": "gojek purwokerto",
+          "value": 0.0187
+        },
+        {
+          "group": "petisi_2",
+          "term": "kota purwokerto",
+          "value": 0.0072
+        },
+        {
+          "group": "petisi_2",
+          "term": "masyarakat purwokerto",
+          "value": 0.0072
+        },
+        {
+          "group": "petisi_2",
+          "term": "purwokerto gojek",
+          "value": 0.0072
+        },
+        {
+          "group": "petisi_2",
+          "term": "gojek bantu",
+          "value": 0.0059
+        },
+        {
+          "group": "petisi_2",
+          "term": "bupati mempertimbangkan",
+          "value": 0.0029
+        },
+        {
+          "group": "petisi_2",
+          "term": "daerah banyumas",
+          "value": 0.0029
+        },
+        {
+          "group": "petisi_2",
+          "term": "gojek manfaat",
+          "value": 0.0029
+        },
+        {
+          "group": "petisi_2",
+          "term": "gojek satria",
+          "value": 0.0029
+        },
+        {
+          "group": "petisi_2",
+          "term": "harap bupati",
+          "value": 0.0029
+        },
+        {
+          "group": "petisi_2",
+          "term": "kreatif inovatif",
+          "value": 0.0029
+        },
+        {
+          "group": "petisi_2",
+          "term": "kuliah purwokerto",
+          "value": 0.0029
+        },
+        {
+          "group": "petisi_2",
+          "term": "masyarakat banyumas",
+          "value": 0.0029
+        },
+        {
+          "group": "petisi_2",
+          "term": "masyarakat gojek",
+          "value": 0.0029
+        },
+        {
+          "group": "petisi_2",
+          "term": "mempermudah aktifitas",
+          "value": 0.0029
+        },
+        {
+          "group": "petisi_3",
+          "term": "permenhub onehundredandeight",
+          "value": 0.0335
+        },
+        {
+          "group": "petisi_3",
+          "term": "tolak permenhub",
+          "value": 0.0186
+        },
+        {
+          "group": "petisi_3",
+          "term": "pm onehundredandeight",
+          "value": 0.0168
+        },
+        {
+          "group": "petisi_3",
+          "term": "driver online",
+          "value": 0.0091
+        },
+        {
+          "group": "petisi_3",
+          "term": "taksi online",
+          "value": 0.0072
+        },
+        {
+          "group": "petisi_3",
+          "term": "mahkamah agung",
+          "value": 0.0056
+        },
+        {
+          "group": "petisi_3",
+          "term": "mengeluarkan aturan",
+          "value": 0.0056
+        },
+        {
+          "group": "petisi_3",
+          "term": "permen onehundredandeight",
+          "value": 0.0056
+        },
+        {
+          "group": "petisi_3",
+          "term": "tolak pm",
+          "value": 0.0056
+        },
+        {
+          "group": "petisi_3",
+          "term": "aplikator mengacu",
+          "value": 0.0037
+        },
+        {
+          "group": "petisi_3",
+          "term": "aplikator mengeluarkan",
+          "value": 0.0037
+        },
+        {
+          "group": "petisi_3",
+          "term": "aturan aplikator",
+          "value": 0.0037
+        },
+        {
+          "group": "petisi_3",
+          "term": "butir dicabut",
+          "value": 0.0037
+        },
+        {
+          "group": "petisi_3",
+          "term": "calon mitra",
+          "value": 0.0037
+        },
+        {
+          "group": "petisi_3",
+          "term": "daftar taksi",
+          "value": 0.0037
+        },
+        {
+          "group": "petisi_4",
+          "term": "bebas memilih",
+          "value": 0.0044
+        },
+        {
+          "group": "petisi_4",
+          "term": "memilih transportasi",
+          "value": 0.0042
+        },
+        {
+          "group": "petisi_4",
+          "term": "berhak memilih",
+          "value": 0.0041
+        },
+        {
+          "group": "petisi_4",
+          "term": "supir angkot",
+          "value": 0.0035
+        },
+        {
+          "group": "petisi_4",
+          "term": "jawa barat",
+          "value": 0.0027
+        },
+        {
+          "group": "petisi_4",
+          "term": "warga bandung",
+          "value": 0.0027
+        },
+        {
+          "group": "petisi_4",
+          "term": "kota bandung",
+          "value": 0.0024
+        },
+        {
+          "group": "petisi_4",
+          "term": "masyarakat bebas",
+          "value": 0.0024
+        },
+        {
+          "group": "petisi_4",
+          "term": "angkutan online",
+          "value": 0.0023
+        },
+        {
+          "group": "petisi_4",
+          "term": "hak memilih",
+          "value": 0.0023
+        },
+        {
+          "group": "petisi_4",
+          "term": "bersaing sehat",
+          "value": 0.002
+        },
+        {
+          "group": "petisi_4",
+          "term": "kenyamanan keamanan",
+          "value": 0.002
+        },
+        {
+          "group": "petisi_4",
+          "term": "memilih angkutan",
+          "value": 0.002
+        },
+        {
+          "group": "petisi_4",
+          "term": "masyarakat memilih",
+          "value": 0.0019
+        },
+        {
+          "group": "petisi_4",
+          "term": "hak warga",
+          "value": 0.0017
+        },
+        {
+          "group": "petisi_5",
+          "term": "gojek solo",
+          "value": 0.0152
+        },
+        {
+          "group": "petisi_5",
+          "term": "kota solo",
+          "value": 0.0088
+        },
+        {
+          "group": "petisi_5",
+          "term": "membutuhkan gojek",
+          "value": 0.0077
+        },
+        {
+          "group": "petisi_5",
+          "term": "kota surakarta",
+          "value": 0.0076
+        },
+        {
+          "group": "petisi_5",
+          "term": "solo gojek",
+          "value": 0.0063
+        },
+        {
+          "group": "petisi_5",
+          "term": "solo butuh",
+          "value": 0.0051
+        },
+        {
+          "group": "petisi_5",
+          "term": "surakarta butuh",
+          "value": 0.0051
+        },
+        {
+          "group": "petisi_5",
+          "term": "butuh gojek",
+          "value": 0.0043
+        },
+        {
+          "group": "petisi_5",
+          "term": "masyarakat kota",
+          "value": 0.0039
+        },
+        {
+          "group": "petisi_5",
+          "term": "bus bst",
+          "value": 0.0038
+        },
+        {
+          "group": "petisi_5",
+          "term": "gojek masyarakat",
+          "value": 0.0038
+        },
+        {
+          "group": "petisi_5",
+          "term": "manfaat gojek",
+          "value": 0.0038
+        },
+        {
+          "group": "petisi_5",
+          "term": "masyarakat solo",
+          "value": 0.0038
+        },
+        {
+          "group": "petisi_5",
+          "term": "solo membutuhkan",
+          "value": 0.0038
+        },
+        {
+          "group": "petisi_5",
+          "term": "warga solo",
+          "value": 0.0038
+        },
+        {
+          "group": "petisi_6",
+          "term": "gojek tasikmalaya",
+          "value": 0.0135
+        },
+        {
+          "group": "petisi_6",
+          "term": "kota tasikmalaya",
+          "value": 0.0125
+        },
+        {
+          "group": "petisi_6",
+          "term": "kota tasik",
+          "value": 0.0067
+        },
+        {
+          "group": "petisi_6",
+          "term": "gojek bantu",
+          "value": 0.0052
+        },
+        {
+          "group": "petisi_6",
+          "term": "gojek tasik",
+          "value": 0.0038
+        },
+        {
+          "group": "petisi_6",
+          "term": "pencabutan gojek",
+          "value": 0.0038
+        },
+        {
+          "group": "petisi_6",
+          "term": "tasikmalaya gojek",
+          "value": 0.0038
+        },
+        {
+          "group": "petisi_6",
+          "term": "tasikmalaya setuju",
+          "value": 0.0038
+        },
+        {
+          "group": "petisi_6",
+          "term": "angkutan kota",
+          "value": 0.003
+        },
+        {
+          "group": "petisi_6",
+          "term": "fasilitas gojek",
+          "value": 0.0029
+        },
+        {
+          "group": "petisi_6",
+          "term": "gojek dicabut",
+          "value": 0.0029
+        },
+        {
+          "group": "petisi_6",
+          "term": "pemerintah daerah",
+          "value": 0.0029
+        },
+        {
+          "group": "petisi_6",
+          "term": "tasik maju",
+          "value": 0.0029
+        },
+        {
+          "group": "petisi_6",
+          "term": "tasikmalaya maju",
+          "value": 0.0029
+        },
+        {
+          "group": "petisi_6",
+          "term": "gojek bermanfaat",
+          "value": 0.0022
+        }
+      ],
+      "topicmodelling": [
+        {
+          "group": "topik 1",
+          "term": "ojek online",
+          "value": 0.0143
+        },
+        {
+          "group": "topik 1",
+          "term": "gojek bantu",
+          "value": 0.009
+        },
+        {
+          "group": "topik 1",
+          "term": "transportasi online",
+          "value": 0.0063
+        },
+        {
+          "group": "topik 1",
+          "term": "bebas memilih",
+          "value": 0.0046
+        },
+        {
+          "group": "topik 1",
+          "term": "memilih transportasi",
+          "value": 0.0033
+        },
+        {
+          "group": "topik 1",
+          "term": "terbantu gojek",
+          "value": 0.0025
+        },
+        {
+          "group": "topik 1",
+          "term": "membutuhkan gojek",
+          "value": 0.0024
+        },
+        {
+          "group": "topik 1",
+          "term": "lapangan kerja",
+          "value": 0.0023
+        },
+        {
+          "group": "topik 1",
+          "term": "permenhub onehundredandeight",
+          "value": 0.0023
+        },
+        {
+          "group": "topik 1",
+          "term": "kota tasikmalaya",
+          "value": 0.0022
+        },
+        {
+          "group": "topik 1",
+          "term": "lapangan pekerjaan",
+          "value": 0.0022
+        },
+        {
+          "group": "topik 1",
+          "term": "bantu masyarakat",
+          "value": 0.0022
+        },
+        {
+          "group": "topik 1",
+          "term": "driver online",
+          "value": 0.0022
+        },
+        {
+          "group": "topik 1",
+          "term": "menandatangani gojek",
+          "value": 0.0022
+        },
+        {
+          "group": "topik 1",
+          "term": "online bantu",
+          "value": 0.0021
+        },
+        {
+          "group": "topik 2",
+          "term": "transportasi online",
+          "value": 0.0093
+        },
+        {
+          "group": "topik 2",
+          "term": "ojek online",
+          "value": 0.0052
+        },
+        {
+          "group": "topik 2",
+          "term": "memilih transportasi",
+          "value": 0.0044
+        },
+        {
+          "group": "topik 2",
+          "term": "butuh gojek",
+          "value": 0.0043
+        },
+        {
+          "group": "topik 2",
+          "term": "taksi online",
+          "value": 0.004
+        },
+        {
+          "group": "topik 2",
+          "term": "ojek pangkalan",
+          "value": 0.0035
+        },
+        {
+          "group": "topik 2",
+          "term": "aman nyaman",
+          "value": 0.0035
+        },
+        {
+          "group": "topik 2",
+          "term": "nyaman aman",
+          "value": 0.0035
+        },
+        {
+          "group": "topik 2",
+          "term": "driver gojek",
+          "value": 0.0026
+        },
+        {
+          "group": "topik 2",
+          "term": "online bantu",
+          "value": 0.0026
+        },
+        {
+          "group": "topik 2",
+          "term": "transportasi berbasis",
+          "value": 0.0025
+        },
+        {
+          "group": "topik 2",
+          "term": "gojek solo",
+          "value": 0.0024
+        },
+        {
+          "group": "topik 2",
+          "term": "gojek bermanfaat",
+          "value": 0.0023
+        },
+        {
+          "group": "topik 2",
+          "term": "gojek purwokerto",
+          "value": 0.002
+        },
+        {
+          "group": "topik 2",
+          "term": "berhak memilih",
+          "value": 0.002
+        },
+        {
+          "group": "topik 3",
+          "term": "transportasi online",
+          "value": 0.0184
+        },
+        {
+          "group": "topik 3",
+          "term": "angkutan online",
+          "value": 0.0066
+        },
+        {
+          "group": "topik 3",
+          "term": "gojek bantu",
+          "value": 0.0049
+        },
+        {
+          "group": "topik 3",
+          "term": "online bantu",
+          "value": 0.0047
+        },
+        {
+          "group": "topik 3",
+          "term": "jasa transportasi",
+          "value": 0.0036
+        },
+        {
+          "group": "topik 3",
+          "term": "dukung gojek",
+          "value": 0.0036
+        },
+        {
+          "group": "topik 3",
+          "term": "menandatangani petisi",
+          "value": 0.003
+        },
+        {
+          "group": "topik 3",
+          "term": "supir angkot",
+          "value": 0.003
+        },
+        {
+          "group": "topik 3",
+          "term": "aman nyaman",
+          "value": 0.003
+        },
+        {
+          "group": "topik 3",
+          "term": "alat transportasi",
+          "value": 0.003
+        },
+        {
+          "group": "topik 3",
+          "term": "kemajuan teknologi",
+          "value": 0.0027
+        },
+        {
+          "group": "topik 3",
+          "term": "mata pencaharian",
+          "value": 0.0027
+        },
+        {
+          "group": "topik 3",
+          "term": "berbasis online",
+          "value": 0.0025
+        },
+        {
+          "group": "topik 3",
+          "term": "pengguna jasa",
+          "value": 0.0025
+        },
+        {
+          "group": "topik 3",
+          "term": "moda transportasi",
+          "value": 0.0023
+        }
+      ]
+    },
+    "twitter": {
+      "frekuensi": [
+        {
+          "group": "#savedrivergojek",
+          "term": "driver gojek",
+          "value": 55
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "anak bangsa",
+          "value": 39
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "tarif driver",
+          "value": 32
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "driver demo",
+          "value": 27
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "transportasi online",
+          "value": 26
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "tarif gojek",
+          "value": 24
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "karya anak",
+          "value": 23
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "tarif turun",
+          "value": 17
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "ojek online",
+          "value": 16
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "tarif onethousandsixhundred",
+          "value": 16
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "tarif manusiawi",
+          "value": 15
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "kasihan driver",
+          "value": 14
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "toilet twothousand",
+          "value": 14
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "driver tarif",
+          "value": 12
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "gojek onethousandsixhundred",
+          "value": 12
+        },
+        {
+          "group": "#savegojek",
+          "term": "ojek online",
+          "value": 62
+        },
+        {
+          "group": "#savegojek",
+          "term": "transportasi online",
+          "value": 25
+        },
+        {
+          "group": "#savegojek",
+          "term": "orang orang",
+          "value": 15
+        },
+        {
+          "group": "#savegojek",
+          "term": "terima kasih",
+          "value": 15
+        },
+        {
+          "group": "#savegojek",
+          "term": "gojek gojek",
+          "value": 14
+        },
+        {
+          "group": "#savegojek",
+          "term": "berkibar twitter",
+          "value": 13
+        },
+        {
+          "group": "#savegojek",
+          "term": "driver gojek",
+          "value": 13
+        },
+        {
+          "group": "#savegojek",
+          "term": "dukung ojek",
+          "value": 13
+        },
+        {
+          "group": "#savegojek",
+          "term": "online berkibar",
+          "value": 13
+        },
+        {
+          "group": "#savegojek",
+          "term": "tolak memperbarui",
+          "value": 13
+        },
+        {
+          "group": "#savegojek",
+          "term": "undang undang",
+          "value": 11
+        },
+        {
+          "group": "#savegojek",
+          "term": "anak bangsa",
+          "value": 10
+        },
+        {
+          "group": "#savegojek",
+          "term": "gojek dilarang",
+          "value": 10
+        },
+        {
+          "group": "#savegojek",
+          "term": "kekuatan terbesar",
+          "value": 10
+        },
+        {
+          "group": "#savegojek",
+          "term": "mengalahkan stress",
+          "value": 10
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "ojek online",
+          "value": 74
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "driver ojek",
+          "value": 22
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "driver ojol",
+          "value": 6
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "payung hukum",
+          "value": 6
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "supir angkot",
+          "value": 5
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "transportasi online",
+          "value": 5
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "aye dukung",
+          "value": 4
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "online ojek",
+          "value": 4
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "alat transportasi",
+          "value": 3
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "berhenti nyaman",
+          "value": 3
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "bersaing sehat",
+          "value": 3
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "driver gojek",
+          "value": 3
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "dukung ojek",
+          "value": 3
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "kejelasan payung",
+          "value": 3
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "ojek ol",
+          "value": 3
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "ojek online",
+          "value": 12
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "terima kasih",
+          "value": 12
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "teman teman",
+          "value": 10
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "driver gojek",
+          "value": 9
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "teman driver",
+          "value": 6
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "driver grab",
+          "value": 5
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "driver ojol",
+          "value": 5
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "driver uber",
+          "value": 5
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "uang pas",
+          "value": 5
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "ambil orderan",
+          "value": 4
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "bayar pakai",
+          "value": 4
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "driver cancel",
+          "value": 4
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "driver terima",
+          "value": 4
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "kasih bintang",
+          "value": 4
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "pas turun",
+          "value": 4
+        }
+      ],
+      "tfidf": [
+        {
+          "group": "#savedrivergojek",
+          "term": "tarif driver",
+          "value": 0.0048
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "gojek susah",
+          "value": 0.0036
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "pelanggan setia",
+          "value": 0.0036
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "penurunan tarif",
+          "value": 0.0036
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "rp fourthousand",
+          "value": 0.0036
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "sapi perah",
+          "value": 0.0036
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "tarif gojek",
+          "value": 0.0036
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "tarif manusiawi",
+          "value": 0.0036
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "tarif ojek",
+          "value": 0.0036
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "twothousandandfifteen rp",
+          "value": 0.0036
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "driver gojek",
+          "value": 0.0035
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "driver tarif",
+          "value": 0.003
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "anak bangsa",
+          "value": 0.0024
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "aksi kamis",
+          "value": 0.0024
+        },
+        {
+          "group": "#savedrivergojek",
+          "term": "aplikasi mobile",
+          "value": 0.0024
+        },
+        {
+          "group": "#savegojek",
+          "term": "berkibar twitter",
+          "value": 0.0231
+        },
+        {
+          "group": "#savegojek",
+          "term": "online berkibar",
+          "value": 0.0231
+        },
+        {
+          "group": "#savegojek",
+          "term": "blue bird",
+          "value": 0.0154
+        },
+        {
+          "group": "#savegojek",
+          "term": "kadishub batam",
+          "value": 0.0154
+        },
+        {
+          "group": "#savegojek",
+          "term": "save save",
+          "value": 0.0154
+        },
+        {
+          "group": "#savegojek",
+          "term": "twitter dukung",
+          "value": 0.0154
+        },
+        {
+          "group": "#savegojek",
+          "term": "dukung ojek",
+          "value": 0.0116
+        },
+        {
+          "group": "#savegojek",
+          "term": "akibat kadishub",
+          "value": 0.0077
+        },
+        {
+          "group": "#savegojek",
+          "term": "aksi pemerintah",
+          "value": 0.0077
+        },
+        {
+          "group": "#savegojek",
+          "term": "anarkis guebpake",
+          "value": 0.0077
+        },
+        {
+          "group": "#savegojek",
+          "term": "aturan rakyat",
+          "value": 0.0077
+        },
+        {
+          "group": "#savegojek",
+          "term": "babak seri",
+          "value": 0.0077
+        },
+        {
+          "group": "#savegojek",
+          "term": "bagus trut",
+          "value": 0.0077
+        },
+        {
+          "group": "#savegojek",
+          "term": "ban bocor",
+          "value": 0.0077
+        },
+        {
+          "group": "#savegojek",
+          "term": "banget gojek",
+          "value": 0.0077
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "anak istri",
+          "value": 0.0187
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "transportasi massal",
+          "value": 0.0187
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "ajak berbicara",
+          "value": 0.0094
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "alat transportasi",
+          "value": 0.0094
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "anak haram",
+          "value": 0.0094
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "aneh warga",
+          "value": 0.0094
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "atribut online",
+          "value": 0.0094
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "aye dukung",
+          "value": 0.0094
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "aye langganan",
+          "value": 0.0094
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "balikpapan dilarang",
+          "value": 0.0094
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "bayar ijin",
+          "value": 0.0094
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "berbicara hati",
+          "value": 0.0094
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "bersaing aneh",
+          "value": 0.0094
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "bogor wajib",
+          "value": 0.0094
+        },
+        {
+          "group": "#saveojekonline",
+          "term": "cari solusi",
+          "value": 0.0094
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "bayar pakai",
+          "value": 0.0019
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "puluh ribu",
+          "value": 0.0019
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "uang pas",
+          "value": 0.0019
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "ojek lokal",
+          "value": 0.0014
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "ojol rumah",
+          "value": 0.0014
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "pakai uber",
+          "value": 0.0014
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "terima kasih",
+          "value": 0.0014
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "ajak ngobrol",
+          "value": 0.001
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "apapun driver",
+          "value": 0.001
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "auto bid",
+          "value": 0.001
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "baca gps",
+          "value": 0.001
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "bantu driver",
+          "value": 0.001
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "baris turun",
+          "value": 0.001
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "bawa motornya",
+          "value": 0.001
+        },
+        {
+          "group": "to_@CeritaTranspOL",
+          "term": "biar driver",
+          "value": 0.001
+        }
+      ],
+      "topicmodelling": [
+        {
+          "group": "topik 1",
+          "term": "ojek online",
+          "value": 0.0155
+        },
+        {
+          "group": "topik 1",
+          "term": "driver demo",
+          "value": 0.0057
+        },
+        {
+          "group": "topik 1",
+          "term": "driver ojek",
+          "value": 0.003
+        },
+        {
+          "group": "topik 1",
+          "term": "driver gojek",
+          "value": 0.0029
+        },
+        {
+          "group": "topik 1",
+          "term": "gojek error",
+          "value": 0.0025
+        },
+        {
+          "group": "topik 1",
+          "term": "transportasi online",
+          "value": 0.002
+        },
+        {
+          "group": "topik 1",
+          "term": "error driver",
+          "value": 0.0018
+        },
+        {
+          "group": "topik 1",
+          "term": "tarif manusiawi",
+          "value": 0.0018
+        },
+        {
+          "group": "topik 1",
+          "term": "teman teman",
+          "value": 0.0018
+        },
+        {
+          "group": "topik 1",
+          "term": "online dilarang",
+          "value": 0.0018
+        },
+        {
+          "group": "topik 1",
+          "term": "driver ojol",
+          "value": 0.0016
+        },
+        {
+          "group": "topik 1",
+          "term": "tarif turun",
+          "value": 0.0016
+        },
+        {
+          "group": "topik 1",
+          "term": "system error",
+          "value": 0.0016
+        },
+        {
+          "group": "topik 1",
+          "term": "terima kasih",
+          "value": 0.0014
+        },
+        {
+          "group": "topik 1",
+          "term": "tinggalkanlah kesenangan",
+          "value": 0.0014
+        },
+        {
+          "group": "topik 2",
+          "term": "transportasi online",
+          "value": 0.0104
+        },
+        {
+          "group": "topik 2",
+          "term": "ojek online",
+          "value": 0.0092
+        },
+        {
+          "group": "topik 2",
+          "term": "tarif gojek",
+          "value": 0.004
+        },
+        {
+          "group": "topik 2",
+          "term": "orang orang",
+          "value": 0.0033
+        },
+        {
+          "group": "topik 2",
+          "term": "supir angkot",
+          "value": 0.0031
+        },
+        {
+          "group": "topik 2",
+          "term": "angkutan online",
+          "value": 0.0029
+        },
+        {
+          "group": "topik 2",
+          "term": "berkibar twitter",
+          "value": 0.0029
+        },
+        {
+          "group": "topik 2",
+          "term": "online berkibar",
+          "value": 0.0029
+        },
+        {
+          "group": "topik 2",
+          "term": "dukung ojek",
+          "value": 0.0028
+        },
+        {
+          "group": "topik 2",
+          "term": "kisah nyata",
+          "value": 0.0024
+        },
+        {
+          "group": "topik 2",
+          "term": "star wars",
+          "value": 0.0024
+        },
+        {
+          "group": "topik 2",
+          "term": "tolak perubahan",
+          "value": 0.0022
+        },
+        {
+          "group": "topik 2",
+          "term": "trending indonesia",
+          "value": 0.0022
+        },
+        {
+          "group": "topik 2",
+          "term": "tarif murah",
+          "value": 0.002
+        },
+        {
+          "group": "topik 2",
+          "term": "gojek gojek",
+          "value": 0.002
+        },
+        {
+          "group": "topik 3",
+          "term": "ojek online",
+          "value": 0.0092
+        },
+        {
+          "group": "topik 3",
+          "term": "driver gojek",
+          "value": 0.0072
+        },
+        {
+          "group": "topik 3",
+          "term": "tarif driver",
+          "value": 0.0053
+        },
+        {
+          "group": "topik 3",
+          "term": "terima kasih",
+          "value": 0.0036
+        },
+        {
+          "group": "topik 3",
+          "term": "toilet twothousand",
+          "value": 0.003
+        },
+        {
+          "group": "topik 3",
+          "term": "kasihan driver",
+          "value": 0.0024
+        },
+        {
+          "group": "topik 3",
+          "term": "kekuatan terbesar",
+          "value": 0.0022
+        },
+        {
+          "group": "topik 3",
+          "term": "mengalahkan stress",
+          "value": 0.0022
+        },
+        {
+          "group": "topik 3",
+          "term": "terbesar mengalahkan",
+          "value": 0.0022
+        },
+        {
+          "group": "topik 3",
+          "term": "supir metromini",
+          "value": 0.002
+        },
+        {
+          "group": "topik 3",
+          "term": "metromini gelar",
+          "value": 0.0018
+        },
+        {
+          "group": "topik 3",
+          "term": "onethousandsixhundred toilet",
+          "value": 0.0018
+        },
+        {
+          "group": "topik 3",
+          "term": "paraf petisi",
+          "value": 0.0018
+        },
+        {
+          "group": "topik 3",
+          "term": "samarinda paraf",
+          "value": 0.0018
+        },
+        {
+          "group": "topik 3",
+          "term": "driver murah",
+          "value": 0.0016
+        },
+        {
+          "group": "topik 4",
+          "term": "anak bangsa",
+          "value": 0.0112
+        },
+        {
+          "group": "topik 4",
+          "term": "karya anak",
+          "value": 0.0058
+        },
+        {
+          "group": "topik 4",
+          "term": "driver gojek",
+          "value": 0.0056
+        },
+        {
+          "group": "topik 4",
+          "term": "tolak memperbarui",
+          "value": 0.0029
+        },
+        {
+          "group": "topik 4",
+          "term": "ojek online",
+          "value": 0.0029
+        },
+        {
+          "group": "topik 4",
+          "term": "terima kasih",
+          "value": 0.0025
+        },
+        {
+          "group": "topik 4",
+          "term": "orang takut",
+          "value": 0.0018
+        },
+        {
+          "group": "topik 4",
+          "term": "driver grab",
+          "value": 0.0016
+        },
+        {
+          "group": "topik 4",
+          "term": "memperbarui kerja",
+          "value": 0.0016
+        },
+        {
+          "group": "topik 4",
+          "term": "pekerjaan sesuai",
+          "value": 0.0013
+        },
+        {
+          "group": "topik 4",
+          "term": "takut berani",
+          "value": 0.0013
+        },
+        {
+          "group": "topik 4",
+          "term": "berani keberanian",
+          "value": 0.0011
+        },
+        {
+          "group": "topik 4",
+          "term": "gojek bantu",
+          "value": 0.0011
+        },
+        {
+          "group": "topik 4",
+          "term": "taksi online",
+          "value": 0.0011
+        },
+        {
+          "group": "topik 4",
+          "term": "tarif driver",
+          "value": 0.0011
+        }
+      ]
+    },
+    "playstore_customer": {
+      "frekuensi": [
+        {
+          "group": "gojek_customer",
+          "term": "terima kasih",
+          "value": 95
+        },
+        {
+          "group": "gojek_customer",
+          "term": "versi terbaru",
+          "value": 87
+        },
+        {
+          "group": "gojek_customer",
+          "term": "update terbaru",
+          "value": 83
+        },
+        {
+          "group": "gojek_customer",
+          "term": "aplikasi gojek",
+          "value": 74
+        },
+        {
+          "group": "gojek_customer",
+          "term": "fitur chat",
+          "value": 72
+        },
+        {
+          "group": "gojek_customer",
+          "term": "tolong diperbaiki",
+          "value": 70
+        },
+        {
+          "group": "gojek_customer",
+          "term": "user friendly",
+          "value": 63
+        },
+        {
+          "group": "gojek_customer",
+          "term": "kustomer service",
+          "value": 62
+        },
+        {
+          "group": "gojek_customer",
+          "term": "pakai gopay",
+          "value": 62
+        },
+        {
+          "group": "gojek_customer",
+          "term": "app helpful",
+          "value": 60
+        },
+        {
+          "group": "gojek_customer",
+          "term": "helpful app",
+          "value": 60
+        },
+        {
+          "group": "gojek_customer",
+          "term": "pakai gojek",
+          "value": 52
+        },
+        {
+          "group": "gojek_customer",
+          "term": "update aplikasi",
+          "value": 51
+        },
+        {
+          "group": "gojek_customer",
+          "term": "nice app",
+          "value": 49
+        },
+        {
+          "group": "gojek_customer",
+          "term": "habis update",
+          "value": 48
+        }
+      ],
+      "tfidf": [
+        {
+          "group": "gojek_customer",
+          "term": "app helpful",
+          "value": 0.0008
+        },
+        {
+          "group": "gojek_customer",
+          "term": "helpful app",
+          "value": 0.0008
+        },
+        {
+          "group": "gojek_customer",
+          "term": "saldo gopay",
+          "value": 0.0005
+        },
+        {
+          "group": "gojek_customer",
+          "term": "harga mahal",
+          "value": 0.0004
+        },
+        {
+          "group": "gojek_customer",
+          "term": "life easier",
+          "value": 0.0004
+        },
+        {
+          "group": "gojek_customer",
+          "term": "helpful helpful",
+          "value": 0.0004
+        },
+        {
+          "group": "gojek_customer",
+          "term": "gojek update",
+          "value": 0.0004
+        },
+        {
+          "group": "gojek_customer",
+          "term": "unable process",
+          "value": 0.0004
+        },
+        {
+          "group": "gojek_customer",
+          "term": "mahal banget",
+          "value": 0.0004
+        },
+        {
+          "group": "gojek_customer",
+          "term": "apps helpful",
+          "value": 0.0003
+        },
+        {
+          "group": "gojek_customer",
+          "term": "gojek mahal",
+          "value": 0.0003
+        },
+        {
+          "group": "gojek_customer",
+          "term": "server busy",
+          "value": 0.0003
+        },
+        {
+          "group": "gojek_customer",
+          "term": "helpful easy",
+          "value": 0.0003
+        },
+        {
+          "group": "gojek_customer",
+          "term": "helpful apps",
+          "value": 0.0003
+        },
+        {
+          "group": "gojek_customer",
+          "term": "easy app",
+          "value": 0.0003
+        }
+      ],
+      "topicmodelling": [
+        {
+          "group": "topik 1",
+          "term": "nice app",
+          "value": 0.0036
+        },
+        {
+          "group": "topik 1",
+          "term": "fitur chat",
+          "value": 0.003
+        },
+        {
+          "group": "topik 1",
+          "term": "chat driver",
+          "value": 0.0027
+        },
+        {
+          "group": "topik 1",
+          "term": "user friendly",
+          "value": 0.0025
+        },
+        {
+          "group": "topik 1",
+          "term": "kustomer service",
+          "value": 0.0024
+        },
+        {
+          "group": "topik 1",
+          "term": "pakai gopay",
+          "value": 0.0022
+        },
+        {
+          "group": "topik 1",
+          "term": "update terbaru",
+          "value": 0.0015
+        },
+        {
+          "group": "topik 1",
+          "term": "terima kasih",
+          "value": 0.0015
+        },
+        {
+          "group": "topik 1",
+          "term": "aplikasi gojek",
+          "value": 0.0014
+        },
+        {
+          "group": "topik 1",
+          "term": "pakai gojek",
+          "value": 0.0014
+        },
+        {
+          "group": "topik 1",
+          "term": "driver driver",
+          "value": 0.0013
+        },
+        {
+          "group": "topik 1",
+          "term": "tolong diperbaiki",
+          "value": 0.0013
+        },
+        {
+          "group": "topik 1",
+          "term": "easy helpful",
+          "value": 0.0013
+        },
+        {
+          "group": "topik 1",
+          "term": "driver gojek",
+          "value": 0.0012
+        },
+        {
+          "group": "topik 1",
+          "term": "helpful apps",
+          "value": 0.0011
+        },
+        {
+          "group": "topik 2",
+          "term": "versi terbaru",
+          "value": 0.0055
+        },
+        {
+          "group": "topik 2",
+          "term": "update versi",
+          "value": 0.0035
+        },
+        {
+          "group": "topik 2",
+          "term": "anak bangsa",
+          "value": 0.0034
+        },
+        {
+          "group": "topik 2",
+          "term": "terima kasih",
+          "value": 0.003
+        },
+        {
+          "group": "topik 2",
+          "term": "habis update",
+          "value": 0.0029
+        },
+        {
+          "group": "topik 2",
+          "term": "tolong diperbaiki",
+          "value": 0.0026
+        },
+        {
+          "group": "topik 2",
+          "term": "karya anak",
+          "value": 0.0024
+        },
+        {
+          "group": "topik 2",
+          "term": "saldo gopay",
+          "value": 0.0021
+        },
+        {
+          "group": "topik 2",
+          "term": "suka error",
+          "value": 0.0016
+        },
+        {
+          "group": "topik 2",
+          "term": "server busy",
+          "value": 0.0016
+        },
+        {
+          "group": "topik 2",
+          "term": "fitur chat",
+          "value": 0.0015
+        },
+        {
+          "group": "topik 2",
+          "term": "maya account",
+          "value": 0.0014
+        },
+        {
+          "group": "topik 2",
+          "term": "user friendly",
+          "value": 0.0014
+        },
+        {
+          "group": "topik 2",
+          "term": "update app",
+          "value": 0.0014
+        },
+        {
+          "group": "topik 2",
+          "term": "update update",
+          "value": 0.0013
+        },
+        {
+          "group": "topik 3",
+          "term": "update terbaru",
+          "value": 0.0041
+        },
+        {
+          "group": "topik 3",
+          "term": "life easier",
+          "value": 0.0027
+        },
+        {
+          "group": "topik 3",
+          "term": "terima kasih",
+          "value": 0.0025
+        },
+        {
+          "group": "topik 3",
+          "term": "maya life",
+          "value": 0.0023
+        },
+        {
+          "group": "topik 3",
+          "term": "love app",
+          "value": 0.0017
+        },
+        {
+          "group": "topik 3",
+          "term": "tolong diperbaiki",
+          "value": 0.0017
+        },
+        {
+          "group": "topik 3",
+          "term": "nice apps",
+          "value": 0.0016
+        },
+        {
+          "group": "topik 3",
+          "term": "mahal banget",
+          "value": 0.0016
+        },
+        {
+          "group": "topik 3",
+          "term": "titik penjemputan",
+          "value": 0.0015
+        },
+        {
+          "group": "topik 3",
+          "term": "update aplikasi",
+          "value": 0.0015
+        },
+        {
+          "group": "topik 3",
+          "term": "helpful easy",
+          "value": 0.0014
+        },
+        {
+          "group": "topik 3",
+          "term": "aplikasi update",
+          "value": 0.0014
+        },
+        {
+          "group": "topik 3",
+          "term": "lokasi penjemputan",
+          "value": 0.0013
+        },
+        {
+          "group": "topik 3",
+          "term": "harga mahal",
+          "value": 0.0012
+        },
+        {
+          "group": "topik 3",
+          "term": "pakai gopay",
+          "value": 0.0012
+        },
+        {
+          "group": "topik 4",
+          "term": "aplikasi gojek",
+          "value": 0.0034
+        },
+        {
+          "group": "topik 4",
+          "term": "helpful app",
+          "value": 0.0028
+        },
+        {
+          "group": "topik 4",
+          "term": "update aplikasi",
+          "value": 0.0021
+        },
+        {
+          "group": "topik 4",
+          "term": "pakai gojek",
+          "value": 0.0018
+        },
+        {
+          "group": "topik 4",
+          "term": "gojek bantu",
+          "value": 0.0017
+        },
+        {
+          "group": "topik 4",
+          "term": "kustomer service",
+          "value": 0.0016
+        },
+        {
+          "group": "topik 4",
+          "term": "unable process",
+          "value": 0.0016
+        },
+        {
+          "group": "topik 4",
+          "term": "mohon diperbaiki",
+          "value": 0.0015
+        },
+        {
+          "group": "topik 4",
+          "term": "app helpful",
+          "value": 0.0015
+        },
+        {
+          "group": "topik 4",
+          "term": "posisi driver",
+          "value": 0.0015
+        },
+        {
+          "group": "topik 4",
+          "term": "fitur chat",
+          "value": 0.0013
+        },
+        {
+          "group": "topik 4",
+          "term": "terima kasih",
+          "value": 0.0013
+        },
+        {
+          "group": "topik 4",
+          "term": "pakai gopay",
+          "value": 0.0011
+        },
+        {
+          "group": "topik 4",
+          "term": "gojek app",
+          "value": 0.0011
+        },
+        {
+          "group": "topik 4",
+          "term": "application helpful",
+          "value": 0.0011
+        }
+      ]
+    },
+    "playstore_driver": {
+      "frekuensi": [
+        {
+          "group": "gojek_driver",
+          "term": "fitur chat",
+          "value": 135
+        },
+        {
+          "group": "gojek_driver",
+          "term": "fake gps",
+          "value": 59
+        },
+        {
+          "group": "gojek_driver",
+          "term": "orderan masuk",
+          "value": 48
+        },
+        {
+          "group": "gojek_driver",
+          "term": "driver gojek",
+          "value": 36
+        },
+        {
+          "group": "gojek_driver",
+          "term": "anak bangsa",
+          "value": 35
+        },
+        {
+          "group": "gojek_driver",
+          "term": "tolong perbaiki",
+          "value": 32
+        },
+        {
+          "group": "gojek_driver",
+          "term": "tolong diperbaiki",
+          "value": 27
+        },
+        {
+          "group": "gojek_driver",
+          "term": "tambahkan fitur",
+          "value": 26
+        },
+        {
+          "group": "gojek_driver",
+          "term": "chat driver",
+          "value": 23
+        },
+        {
+          "group": "gojek_driver",
+          "term": "gojek driver",
+          "value": 22
+        },
+        {
+          "group": "gojek_driver",
+          "term": "karya anak",
+          "value": 22
+        },
+        {
+          "group": "gojek_driver",
+          "term": "tambahin fitur",
+          "value": 22
+        },
+        {
+          "group": "gojek_driver",
+          "term": "terima kasih",
+          "value": 22
+        },
+        {
+          "group": "gojek_driver",
+          "term": "gojek indonesia",
+          "value": 20
+        },
+        {
+          "group": "gojek_driver",
+          "term": "pt gojek",
+          "value": 20
+        }
+      ],
+      "tfidf": [
+        {
+          "group": "gojek_driver",
+          "term": "performa turun",
+          "value": 0.0009
+        },
+        {
+          "group": "gojek_driver",
+          "term": "orderan sepi",
+          "value": 0.0006
+        },
+        {
+          "group": "gojek_driver",
+          "term": "masuk notif",
+          "value": 0.0004
+        },
+        {
+          "group": "gojek_driver",
+          "term": "performa hancur",
+          "value": 0.0004
+        },
+        {
+          "group": "gojek_driver",
+          "term": "susah orderan",
+          "value": 0.0004
+        },
+        {
+          "group": "gojek_driver",
+          "term": "irit pulsa",
+          "value": 0.0004
+        },
+        {
+          "group": "gojek_driver",
+          "term": "masuk performa",
+          "value": 0.0004
+        },
+        {
+          "group": "gojek_driver",
+          "term": "sepi orderan",
+          "value": 0.0004
+        },
+        {
+          "group": "gojek_driver",
+          "term": "driver jujur",
+          "value": 0.0003
+        },
+        {
+          "group": "gojek_driver",
+          "term": "kena suspend",
+          "value": 0.0003
+        },
+        {
+          "group": "gojek_driver",
+          "term": "masuk orderan",
+          "value": 0.0003
+        },
+        {
+          "group": "gojek_driver",
+          "term": "uang tunai",
+          "value": 0.0003
+        },
+        {
+          "group": "gojek_driver",
+          "term": "gps tuyul",
+          "value": 0.0003
+        },
+        {
+          "group": "gojek_driver",
+          "term": "masuk aplikasi",
+          "value": 0.0003
+        },
+        {
+          "group": "gojek_driver",
+          "term": "notifikasi pesan",
+          "value": 0.0003
+        }
+      ],
+      "topicmodelling": [
+        {
+          "group": "topik 1",
+          "term": "fitur chat",
+          "value": 0.034
+        },
+        {
+          "group": "topik 1",
+          "term": "fake gps",
+          "value": 0.0111
+        },
+        {
+          "group": "topik 1",
+          "term": "tambahkan fitur",
+          "value": 0.0066
+        },
+        {
+          "group": "topik 1",
+          "term": "tambahin fitur",
+          "value": 0.0056
+        },
+        {
+          "group": "topik 1",
+          "term": "force close",
+          "value": 0.0043
+        },
+        {
+          "group": "topik 1",
+          "term": "tolong diperbaiki",
+          "value": 0.0041
+        },
+        {
+          "group": "topik 1",
+          "term": "chat app",
+          "value": 0.003
+        },
+        {
+          "group": "topik 1",
+          "term": "pakai fake",
+          "value": 0.003
+        },
+        {
+          "group": "topik 1",
+          "term": "orderan sepi",
+          "value": 0.0026
+        },
+        {
+          "group": "topik 1",
+          "term": "tolong fitur",
+          "value": 0.0026
+        },
+        {
+          "group": "topik 1",
+          "term": "chat chat",
+          "value": 0.0025
+        },
+        {
+          "group": "topik 1",
+          "term": "tolong tambahkan",
+          "value": 0.0025
+        },
+        {
+          "group": "topik 1",
+          "term": "chat kustomer",
+          "value": 0.0024
+        },
+        {
+          "group": "topik 1",
+          "term": "terima kasih",
+          "value": 0.0023
+        },
+        {
+          "group": "topik 1",
+          "term": "aplikasi chat",
+          "value": 0.0023
+        },
+        {
+          "group": "topik 2",
+          "term": "orderan masuk",
+          "value": 0.007
+        },
+        {
+          "group": "topik 2",
+          "term": "anak bangsa",
+          "value": 0.0063
+        },
+        {
+          "group": "topik 2",
+          "term": "karya anak",
+          "value": 0.0048
+        },
+        {
+          "group": "topik 2",
+          "term": "app chat",
+          "value": 0.0041
+        },
+        {
+          "group": "topik 2",
+          "term": "merugikan driver",
+          "value": 0.0034
+        },
+        {
+          "group": "topik 2",
+          "term": "fitur app",
+          "value": 0.0033
+        },
+        {
+          "group": "topik 2",
+          "term": "tolong diperbaiki",
+          "value": 0.0028
+        },
+        {
+          "group": "topik 2",
+          "term": "fitur chatnya",
+          "value": 0.0028
+        },
+        {
+          "group": "topik 2",
+          "term": "driver kustomer",
+          "value": 0.0027
+        },
+        {
+          "group": "topik 2",
+          "term": "chat driver",
+          "value": 0.0024
+        },
+        {
+          "group": "topik 2",
+          "term": "driver gojek",
+          "value": 0.0023
+        },
+        {
+          "group": "topik 2",
+          "term": "fake gps",
+          "value": 0.0023
+        },
+        {
+          "group": "topik 2",
+          "term": "koneksi internet",
+          "value": 0.0023
+        },
+        {
+          "group": "topik 2",
+          "term": "update versi",
+          "value": 0.0023
+        },
+        {
+          "group": "topik 2",
+          "term": "performa turun",
+          "value": 0.002
+        },
+        {
+          "group": "topik 3",
+          "term": "tolong perbaiki",
+          "value": 0.0054
+        },
+        {
+          "group": "topik 3",
+          "term": "driver gojek",
+          "value": 0.0046
+        },
+        {
+          "group": "topik 3",
+          "term": "pt gojek",
+          "value": 0.0044
+        },
+        {
+          "group": "topik 3",
+          "term": "aplikasi gojek",
+          "value": 0.0037
+        },
+        {
+          "group": "topik 3",
+          "term": "aplikasi error",
+          "value": 0.0034
+        },
+        {
+          "group": "topik 3",
+          "term": "orderan masuk",
+          "value": 0.0033
+        },
+        {
+          "group": "topik 3",
+          "term": "gojek indonesia",
+          "value": 0.0031
+        },
+        {
+          "group": "topik 3",
+          "term": "gojek driver",
+          "value": 0.0028
+        },
+        {
+          "group": "topik 3",
+          "term": "aplikasi bagus",
+          "value": 0.0026
+        },
+        {
+          "group": "topik 3",
+          "term": "versi terbaru",
+          "value": 0.0023
+        },
+        {
+          "group": "topik 3",
+          "term": "anak bangsa",
+          "value": 0.0021
+        },
+        {
+          "group": "topik 3",
+          "term": "driver driver",
+          "value": 0.0021
+        },
+        {
+          "group": "topik 3",
+          "term": "tolong gojek",
+          "value": 0.0021
+        },
+        {
+          "group": "topik 3",
+          "term": "auto bid",
+          "value": 0.0018
+        },
+        {
+          "group": "topik 3",
+          "term": "performa turun",
+          "value": 0.0018
+        }
+      ]
+    }
+  },
+  "change": {
+    "media": {
+      "frekuensi": [
+        {
+          "group": "balipost",
+          "term": "teluk benoa",
+          "value": 426
+        },
+        {
+          "group": "balipost",
+          "term": "reklamasi teluk",
+          "value": 355
+        },
+        {
+          "group": "balipost",
+          "term": "tolak reklamasi",
+          "value": 221
+        },
+        {
+          "group": "balipost",
+          "term": "desa adat",
+          "value": 82
+        },
+        {
+          "group": "balipost",
+          "term": "nama jalan",
+          "value": 77
+        },
+        {
+          "group": "balipost",
+          "term": "penolakan reklamasi",
+          "value": 75
+        },
+        {
+          "group": "balipost",
+          "term": "rencana reklamasi",
+          "value": 65
+        },
+        {
+          "group": "balipost",
+          "term": "denpasar balipost",
+          "value": 63
+        },
+        {
+          "group": "balipost",
+          "term": "nusa penida",
+          "value": 63
+        },
+        {
+          "group": "balipost",
+          "term": "bali tolak",
+          "value": 57
+        },
+        {
+          "group": "balipost",
+          "term": "gubernur bali",
+          "value": 55
+        },
+        {
+          "group": "balipost",
+          "term": "rakyat bali",
+          "value": 47
+        },
+        {
+          "group": "balipost",
+          "term": "fiftyone twothousandandfourteen",
+          "value": 43
+        },
+        {
+          "group": "balipost",
+          "term": "jalan nusa",
+          "value": 42
+        },
+        {
+          "group": "balipost",
+          "term": "marka nama",
+          "value": 35
+        },
+        {
+          "group": "beritabali",
+          "term": "teluk benoa",
+          "value": 422
+        },
+        {
+          "group": "beritabali",
+          "term": "reklamasi teluk",
+          "value": 259
+        },
+        {
+          "group": "beritabali",
+          "term": "tolak reklamasi",
+          "value": 113
+        },
+        {
+          "group": "beritabali",
+          "term": "masyarakat bali",
+          "value": 67
+        },
+        {
+          "group": "beritabali",
+          "term": "kawasan suci",
+          "value": 62
+        },
+        {
+          "group": "beritabali",
+          "term": "desa adat",
+          "value": 61
+        },
+        {
+          "group": "beritabali",
+          "term": "sabha pandita",
+          "value": 57
+        },
+        {
+          "group": "beritabali",
+          "term": "beritabali denpasar",
+          "value": 53
+        },
+        {
+          "group": "beritabali",
+          "term": "rencana reklamasi",
+          "value": 42
+        },
+        {
+          "group": "beritabali",
+          "term": "sabha walaka",
+          "value": 42
+        },
+        {
+          "group": "beritabali",
+          "term": "bali tolak",
+          "value": 39
+        },
+        {
+          "group": "beritabali",
+          "term": "pro kontra",
+          "value": 38
+        },
+        {
+          "group": "beritabali",
+          "term": "kawasan teluk",
+          "value": 35
+        },
+        {
+          "group": "beritabali",
+          "term": "rakyat bali",
+          "value": 34
+        },
+        {
+          "group": "beritabali",
+          "term": "gubernur bali",
+          "value": 33
+        },
+        {
+          "group": "tempo",
+          "term": "teluk benoa",
+          "value": 297
+        },
+        {
+          "group": "tempo",
+          "term": "reklamasi teluk",
+          "value": 242
+        },
+        {
+          "group": "tempo",
+          "term": "tolak reklamasi",
+          "value": 227
+        },
+        {
+          "group": "tempo",
+          "term": "desa adat",
+          "value": 99
+        },
+        {
+          "group": "tempo",
+          "term": "bali tolak",
+          "value": 74
+        },
+        {
+          "group": "tempo",
+          "term": "gubernur bali",
+          "value": 55
+        },
+        {
+          "group": "tempo",
+          "term": "rakyat bali",
+          "value": 51
+        },
+        {
+          "group": "tempo",
+          "term": "masyarakat bali",
+          "value": 49
+        },
+        {
+          "group": "tempo",
+          "term": "penolakan reklamasi",
+          "value": 47
+        },
+        {
+          "group": "tempo",
+          "term": "rencana reklamasi",
+          "value": 45
+        },
+        {
+          "group": "tempo",
+          "term": "tempo denpasar",
+          "value": 41
+        },
+        {
+          "group": "tempo",
+          "term": "bram setiawan",
+          "value": 34
+        },
+        {
+          "group": "tempo",
+          "term": "fiftyone twothousandandfourteen",
+          "value": 32
+        },
+        {
+          "group": "tempo",
+          "term": "reklamasi forbali",
+          "value": 31
+        },
+        {
+          "group": "tempo",
+          "term": "adat bali",
+          "value": 30
+        },
+        {
+          "group": "kompas",
+          "term": "teluk benoa",
+          "value": 136
+        },
+        {
+          "group": "kompas",
+          "term": "reklamasi teluk",
+          "value": 125
+        },
+        {
+          "group": "kompas",
+          "term": "tolak reklamasi",
+          "value": 74
+        },
+        {
+          "group": "kompas",
+          "term": "teluk jakarta",
+          "value": 41
+        },
+        {
+          "group": "kompas",
+          "term": "tanjung benoa",
+          "value": 33
+        },
+        {
+          "group": "kompas",
+          "term": "gubernur bali",
+          "value": 30
+        },
+        {
+          "group": "kompas",
+          "term": "lingkungan hidup",
+          "value": 30
+        },
+        {
+          "group": "kompas",
+          "term": "pembangunan reklamasi",
+          "value": 28
+        },
+        {
+          "group": "kompas",
+          "term": "reklamasi pulau",
+          "value": 28
+        },
+        {
+          "group": "kompas",
+          "term": "proyek reklamasi",
+          "value": 26
+        },
+        {
+          "group": "kompas",
+          "term": "denpasar kompas",
+          "value": 25
+        },
+        {
+          "group": "kompas",
+          "term": "jakarta kompas",
+          "value": 25
+        },
+        {
+          "group": "kompas",
+          "term": "benoa bali",
+          "value": 23
+        },
+        {
+          "group": "kompas",
+          "term": "reklamasi terselubung",
+          "value": 22
+        },
+        {
+          "group": "kompas",
+          "term": "rencana reklamasi",
+          "value": 19
+        }
+      ],
+      "tfidf": [
+        {
+          "group": "balipost",
+          "term": "nama jalan",
+          "value": 0.0055
+        },
+        {
+          "group": "balipost",
+          "term": "denpasar balipost",
+          "value": 0.0045
+        },
+        {
+          "group": "balipost",
+          "term": "balipost denpasar",
+          "value": 0.0041
+        },
+        {
+          "group": "balipost",
+          "term": "jalan nusa",
+          "value": 0.003
+        },
+        {
+          "group": "balipost",
+          "term": "marka nama",
+          "value": 0.0025
+        },
+        {
+          "group": "balipost",
+          "term": "nusa penida",
+          "value": 0.0023
+        },
+        {
+          "group": "balipost",
+          "term": "marka jalan",
+          "value": 0.002
+        },
+        {
+          "group": "balipost",
+          "term": "penida dilengkapi",
+          "value": 0.002
+        },
+        {
+          "group": "balipost",
+          "term": "kmb balipost",
+          "value": 0.0017
+        },
+        {
+          "group": "balipost",
+          "term": "digital economy",
+          "value": 0.0015
+        },
+        {
+          "group": "balipost",
+          "term": "dilengkapi marka",
+          "value": 0.0015
+        },
+        {
+          "group": "balipost",
+          "term": "ekonomi digital",
+          "value": 0.0015
+        },
+        {
+          "group": "balipost",
+          "term": "jalan nama",
+          "value": 0.0015
+        },
+        {
+          "group": "balipost",
+          "term": "keamanan informasi",
+          "value": 0.0015
+        },
+        {
+          "group": "balipost",
+          "term": "text decoration",
+          "value": 0.0014
+        },
+        {
+          "group": "beritabali",
+          "term": "sabha pandita",
+          "value": 0.0045
+        },
+        {
+          "group": "beritabali",
+          "term": "beritabali denpasar",
+          "value": 0.0043
+        },
+        {
+          "group": "beritabali",
+          "term": "sabha walaka",
+          "value": 0.0033
+        },
+        {
+          "group": "beritabali",
+          "term": "psk beritabali",
+          "value": 0.0024
+        },
+        {
+          "group": "beritabali",
+          "term": "putu wirata",
+          "value": 0.0024
+        },
+        {
+          "group": "beritabali",
+          "term": "bbn rls",
+          "value": 0.0022
+        },
+        {
+          "group": "beritabali",
+          "term": "pasamuhan sabha",
+          "value": 0.0021
+        },
+        {
+          "group": "beritabali",
+          "term": "wirata dwikora",
+          "value": 0.0014
+        },
+        {
+          "group": "beritabali",
+          "term": "pt btid",
+          "value": 0.0012
+        },
+        {
+          "group": "beritabali",
+          "term": "rls beritabali",
+          "value": 0.0011
+        },
+        {
+          "group": "beritabali",
+          "term": "dpd pdip",
+          "value": 0.001
+        },
+        {
+          "group": "beritabali",
+          "term": "pilihan redaksi",
+          "value": 0.001
+        },
+        {
+          "group": "beritabali",
+          "term": "rls psk",
+          "value": 0.001
+        },
+        {
+          "group": "beritabali",
+          "term": "bbn dws",
+          "value": 0.0009
+        },
+        {
+          "group": "beritabali",
+          "term": "ketua sabha",
+          "value": 0.0009
+        },
+        {
+          "group": "tempo",
+          "term": "tempo denpasar",
+          "value": 0.0039
+        },
+        {
+          "group": "tempo",
+          "term": "bram setiawan",
+          "value": 0.0033
+        },
+        {
+          "group": "tempo",
+          "term": "setiawan tempo",
+          "value": 0.0032
+        },
+        {
+          "group": "tempo",
+          "term": "tempo jakarta",
+          "value": 0.0017
+        },
+        {
+          "group": "tempo",
+          "term": "reklamasi forbali",
+          "value": 0.0015
+        },
+        {
+          "group": "tempo",
+          "term": "konser mini",
+          "value": 0.0012
+        },
+        {
+          "group": "tempo",
+          "term": "menteri susi",
+          "value": 0.0012
+        },
+        {
+          "group": "tempo",
+          "term": "koordinator forum",
+          "value": 0.0011
+        },
+        {
+          "group": "tempo",
+          "term": "juli twothousandandsixteen",
+          "value": 0.001
+        },
+        {
+          "group": "tempo",
+          "term": "grup musik",
+          "value": 0.001
+        },
+        {
+          "group": "tempo",
+          "term": "muda mudi",
+          "value": 0.001
+        },
+        {
+          "group": "tempo",
+          "term": "ditemui tempo",
+          "value": 0.0009
+        },
+        {
+          "group": "tempo",
+          "term": "bisnis milik",
+          "value": 0.0008
+        },
+        {
+          "group": "tempo",
+          "term": "jaringan bisnis",
+          "value": 0.0008
+        },
+        {
+          "group": "tempo",
+          "term": "perlawanan tolak",
+          "value": 0.0008
+        },
+        {
+          "group": "kompas",
+          "term": "denpasar kompas",
+          "value": 0.0034
+        },
+        {
+          "group": "kompas",
+          "term": "jakarta kompas",
+          "value": 0.0034
+        },
+        {
+          "group": "kompas",
+          "term": "hektar kk",
+          "value": 0.0018
+        },
+        {
+          "group": "kompas",
+          "term": "dki nomor",
+          "value": 0.0012
+        },
+        {
+          "group": "kompas",
+          "term": "pemberian izin",
+          "value": 0.0012
+        },
+        {
+          "group": "kompas",
+          "term": "sertifikat hgb",
+          "value": 0.0012
+        },
+        {
+          "group": "kompas",
+          "term": "sk gubernur",
+          "value": 0.0012
+        },
+        {
+          "group": "kompas",
+          "term": "keputusan gubernur",
+          "value": 0.0011
+        },
+        {
+          "group": "kompas",
+          "term": "hgb pulau",
+          "value": 0.001
+        },
+        {
+          "group": "kompas",
+          "term": "kompas menteri",
+          "value": 0.001
+        },
+        {
+          "group": "kompas",
+          "term": "pluit city",
+          "value": 0.001
+        },
+        {
+          "group": "kompas",
+          "term": "seluas hektar",
+          "value": 0.0009
+        },
+        {
+          "group": "kompas",
+          "term": "berbicara pb3as",
+          "value": 0.0008
+        },
+        {
+          "group": "kompas",
+          "term": "boskalis international",
+          "value": 0.0008
+        },
+        {
+          "group": "kompas",
+          "term": "gugatan nelayan",
+          "value": 0.0008
+        }
+      ]
+    },
+    "petisi": {
+      "frekuensi": [
+        {
+          "group": "petisi 1",
+          "term": "teluk benoa",
+          "value": 466
+        },
+        {
+          "group": "petisi 1",
+          "term": "tolak reklamasi",
+          "value": 412
+        },
+        {
+          "group": "petisi 1",
+          "term": "reklamasi teluk",
+          "value": 294
+        },
+        {
+          "group": "petisi 2",
+          "term": "teluk benoa",
+          "value": 258
+        },
+        {
+          "group": "petisi 2",
+          "term": "tolak reklamasi",
+          "value": 232
+        },
+        {
+          "group": "petisi 2",
+          "term": "reklamasi teluk",
+          "value": 149
+        },
+        {
+          "group": "petisi 2",
+          "term": "bali bali",
+          "value": 139
+        },
+        {
+          "group": "petisi 2",
+          "term": "alam bali",
+          "value": 128
+        },
+        {
+          "group": "petisi 1",
+          "term": "bali bali",
+          "value": 120
+        },
+        {
+          "group": "petisi 1",
+          "term": "alam bali",
+          "value": 112
+        },
+        {
+          "group": "petisi 1",
+          "term": "bali tolak",
+          "value": 110
+        },
+        {
+          "group": "petisi 3",
+          "term": "love bali",
+          "value": 94
+        },
+        {
+          "group": "petisi 2",
+          "term": "anak cucu",
+          "value": 94
+        },
+        {
+          "group": "petisi 2",
+          "term": "bali tolak",
+          "value": 90
+        },
+        {
+          "group": "petisi 1",
+          "term": "orang bali",
+          "value": 83
+        },
+        {
+          "group": "petisi 2",
+          "term": "cinta bali",
+          "value": 78
+        },
+        {
+          "group": "petisi 2",
+          "term": "pulau bali",
+          "value": 75
+        },
+        {
+          "group": "petisi 1",
+          "term": "cinta bali",
+          "value": 72
+        },
+        {
+          "group": "petisi 2",
+          "term": "orang bali",
+          "value": 66
+        },
+        {
+          "group": "petisi 1",
+          "term": "masyarakat bali",
+          "value": 62
+        },
+        {
+          "group": "petisi 1",
+          "term": "pulau bali",
+          "value": 61
+        },
+        {
+          "group": "petisi 1",
+          "term": "reklamasi rusak",
+          "value": 59
+        },
+        {
+          "group": "petisi 1",
+          "term": "rusak alam",
+          "value": 59
+        },
+        {
+          "group": "petisi 1",
+          "term": "setuju reklamasi",
+          "value": 55
+        },
+        {
+          "group": "petisi 2",
+          "term": "rusak alam",
+          "value": 55
+        },
+        {
+          "group": "petisi 1",
+          "term": "anak cucu",
+          "value": 54
+        },
+        {
+          "group": "petisi 3",
+          "term": "bali bali",
+          "value": 54
+        },
+        {
+          "group": "petisi 1",
+          "term": "reklamasi bali",
+          "value": 52
+        },
+        {
+          "group": "petisi 2",
+          "term": "reklamasi bali",
+          "value": 50
+        },
+        {
+          "group": "petisi 2",
+          "term": "masyarakat bali",
+          "value": 49
+        },
+        {
+          "group": "petisi 2",
+          "term": "bali sale",
+          "value": 48
+        },
+        {
+          "group": "petisi 2",
+          "term": "bali selatan",
+          "value": 47
+        },
+        {
+          "group": "petisi 3",
+          "term": "tolak reklamasi",
+          "value": 39
+        },
+        {
+          "group": "petisi 3",
+          "term": "bali beautiful",
+          "value": 29
+        },
+        {
+          "group": "petisi 3",
+          "term": "maya home",
+          "value": 23
+        },
+        {
+          "group": "petisi 3",
+          "term": "teluk benoa",
+          "value": 23
+        },
+        {
+          "group": "petisi 3",
+          "term": "beautiful island",
+          "value": 22
+        },
+        {
+          "group": "petisi 3",
+          "term": "balinese people",
+          "value": 21
+        },
+        {
+          "group": "petisi 3",
+          "term": "bali people",
+          "value": 20
+        },
+        {
+          "group": "petisi 3",
+          "term": "people bali",
+          "value": 20
+        },
+        {
+          "group": "petisi 3",
+          "term": "bali maya",
+          "value": 19
+        },
+        {
+          "group": "petisi 3",
+          "term": "save bali",
+          "value": 19
+        },
+        {
+          "group": "petisi 3",
+          "term": "reklamasi teluk",
+          "value": 18
+        },
+        {
+          "group": "petisi 3",
+          "term": "bali culture",
+          "value": 14
+        },
+        {
+          "group": "petisi 3",
+          "term": "destroy bali",
+          "value": 14
+        }
+      ],
+      "tfidf": [
+        {
+          "group": "petisi 1",
+          "term": "batalkan perpres",
+          "value": 0.0011
+        },
+        {
+          "group": "petisi 1",
+          "term": "anak cucu",
+          "value": 0.0011
+        },
+        {
+          "group": "petisi 1",
+          "term": "mengurug laut",
+          "value": 0.001
+        },
+        {
+          "group": "petisi 1",
+          "term": "perpres fiftyone",
+          "value": 0.0009
+        },
+        {
+          "group": "petisi 1",
+          "term": "bali butuh",
+          "value": 0.0007
+        },
+        {
+          "group": "petisi 1",
+          "term": "berkedok revitalisasi",
+          "value": 0.0007
+        },
+        {
+          "group": "petisi 1",
+          "term": "kelestarian alam",
+          "value": 0.0007
+        },
+        {
+          "group": "petisi 1",
+          "term": "benoa reklamasi",
+          "value": 0.0006
+        },
+        {
+          "group": "petisi 1",
+          "term": "fiftyone twothousandandfourteen",
+          "value": 0.0006
+        },
+        {
+          "group": "petisi 1",
+          "term": "pelaut mengurug",
+          "value": 0.0006
+        },
+        {
+          "group": "petisi 1",
+          "term": "benoa tolak",
+          "value": 0.0005
+        },
+        {
+          "group": "petisi 1",
+          "term": "kepentingan rakyat",
+          "value": 0.0005
+        },
+        {
+          "group": "petisi 1",
+          "term": "peduli kelestarian",
+          "value": 0.0005
+        },
+        {
+          "group": "petisi 1",
+          "term": "petisi tolak",
+          "value": 0.0005
+        },
+        {
+          "group": "petisi 1",
+          "term": "kawasan suci",
+          "value": 0.0005
+        },
+        {
+          "group": "petisi 2",
+          "term": "anak cucu",
+          "value": 0.0019
+        },
+        {
+          "group": "petisi 2",
+          "term": "sk reklamasi",
+          "value": 0.0013
+        },
+        {
+          "group": "petisi 2",
+          "term": "cabut sk",
+          "value": 0.0009
+        },
+        {
+          "group": "petisi 2",
+          "term": "bali milik",
+          "value": 0.0006
+        },
+        {
+          "group": "petisi 2",
+          "term": "kelestarian alam",
+          "value": 0.0006
+        },
+        {
+          "group": "petisi 2",
+          "term": "gubernur bali",
+          "value": 0.0006
+        },
+        {
+          "group": "petisi 2",
+          "term": "lingkungan hidup",
+          "value": 0.0005
+        },
+        {
+          "group": "petisi 2",
+          "term": "propinsi bali",
+          "value": 0.0005
+        },
+        {
+          "group": "petisi 2",
+          "term": "rusak keseimbangan",
+          "value": 0.0005
+        },
+        {
+          "group": "petisi 2",
+          "term": "cinta indonesia",
+          "value": 0.0005
+        },
+        {
+          "group": "petisi 2",
+          "term": "orang orang",
+          "value": 0.0004
+        },
+        {
+          "group": "petisi 2",
+          "term": "cinta lingkungan",
+          "value": 0.0004
+        },
+        {
+          "group": "petisi 2",
+          "term": "dprd bali",
+          "value": 0.0004
+        },
+        {
+          "group": "petisi 2",
+          "term": "bali kenal",
+          "value": 0.0004
+        },
+        {
+          "group": "petisi 2",
+          "term": "benoa reklamasi",
+          "value": 0.0004
+        },
+        {
+          "group": "petisi 3",
+          "term": "benoa gulf",
+          "value": 0.0013
+        },
+        {
+          "group": "petisi 3",
+          "term": "registered trademark",
+          "value": 0.0013
+        },
+        {
+          "group": "petisi 3",
+          "term": "beautiful people",
+          "value": 0.0012
+        },
+        {
+          "group": "petisi 3",
+          "term": "people culture",
+          "value": 0.0012
+        },
+        {
+          "group": "petisi 3",
+          "term": "destroy beautiful",
+          "value": 0.001
+        },
+        {
+          "group": "petisi 3",
+          "term": "bali dont",
+          "value": 0.0009
+        },
+        {
+          "group": "petisi 3",
+          "term": "island people",
+          "value": 0.0009
+        },
+        {
+          "group": "petisi 3",
+          "term": "stop destroying",
+          "value": 0.0009
+        },
+        {
+          "group": "petisi 3",
+          "term": "trademark registered",
+          "value": 0.0009
+        },
+        {
+          "group": "petisi 3",
+          "term": "bali belongs",
+          "value": 0.0008
+        },
+        {
+          "group": "petisi 3",
+          "term": "corporate greed",
+          "value": 0.0008
+        },
+        {
+          "group": "petisi 3",
+          "term": "development project",
+          "value": 0.0008
+        },
+        {
+          "group": "petisi 3",
+          "term": "lived bali",
+          "value": 0.0008
+        },
+        {
+          "group": "petisi 3",
+          "term": "money bali",
+          "value": 0.0008
+        },
+        {
+          "group": "petisi 3",
+          "term": "reclamation destroy",
+          "value": 0.0008
+        }
+      ],
+      "topicmodelling": [
+        {
+          "group": 1,
+          "term": "love bali",
+          "value": 0.0137
+        },
+        {
+          "group": 1,
+          "term": "teluk benoa",
+          "value": 0.012
+        },
+        {
+          "group": 1,
+          "term": "pulau bali",
+          "value": 0.0069
+        },
+        {
+          "group": 1,
+          "term": "bali sale",
+          "value": 0.0066
+        },
+        {
+          "group": 1,
+          "term": "save bali",
+          "value": 0.0055
+        },
+        {
+          "group": 1,
+          "term": "bali bali",
+          "value": 0.005
+        },
+        {
+          "group": 1,
+          "term": "bali indah",
+          "value": 0.0043
+        },
+        {
+          "group": 1,
+          "term": "setuju reklamasi",
+          "value": 0.0038
+        },
+        {
+          "group": 1,
+          "term": "perpres fiftyone",
+          "value": 0.0038
+        },
+        {
+          "group": 1,
+          "term": "reklamasi rusak",
+          "value": 0.0037
+        },
+        {
+          "group": 1,
+          "term": "fiftyone twothousandandfourteen",
+          "value": 0.003
+        },
+        {
+          "group": 1,
+          "term": "reklamasi teluk",
+          "value": 0.0029
+        },
+        {
+          "group": 1,
+          "term": "masyarakat bali",
+          "value": 0.0028
+        },
+        {
+          "group": 1,
+          "term": "rusak lingkungan",
+          "value": 0.0027
+        },
+        {
+          "group": 1,
+          "term": "orang bali",
+          "value": 0.0027
+        },
+        {
+          "group": 2,
+          "term": "orang bali",
+          "value": 0.0117
+        },
+        {
+          "group": 2,
+          "term": "rusak alam",
+          "value": 0.0093
+        },
+        {
+          "group": 2,
+          "term": "alam bali",
+          "value": 0.0083
+        },
+        {
+          "group": 2,
+          "term": "anak cucu",
+          "value": 0.0075
+        },
+        {
+          "group": 2,
+          "term": "kelestarian alam",
+          "value": 0.0065
+        },
+        {
+          "group": 2,
+          "term": "tolak reklamasi",
+          "value": 0.0062
+        },
+        {
+          "group": 2,
+          "term": "reklamasi rusak",
+          "value": 0.0055
+        },
+        {
+          "group": 2,
+          "term": "teluk benoa",
+          "value": 0.0043
+        },
+        {
+          "group": 2,
+          "term": "keindahan alam",
+          "value": 0.0039
+        },
+        {
+          "group": 2,
+          "term": "bali bali",
+          "value": 0.0038
+        },
+        {
+          "group": 2,
+          "term": "rusak lingkungan",
+          "value": 0.0037
+        },
+        {
+          "group": 2,
+          "term": "menjaga kelestarian",
+          "value": 0.0035
+        },
+        {
+          "group": 2,
+          "term": "budaya bali",
+          "value": 0.0033
+        },
+        {
+          "group": 2,
+          "term": "warga bali",
+          "value": 0.0033
+        },
+        {
+          "group": 2,
+          "term": "alam rusak",
+          "value": 0.0028
+        },
+        {
+          "group": 3,
+          "term": "tolak reklamasi",
+          "value": 0.0676
+        },
+        {
+          "group": 3,
+          "term": "teluk benoa",
+          "value": 0.0629
+        },
+        {
+          "group": 3,
+          "term": "reklamasi teluk",
+          "value": 0.0466
+        },
+        {
+          "group": 3,
+          "term": "bali tolak",
+          "value": 0.0162
+        },
+        {
+          "group": 3,
+          "term": "masyarakat bali",
+          "value": 0.0058
+        },
+        {
+          "group": 3,
+          "term": "alam bali",
+          "value": 0.005
+        },
+        {
+          "group": 3,
+          "term": "pulau bali",
+          "value": 0.004
+        },
+        {
+          "group": 3,
+          "term": "setuju reklamasi",
+          "value": 0.0038
+        },
+        {
+          "group": 3,
+          "term": "benoa bali",
+          "value": 0.0036
+        },
+        {
+          "group": 3,
+          "term": "selamatkan bali",
+          "value": 0.0036
+        },
+        {
+          "group": 3,
+          "term": "reklamasi berkedok",
+          "value": 0.0035
+        },
+        {
+          "group": 3,
+          "term": "berkedok revitalisasi",
+          "value": 0.0035
+        },
+        {
+          "group": 3,
+          "term": "peduli lingkungan",
+          "value": 0.0032
+        },
+        {
+          "group": 3,
+          "term": "rakyat bali",
+          "value": 0.0032
+        },
+        {
+          "group": 3,
+          "term": "tolak keras",
+          "value": 0.0032
+        },
+        {
+          "group": 4,
+          "term": "bali bali",
+          "value": 0.0079
+        },
+        {
+          "group": 4,
+          "term": "love bali",
+          "value": 0.0039
+        },
+        {
+          "group": 4,
+          "term": "teluk benoa",
+          "value": 0.0036
+        },
+        {
+          "group": 4,
+          "term": "bali people",
+          "value": 0.0031
+        },
+        {
+          "group": 4,
+          "term": "bali milik",
+          "value": 0.0027
+        },
+        {
+          "group": 4,
+          "term": "rusak bali",
+          "value": 0.0025
+        },
+        {
+          "group": 4,
+          "term": "bali rumah",
+          "value": 0.0024
+        },
+        {
+          "group": 4,
+          "term": "orang bali",
+          "value": 0.0023
+        },
+        {
+          "group": 4,
+          "term": "hita karana",
+          "value": 0.0022
+        },
+        {
+          "group": 4,
+          "term": "tri hita",
+          "value": 0.0022
+        },
+        {
+          "group": 4,
+          "term": "people bali",
+          "value": 0.0021
+        },
+        {
+          "group": 4,
+          "term": "bali culture",
+          "value": 0.002
+        },
+        {
+          "group": 4,
+          "term": "balinese people",
+          "value": 0.002
+        },
+        {
+          "group": 4,
+          "term": "care bali",
+          "value": 0.0019
+        },
+        {
+          "group": 4,
+          "term": "ajeg bali",
+          "value": 0.0019
+        },
+        {
+          "group": 5,
+          "term": "cinta bali",
+          "value": 0.0161
+        },
+        {
+          "group": 5,
+          "term": "alam bali",
+          "value": 0.0095
+        },
+        {
+          "group": 5,
+          "term": "alam indonesia",
+          "value": 0.0065
+        },
+        {
+          "group": 5,
+          "term": "tanah kelahiran",
+          "value": 0.0058
+        },
+        {
+          "group": 5,
+          "term": "anak cucu",
+          "value": 0.0058
+        },
+        {
+          "group": 5,
+          "term": "bali rusak",
+          "value": 0.0055
+        },
+        {
+          "group": 5,
+          "term": "bali bali",
+          "value": 0.0047
+        },
+        {
+          "group": 5,
+          "term": "cinta indonesia",
+          "value": 0.004
+        },
+        {
+          "group": 5,
+          "term": "cinta alam",
+          "value": 0.0037
+        },
+        {
+          "group": 5,
+          "term": "biarkan bali",
+          "value": 0.0036
+        },
+        {
+          "group": 5,
+          "term": "peduli bali",
+          "value": 0.0035
+        },
+        {
+          "group": 5,
+          "term": "peduli alam",
+          "value": 0.0032
+        },
+        {
+          "group": 5,
+          "term": "hita karana",
+          "value": 0.0027
+        },
+        {
+          "group": 5,
+          "term": "tri hita",
+          "value": 0.0027
+        },
+        {
+          "group": 5,
+          "term": "bali butuh",
+          "value": 0.0027
+        }
+      ]
+    },
+    "twitter": {
+      "frekuensi": [
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "paraf petisi",
+          "value": 3279
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "teluk benoa",
+          "value": 2062
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "reklamasi teluk",
+          "value": 2047
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "tolak reklamasi",
+          "value": 1855
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "undang undang",
+          "value": 1300
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "worldwide airlines",
+          "value": 973
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "join worldwide",
+          "value": 932
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "shark fin",
+          "value": 932
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "stop shark",
+          "value": 930
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "fin transportation",
+          "value": 929
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "airlines stop",
+          "value": 924
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "predator seksual",
+          "value": 921
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "tandatangani petisi",
+          "value": 777
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "tanda tangan",
+          "value": 706
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "benoa ubah",
+          "value": 703
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "metro tv",
+          "value": 419
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "tolak reklamasi",
+          "value": 190
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "bali tolak",
+          "value": 109
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "twentyone juli",
+          "value": 108
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "tv liputan",
+          "value": 105
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "junjungan ubud",
+          "value": 101
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "jam wib",
+          "value": 86
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "teluk benoa",
+          "value": 83
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "desa junjungan",
+          "value": 80
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "kompas tv",
+          "value": 77
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "lokasi konser",
+          "value": 76
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "penguasa mafia",
+          "value": 74
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "tanah bali",
+          "value": 74
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "obral tanah",
+          "value": 72
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "mafia silakan",
+          "value": 70
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "tolak reklamasi",
+          "value": 2610
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "teluk benoa",
+          "value": 1912
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "reklamasi teluk",
+          "value": 1148
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "bali tolak",
+          "value": 1005
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "alam bali",
+          "value": 541
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "selamat pagi",
+          "value": 523
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "dukung gerakan",
+          "value": 493
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "konser mini",
+          "value": 472
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "limasatu bjad",
+          "value": 468
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "reklamasi bali",
+          "value": 420
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "rakyat bali",
+          "value": 413
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "perpres limasatu",
+          "value": 403
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "sayang bali",
+          "value": 361
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "bangun bali",
+          "value": 338
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "parade budaya",
+          "value": 333
+        }
+      ],
+      "tfidf": [
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "paraf petisi",
+          "value": 0.0137
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "cabut izin",
+          "value": 0.0064
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "izin penyiaran",
+          "value": 0.0061
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "mahkamah konstitusi",
+          "value": 0.0043
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "judicial review",
+          "value": 0.0037
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "penyiaran metro",
+          "value": 0.0033
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "ahok paraf",
+          "value": 0.003
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "anggota dpr",
+          "value": 0.003
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "dukung mui",
+          "value": 0.003
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "mui penjarakan",
+          "value": 0.003
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "penjarakan ahok",
+          "value": 0.003
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "republik indonesia",
+          "value": 0.003
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "dpr indonesia",
+          "value": 0.0027
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "kepala daerah",
+          "value": 0.0027
+        },
+        {
+          "group": "to_@changeOrg_ID",
+          "term": "penyiaran tv",
+          "value": 0.0027
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "junjungan ubud",
+          "value": 0.0048
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "twentyone juli",
+          "value": 0.0048
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "desa junjungan",
+          "value": 0.0038
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "bersepeda sid",
+          "value": 0.0029
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "peta lokasi",
+          "value": 0.0029
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "tepi sawah",
+          "value": 0.0029
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "ubud sid",
+          "value": 0.0029
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "tanah bali",
+          "value": 0.0021
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "bali fantastis",
+          "value": 0.0019
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "band bermain",
+          "value": 0.0019
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "bus tanggung",
+          "value": 0.0019
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "cek puluhan",
+          "value": 0.0019
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "dear event",
+          "value": 0.0019
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "dewata tv",
+          "value": 0.0019
+        },
+        {
+          "group": "#balinotforsale",
+          "term": "diadakan twentyone",
+          "value": 0.0019
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "tolak reklamasi",
+          "value": 0.005
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "teluk benoa",
+          "value": 0.0038
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "reklamasi teluk",
+          "value": 0.0027
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "parade budaya",
+          "value": 0.0026
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "desa adat",
+          "value": 0.002
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "konser mini",
+          "value": 0.0018
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "kawan kawan",
+          "value": 0.0017
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "pro reklamasi",
+          "value": 0.0016
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "sayang bali",
+          "value": 0.0016
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "warga bali",
+          "value": 0.0015
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "padang galak",
+          "value": 0.0012
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "tanjung benoa",
+          "value": 0.0011
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "bali tolak",
+          "value": 0.0011
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "bali dukung",
+          "value": 0.001
+        },
+        {
+          "group": "#balitolakreklamasi",
+          "term": "rakyat bali",
+          "value": 0.001
+        }
+      ],
+      "topicmodelling": [
+        {
+          "group": "topik 1",
+          "term": "teluk benoa",
+          "value": 0.0639
+        },
+        {
+          "group": "topik 1",
+          "term": "reklamasi teluk",
+          "value": 0.0384
+        },
+        {
+          "group": "topik 1",
+          "term": "tolak reklamasi",
+          "value": 0.0304
+        },
+        {
+          "group": "topik 1",
+          "term": "reklamasi bali",
+          "value": 0.0105
+        },
+        {
+          "group": "topik 1",
+          "term": "parade budaya",
+          "value": 0.0082
+        },
+        {
+          "group": "topik 1",
+          "term": "desa adat",
+          "value": 0.0079
+        },
+        {
+          "group": "topik 1",
+          "term": "benoa bali",
+          "value": 0.0049
+        },
+        {
+          "group": "topik 1",
+          "term": "reklamasi benoa",
+          "value": 0.0039
+        },
+        {
+          "group": "topik 1",
+          "term": "ayo sebarkan",
+          "value": 0.0034
+        },
+        {
+          "group": "topik 1",
+          "term": "bali indah",
+          "value": 0.0033
+        },
+        {
+          "group": "topik 1",
+          "term": "penolakan reklamasi",
+          "value": 0.0032
+        },
+        {
+          "group": "topik 1",
+          "term": "rencana reklamasi",
+          "value": 0.003
+        },
+        {
+          "group": "topik 1",
+          "term": "tolak tolak",
+          "value": 0.003
+        },
+        {
+          "group": "topik 1",
+          "term": "batalkan reklamasi",
+          "value": 0.0023
+        },
+        {
+          "group": "topik 1",
+          "term": "lapangan renon",
+          "value": 0.0022
+        },
+        {
+          "group": "topik 2",
+          "term": "dukung gerakan",
+          "value": 0.0191
+        },
+        {
+          "group": "topik 2",
+          "term": "rakyat bali",
+          "value": 0.0159
+        },
+        {
+          "group": "topik 2",
+          "term": "orang bali",
+          "value": 0.0104
+        },
+        {
+          "group": "topik 2",
+          "term": "tanjung benoa",
+          "value": 0.0103
+        },
+        {
+          "group": "topik 2",
+          "term": "bali dukung",
+          "value": 0.0073
+        },
+        {
+          "group": "topik 2",
+          "term": "pro reklamasi",
+          "value": 0.0049
+        },
+        {
+          "group": "topik 2",
+          "term": "ayo dukung",
+          "value": 0.0047
+        },
+        {
+          "group": "topik 2",
+          "term": "suara rakyat",
+          "value": 0.0047
+        },
+        {
+          "group": "topik 2",
+          "term": "harga mati",
+          "value": 0.0041
+        },
+        {
+          "group": "topik 2",
+          "term": "cek timeline",
+          "value": 0.0034
+        },
+        {
+          "group": "topik 2",
+          "term": "net tv",
+          "value": 0.0031
+        },
+        {
+          "group": "topik 2",
+          "term": "turun kejalan",
+          "value": 0.0031
+        },
+        {
+          "group": "topik 2",
+          "term": "lap renon",
+          "value": 0.003
+        },
+        {
+          "group": "topik 2",
+          "term": "sukses acara",
+          "value": 0.0029
+        },
+        {
+          "group": "topik 2",
+          "term": "turun jalan",
+          "value": 0.0029
+        },
+        {
+          "group": "topik 3",
+          "term": "makan nasi",
+          "value": 0.0102
+        },
+        {
+          "group": "topik 3",
+          "term": "butuh reklamasi",
+          "value": 0.01
+        },
+        {
+          "group": "topik 3",
+          "term": "bali bali",
+          "value": 0.0085
+        },
+        {
+          "group": "topik 3",
+          "term": "nasi butuh",
+          "value": 0.0068
+        },
+        {
+          "group": "topik 3",
+          "term": "masyarakat bali",
+          "value": 0.0067
+        },
+        {
+          "group": "topik 3",
+          "term": "subsidi petani",
+          "value": 0.0067
+        },
+        {
+          "group": "topik 3",
+          "term": "bangun bali",
+          "value": 0.0061
+        },
+        {
+          "group": "topik 3",
+          "term": "bali subsidi",
+          "value": 0.0056
+        },
+        {
+          "group": "topik 3",
+          "term": "petani makan",
+          "value": 0.0056
+        },
+        {
+          "group": "topik 3",
+          "term": "alam menang",
+          "value": 0.0053
+        },
+        {
+          "group": "topik 3",
+          "term": "mesin diredam",
+          "value": 0.0043
+        },
+        {
+          "group": "topik 3",
+          "term": "twentyone juli",
+          "value": 0.0043
+        },
+        {
+          "group": "topik 3",
+          "term": "diredam alam",
+          "value": 0.0041
+        },
+        {
+          "group": "topik 3",
+          "term": "junjungan ubud",
+          "value": 0.004
+        },
+        {
+          "group": "topik 3",
+          "term": "lepas tangan",
+          "value": 0.0039
+        },
+        {
+          "group": "topik 4",
+          "term": "peduli bali",
+          "value": 0.0081
+        },
+        {
+          "group": "topik 4",
+          "term": "kompas tv",
+          "value": 0.0063
+        },
+        {
+          "group": "topik 4",
+          "term": "selamatkan bali",
+          "value": 0.0049
+        },
+        {
+          "group": "topik 4",
+          "term": "jakarta peduli",
+          "value": 0.0048
+        },
+        {
+          "group": "topik 4",
+          "term": "bali edukasi",
+          "value": 0.0047
+        },
+        {
+          "group": "topik 4",
+          "term": "save bali",
+          "value": 0.0046
+        },
+        {
+          "group": "topik 4",
+          "term": "edukasi suara",
+          "value": 0.0043
+        },
+        {
+          "group": "topik 4",
+          "term": "alam indonesia",
+          "value": 0.0042
+        },
+        {
+          "group": "topik 4",
+          "term": "bali reklamasi",
+          "value": 0.0041
+        },
+        {
+          "group": "topik 4",
+          "term": "suara pemerintah",
+          "value": 0.004
+        },
+        {
+          "group": "topik 4",
+          "term": "jam sore",
+          "value": 0.0032
+        },
+        {
+          "group": "topik 4",
+          "term": "pakai baju",
+          "value": 0.0032
+        },
+        {
+          "group": "topik 4",
+          "term": "isi petisi",
+          "value": 0.0025
+        },
+        {
+          "group": "topik 4",
+          "term": "kepalkan tangan",
+          "value": 0.0024
+        },
+        {
+          "group": "topik 4",
+          "term": "bali milik",
+          "value": 0.0023
+        },
+        {
+          "group": "topik 5",
+          "term": "konser mini",
+          "value": 0.0124
+        },
+        {
+          "group": "topik 5",
+          "term": "padang galak",
+          "value": 0.0101
+        },
+        {
+          "group": "topik 5",
+          "term": "pantai padang",
+          "value": 0.0057
+        },
+        {
+          "group": "topik 5",
+          "term": "musisi bali",
+          "value": 0.0041
+        },
+        {
+          "group": "topik 5",
+          "term": "gubernur bali",
+          "value": 0.0031
+        },
+        {
+          "group": "topik 5",
+          "term": "lawan tenggelam",
+          "value": 0.0029
+        },
+        {
+          "group": "topik 5",
+          "term": "ayo bergerak",
+          "value": 0.0027
+        },
+        {
+          "group": "topik 5",
+          "term": "ayo bantu",
+          "value": 0.0026
+        },
+        {
+          "group": "topik 5",
+          "term": "tanah kelahiran",
+          "value": 0.0026
+        },
+        {
+          "group": "topik 5",
+          "term": "istana negara",
+          "value": 0.0025
+        },
+        {
+          "group": "topik 5",
+          "term": "kawan ayo",
+          "value": 0.0024
+        },
+        {
+          "group": "topik 5",
+          "term": "hujani akun",
+          "value": 0.0023
+        },
+        {
+          "group": "topik 5",
+          "term": "kawan kawan",
+          "value": 0.0022
+        },
+        {
+          "group": "topik 5",
+          "term": "akun hashtag",
+          "value": 0.0022
+        },
+        {
+          "group": "topik 5",
+          "term": "bali rumah",
+          "value": 0.0022
+        },
+        {
+          "group": "topik 6",
+          "term": "selamat pagi",
+          "value": 0.0138
+        },
+        {
+          "group": "topik 6",
+          "term": "investor rakus",
+          "value": 0.0072
+        },
+        {
+          "group": "topik 6",
+          "term": "turun jalan",
+          "value": 0.0065
+        },
+        {
+          "group": "topik 6",
+          "term": "selamat raya",
+          "value": 0.0036
+        },
+        {
+          "group": "topik 6",
+          "term": "hati nurani",
+          "value": 0.0035
+        },
+        {
+          "group": "topik 6",
+          "term": "aksi damai",
+          "value": 0.0035
+        },
+        {
+          "group": "topik 6",
+          "term": "teman teman",
+          "value": 0.0035
+        },
+        {
+          "group": "topik 6",
+          "term": "kantor gubernur",
+          "value": 0.0033
+        },
+        {
+          "group": "topik 6",
+          "term": "tanah anarki",
+          "value": 0.003
+        },
+        {
+          "group": "topik 6",
+          "term": "lady rose",
+          "value": 0.0026
+        },
+        {
+          "group": "topik 6",
+          "term": "sunset tanah",
+          "value": 0.0025
+        },
+        {
+          "group": "topik 6",
+          "term": "gubernur bali",
+          "value": 0.0024
+        },
+        {
+          "group": "topik 6",
+          "term": "bumi pertiwi",
+          "value": 0.0024
+        },
+        {
+          "group": "topik 6",
+          "term": "kawan bali",
+          "value": 0.0023
+        },
+        {
+          "group": "topik 6",
+          "term": "kawan kawan",
+          "value": 0.0019
+        },
+        {
+          "group": "topik 7",
+          "term": "limasatu bjad",
+          "value": 0.0175
+        },
+        {
+          "group": "topik 7",
+          "term": "perpres limasatu",
+          "value": 0.0151
+        },
+        {
+          "group": "topik 7",
+          "term": "dprd bali",
+          "value": 0.0098
+        },
+        {
+          "group": "topik 7",
+          "term": "batalkan perpres",
+          "value": 0.0092
+        },
+        {
+          "group": "topik 7",
+          "term": "superman dead",
+          "value": 0.0087
+        },
+        {
+          "group": "topik 7",
+          "term": "kantor dprd",
+          "value": 0.0071
+        },
+        {
+          "group": "topik 7",
+          "term": "penguasa pengusaha",
+          "value": 0.0067
+        },
+        {
+          "group": "topik 7",
+          "term": "bali berperang",
+          "value": 0.0058
+        },
+        {
+          "group": "topik 7",
+          "term": "anak cucu",
+          "value": 0.0049
+        },
+        {
+          "group": "topik 7",
+          "term": "svara bumi",
+          "value": 0.0046
+        },
+        {
+          "group": "topik 7",
+          "term": "konser svara",
+          "value": 0.0045
+        },
+        {
+          "group": "topik 7",
+          "term": "revitalisasi teluk",
+          "value": 0.0038
+        },
+        {
+          "group": "topik 7",
+          "term": "tolong bantu",
+          "value": 0.0038
+        },
+        {
+          "group": "topik 7",
+          "term": "indonesia bali",
+          "value": 0.0035
+        },
+        {
+          "group": "topik 7",
+          "term": "pengusaha komisi",
+          "value": 0.0035
+        },
+        {
+          "group": "topik 9",
+          "term": "pulau bali",
+          "value": 0.0091
+        },
+        {
+          "group": "topik 9",
+          "term": "terima kasih",
+          "value": 0.008
+        },
+        {
+          "group": "topik 9",
+          "term": "alam menang",
+          "value": 0.0054
+        },
+        {
+          "group": "topik 9",
+          "term": "selamat berjuang",
+          "value": 0.0053
+        },
+        {
+          "group": "topik 9",
+          "term": "bali sale",
+          "value": 0.004
+        },
+        {
+          "group": "topik 9",
+          "term": "berjuang kawan",
+          "value": 0.0036
+        },
+        {
+          "group": "topik 9",
+          "term": "bali pulau",
+          "value": 0.0033
+        },
+        {
+          "group": "topik 9",
+          "term": "ami award",
+          "value": 0.0033
+        },
+        {
+          "group": "topik 9",
+          "term": "selamat pagi",
+          "value": 0.0033
+        },
+        {
+          "group": "topik 9",
+          "term": "supir truk",
+          "value": 0.003
+        },
+        {
+          "group": "topik 9",
+          "term": "selamat malam",
+          "value": 0.0027
+        },
+        {
+          "group": "topik 9",
+          "term": "melawan penguasa",
+          "value": 0.0026
+        },
+        {
+          "group": "topik 9",
+          "term": "pro reklamasi",
+          "value": 0.0025
+        },
+        {
+          "group": "topik 9",
+          "term": "bali selatan",
+          "value": 0.0025
+        },
+        {
+          "group": "topik 9",
+          "term": "polda bali",
+          "value": 0.0023
+        },
+        {
+          "group": "topik 9",
+          "term": "pulau bali",
+          "value": 0.0091
+        },
+        {
+          "group": "topik 9",
+          "term": "terima kasih",
+          "value": 0.008
+        },
+        {
+          "group": "topik 9",
+          "term": "alam menang",
+          "value": 0.0054
+        },
+        {
+          "group": "topik 9",
+          "term": "selamat berjuang",
+          "value": 0.0053
+        },
+        {
+          "group": "topik 9",
+          "term": "bali sale",
+          "value": 0.004
+        },
+        {
+          "group": "topik 9",
+          "term": "berjuang kawan",
+          "value": 0.0036
+        },
+        {
+          "group": "topik 9",
+          "term": "bali pulau",
+          "value": 0.0033
+        },
+        {
+          "group": "topik 9",
+          "term": "ami award",
+          "value": 0.0033
+        },
+        {
+          "group": "topik 9",
+          "term": "selamat pagi",
+          "value": 0.0033
+        },
+        {
+          "group": "topik 9",
+          "term": "supir truk",
+          "value": 0.003
+        },
+        {
+          "group": "topik 9",
+          "term": "selamat malam",
+          "value": 0.0027
+        },
+        {
+          "group": "topik 9",
+          "term": "melawan penguasa",
+          "value": 0.0026
+        },
+        {
+          "group": "topik 9",
+          "term": "pro reklamasi",
+          "value": 0.0025
+        },
+        {
+          "group": "topik 9",
+          "term": "bali selatan",
+          "value": 0.0025
+        },
+        {
+          "group": "topik 9",
+          "term": "polda bali",
+          "value": 0.0023
+        },
+        {
+          "group": "topik 10",
+          "term": "alam bali",
+          "value": 0.0212
+        },
+        {
+          "group": "topik 10",
+          "term": "metro tv",
+          "value": 0.0167
+        },
+        {
+          "group": "topik 10",
+          "term": "publicity stunt",
+          "value": 0.005
+        },
+        {
+          "group": "topik 10",
+          "term": "rusak alam",
+          "value": 0.0048
+        },
+        {
+          "group": "topik 10",
+          "term": "bali indonesia",
+          "value": 0.0045
+        },
+        {
+          "group": "topik 10",
+          "term": "jam wib",
+          "value": 0.0043
+        },
+        {
+          "group": "topik 10",
+          "term": "anak muda",
+          "value": 0.004
+        },
+        {
+          "group": "topik 10",
+          "term": "selamatkan alam",
+          "value": 0.0038
+        },
+        {
+          "group": "topik 10",
+          "term": "tv liputan",
+          "value": 0.0038
+        },
+        {
+          "group": "topik 10",
+          "term": "bali rusak",
+          "value": 0.0034
+        },
+        {
+          "group": "topik 10",
+          "term": "parade budaya",
+          "value": 0.0031
+        },
+        {
+          "group": "topik 10",
+          "term": "orang bali",
+          "value": 0.0031
+        },
+        {
+          "group": "topik 10",
+          "term": "main konser",
+          "value": 0.003
+        },
+        {
+          "group": "topik 10",
+          "term": "konser dibayar",
+          "value": 0.0026
+        },
+        {
+          "group": "topik 10",
+          "term": "malam jam",
+          "value": 0.0026
+        }
+      ]
+    }
+  }
+}

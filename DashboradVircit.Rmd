@@ -1,5 +1,5 @@
 ---
-title: "Virtual Citizens and the Construction of Publicness"
+title: "MYEDA PROFFESIONAL"
 output: 
   flexdashboard::flex_dashboard:
     vertical_layout: fill
@@ -26,34 +26,34 @@ library(DT)
 ```
 
 ```{r dataVircit, include=FALSE}
-# rangkuman
-rangkuman <- readRDS(gzcon(url("https://github.com/eppofahmi/virtualCitizens/blob/master/dashboardData/rangkuman.rds?raw=true")))
-# eksplorasi
-data_eksplorasi <- readRDS(gzcon(url("https://github.com/eppofahmi/virtualCitizens/blob/master/dashboardData/data_eksplorasi.rds?raw=true")))
-# timeseries
-ts_change <- readRDS(gzcon(url("https://github.com/eppofahmi/virtualCitizens/blob/master/dashboardData/ts_change.rds?raw=true")))
-ts_gojek <- readRDS(gzcon(url("https://github.com/eppofahmi/virtualCitizens/blob/master/dashboardData/ts_gojek.rds?raw=true")))
-# table output
-data_vircit <- readRDS(gzcon(url("https://github.com/eppofahmi/virtualCitizens/blob/master/dashboardData/data_vircit.rds?raw=true")))
-# semantic network
-data_net <- readRDS(gzcon(url("https://github.com/eppofahmi/virtualCitizens/blob/master/dashboardData/semantic_network.rds?raw=true")))
-# social network
-net_user <- readRDS(gzcon(url("https://github.com/eppofahmi/virtualCitizens/blob/master/dashboardData/net_user.rds?raw=true")))
+# # rangkuman
+# rangkuman <- readRDS(gzcon(url("https://github.com/eppofahmi/virtualCitizens/blob/master/dashboardData/rangkuman.rds?raw=true")))
+# # eksplorasi
+# data_eksplorasi <- readRDS(gzcon(url("https://github.com/eppofahmi/virtualCitizens/blob/master/dashboardData/data_eksplorasi.rds?raw=true")))
+# # timeseries
+# ts_change <- readRDS(gzcon(url("https://github.com/eppofahmi/virtualCitizens/blob/master/dashboardData/ts_change.rds?raw=true")))
+# ts_gojek <- readRDS(gzcon(url("https://github.com/eppofahmi/virtualCitizens/blob/master/dashboardData/ts_gojek.rds?raw=true")))
+# # table output
+# data_vircit <- readRDS(gzcon(url("https://github.com/eppofahmi/virtualCitizens/blob/master/dashboardData/data_vircit.rds?raw=true")))
+# # semantic network
+# data_net <- readRDS(gzcon(url("https://github.com/eppofahmi/virtualCitizens/blob/master/dashboardData/semantic_network.rds?raw=true")))
+# # social network
+# net_user <- readRDS(gzcon(url("https://github.com/eppofahmi/virtualCitizens/blob/master/dashboardData/net_user.rds?raw=true")))
 
-## sumber data ----------------------------------------
-# rangkuman <- readRDS("/Volumes/mydata/RStudio/FinalVirtualCitizens/dashboardData/rangkuman.rds")
-# ## data eksplorasi
-# data_eksplorasi <- readRDS("/Volumes/mydata/RStudio/FinalVirtualCitizens/dashboardData/data_eksplorasi.rds")
-# ## time series
-# ts_change <- readRDS("/Volumes/mydata/RStudio/FinalVirtualCitizens/dashboardData/ts_change.rds")
-# ts_gojek <- readRDS("/Volumes/mydata/RStudio/FinalVirtualCitizens/dashboardData/ts_gojek.rds")
-# ## table output
-# data_vircit <- readRDS("/Volumes/mydata/RStudio/FinalVirtualCitizens/dashboardData/data_vircit.rds")
-# ## semantic network
-# data_net <- readRDS("/Volumes/mydata/RStudio/FinalVirtualCitizens/dashboardData/semantic_network.rds")
-# ## social network
-# net_user <- readRDS("/Volumes/mydata/RStudio/FinalVirtualCitizens/dashboardData/net_user.rds")
-# 
+# sumber data ----------------------------------------
+rangkuman <- readRDS("/Volumes/mydata/RStudio/FinalVirtualCitizens/dashboardData/rangkuman.rds")
+## data eksplorasi
+data_eksplorasi <- readRDS("/Volumes/mydata/RStudio/FinalVirtualCitizens/dashboardData/data_eksplorasi.rds")
+## time series
+ts_change <- readRDS("/Volumes/mydata/RStudio/FinalVirtualCitizens/dashboardData/ts_change.rds")
+ts_gojek <- readRDS("/Volumes/mydata/RStudio/FinalVirtualCitizens/dashboardData/ts_gojek.rds")
+## table output
+data_vircit <- readRDS("/Volumes/mydata/RStudio/FinalVirtualCitizens/dashboardData/data_vircit.rds")
+## semantic network
+data_net <- readRDS("/Volumes/mydata/RStudio/FinalVirtualCitizens/dashboardData/semantic_network.rds")
+## social network
+net_user <- readRDS("/Volumes/mydata/RStudio/FinalVirtualCitizens/dashboardData/net_user.rds")
+
 # about cols
 tm <- treemap(rangkuman, index = c("kasus", "sumber_data"),
               vSize = "logjumlah", vColor = "jumlah",
